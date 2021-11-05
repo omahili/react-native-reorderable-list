@@ -8,9 +8,11 @@ import Animated, {
   useAnimatedReaction,
 } from 'react-native-reanimated';
 
+import {ItemOffset} from 'types/common';
+
 interface ReorderableListItemProps extends Animated.AnimateProps<ViewProps> {
   index: number;
-  itemOffsets: Animated.SharedValue<{length: number}[]>;
+  itemOffsets: Animated.SharedValue<ItemOffset>[];
   draggedIndex: Animated.SharedValue<number>;
   currentIndex: Animated.SharedValue<number>;
   enabledOpacity: Animated.SharedValue<boolean>;
@@ -41,19 +43,19 @@ const ReorderableListItem: React.FC<ReorderableListItemProps> = ({
         if (index === draggedIndex.value) {
           for (let i = startMove; i < endMove; i++) {
             newValue = moveDown
-              ? newValue + itemOffsets.value[i].length
-              : newValue - itemOffsets.value[i].length;
+              ? newValue + itemOffsets[i].value.length
+              : newValue - itemOffsets[i].value.length;
           }
 
           // if items have different heights and the dragged item is moved forward
           // then its new offset position needs to be adjusted
           const offsetCorrection = moveDown
-            ? itemOffsets.value[currentIndex.value].length -
-              itemOffsets.value[draggedIndex.value].length
+            ? itemOffsets[currentIndex.value].value.length -
+              itemOffsets[draggedIndex.value].value.length
             : 0;
           newValue += offsetCorrection;
         } else if (index >= startMove && index <= endMove) {
-          const draggedHeight = itemOffsets.value[draggedIndex.value].length;
+          const draggedHeight = itemOffsets[draggedIndex.value].value.length;
           newValue = moveDown ? -draggedHeight : draggedHeight;
         }
 

@@ -3,7 +3,6 @@ import {FlatListProps} from 'react-native';
 export interface ItemOffset {
   length: number;
   offset: number;
-  index: number;
 }
 
 export interface ItemSeparators {

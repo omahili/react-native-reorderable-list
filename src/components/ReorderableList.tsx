@@ -44,6 +44,7 @@ import {
   ItemSeparators,
   ReorderableListState,
 } from 'types/common';
+import useAnimatedSharedValues from 'hooks/useAnimatedSharedValues';
 
 export interface ReorderableListProps<T = any> extends FlatListProps<T> {
   data: T[];
@@ -55,7 +56,7 @@ export interface ReorderableListProps<T = any> extends FlatListProps<T> {
     info: ListRenderItemInfo<T>,
     onLongPress?: () => void,
   ) => React.ReactElement;
-  onReorder: (fromIndex: number, toIndex: number) => void;
+  onReorder: (from: number, to: number) => void;
 }
 
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
@@ -87,7 +88,10 @@ const ReorderableList = forwardRef<FlatList, ReorderableListProps>(
     const containerPositionX = useSharedValue(0);
     const containerPositionY = useSharedValue(0);
     const scrollOffset = useSharedValue(0);
-    const itemOffsets = useSharedValue<ItemOffset[]>([]);
+    const itemOffsets = useAnimatedSharedValues<ItemOffset>(
+      () => ({length: 0, offset: 0}),
+      data.length,
+    );
     const topMoveThreshold = useSharedValue(0);
     const bottomMoveThreshold = useSharedValue(0);
     const flatListHeight = useSharedValue(0);
@@ -220,7 +224,7 @@ const ReorderableList = forwardRef<FlatList, ReorderableListProps>(
     const getIndexFromY = (y: number, scrollY?: number) => {
       'worklet';
 
-      const maxOffset = itemOffsets.value[itemOffsets.value.length - 1];
+      const maxOffset = itemOffsets[itemOffsets.length - 1].value;
       const relativeY = Math.max(
         0,
         Math.min(
@@ -229,11 +233,12 @@ const ReorderableList = forwardRef<FlatList, ReorderableListProps>(
         ),
       );
 
-      const index = itemOffsets.value.findIndex(
+      const index = itemOffsets.findIndex(
         (x, i) =>
-          (i === 0 && relativeY < x.offset) ||
-          (i === itemOffsets.value.length - 1 && relativeY > x.offset) ||
-          (relativeY >= x.offset && relativeY <= x.offset + x.length),
+          (x?.value.offset && i === 0 && relativeY < x.value.offset) ||
+          (i === itemOffsets.length - 1 && relativeY > x.value.offset) ||
+          (relativeY >= x.value.offset &&
+            relativeY <= x.value.offset + x.value.length),
       );
 
       return {index, relativeY};
@@ -254,11 +259,11 @@ const ReorderableList = forwardRef<FlatList, ReorderableListProps>(
           // then its new offset position needs to be adjusted
           const offsetCorrection =
             currentIndex.value > draggedIndex.value
-              ? itemOffsets.value[currentIndex.value].length -
-                itemOffsets.value[draggedIndex.value].length
+              ? itemOffsets[currentIndex.value].value.length -
+                itemOffsets[draggedIndex.value].value.length
               : 0;
           const newTopPosition =
-            itemOffsets.value[currentIndex.value].offset +
+            itemOffsets[currentIndex.value].value.offset +
             offsetCorrection -
             scrollOffset.value;
 
@@ -349,14 +354,10 @@ const ReorderableList = forwardRef<FlatList, ReorderableListProps>(
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const handleItemLayout = useCallback(
       memoize((index: number) => (e: LayoutChangeEvent) => {
-        itemOffsets.value[index] = {
-          index,
+        itemOffsets[index].value = {
           offset: e.nativeEvent.layout.y,
           length: e.nativeEvent.layout.height,
         };
-        // otherwise shared value does not change
-        // TODO: find a better way to do it
-        itemOffsets.value = [...itemOffsets.value];
       }),
       [itemOffsets],
     );
@@ -370,7 +371,7 @@ const ReorderableList = forwardRef<FlatList, ReorderableListProps>(
 
             offsetY.value =
               startY.value -
-              (itemOffsets.value[index].offset - scrollOffset.value);
+              (itemOffsets[index].value.offset - scrollOffset.value);
             draggedTranslateY.value = startY.value - offsetY.value;
             draggedIndex.value = index;
             draggedInfoIndex.value = index;
@@ -484,11 +485,11 @@ const ReorderableList = forwardRef<FlatList, ReorderableListProps>(
     // https://github.com/software-mansion/react-native-reanimated/issues/2019
     // fallback when animated style is empty
     const draggedItemFallbackStyle = {
-      transform: itemOffsets.value[draggedInfoIndex.value]
+      transform: itemOffsets[draggedInfoIndex.value]
         ? [
             {
               translateY:
-                itemOffsets.value[draggedInfoIndex.value].offset -
+                itemOffsets[draggedInfoIndex.value].value.offset -
                 scrollOffset.value,
             },
           ]
@@ -544,7 +545,7 @@ const styles = {
   } as ViewStyle,
   dragged: {
     opacity: 0,
-  } as ViewStyle,
+  },
 };
 
 export default React.memo(ReorderableList);
