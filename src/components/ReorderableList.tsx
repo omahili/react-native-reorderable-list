@@ -48,14 +48,14 @@ import useAnimatedSharedValues from 'hooks/useAnimatedSharedValues';
 
 export interface ReorderableListRenderItemInfo<T>
   extends ListRenderItemInfo<T> {
-  onLongPress?: () => void;
+  drag?: () => void;
   isDragged?: boolean;
 }
 
 export interface ReorderableListProps<T = any> extends FlatListProps<T> {
   data: T[];
   containerStyle?: StyleProp<Animated.AnimateStyle<StyleProp<ViewStyle>>>;
-  scrollAreaHeight?: number;
+  scrollAreaSize?: number;
   scrollSpeed?: number;
   dragScale?: number;
   renderItem: (info: ReorderableListRenderItemInfo<T>) => React.ReactElement;
@@ -69,7 +69,7 @@ const ReorderableList = forwardRef<FlatList, ReorderableListProps>(
     {
       data,
       containerStyle,
-      scrollAreaHeight = 0.1,
+      scrollAreaSize = 0.1,
       scrollSpeed = 2,
       dragScale = 1,
       renderItem,
@@ -366,7 +366,7 @@ const ReorderableList = forwardRef<FlatList, ReorderableListProps>(
     );
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    const onItemLongPress = useCallback(
+    const drag = useCallback(
       memoize(
         (index: number) => () =>
           runOnUI(() => {
@@ -428,9 +428,9 @@ const ReorderableList = forwardRef<FlatList, ReorderableListProps>(
     const renderDraggableItem = useCallback(
       (info: ListRenderItemInfo<any>) => {
         itemSeparators.current[info.index] = info.separators;
-        return renderItem({...info, onLongPress: onItemLongPress(info.index)});
+        return renderItem({...info, drag: drag(info.index)});
       },
-      [renderItem, onItemLongPress],
+      [renderItem, drag],
     );
 
     const handleContainerLayout = () => {
@@ -443,7 +443,7 @@ const ReorderableList = forwardRef<FlatList, ReorderableListProps>(
     const handleFlatListLayout = useCallback(
       (e: LayoutChangeEvent) => {
         const {height} = e.nativeEvent.layout;
-        const portion = height * Math.max(0, Math.min(scrollAreaHeight, 0.5));
+        const portion = height * Math.max(0, Math.min(scrollAreaSize, 0.5));
 
         topMoveThreshold.value = portion;
         bottomMoveThreshold.value = height - portion;
@@ -459,7 +459,7 @@ const ReorderableList = forwardRef<FlatList, ReorderableListProps>(
         topMoveThreshold,
         flatListHeight,
         onLayout,
-        scrollAreaHeight,
+        scrollAreaSize,
       ],
     );
 

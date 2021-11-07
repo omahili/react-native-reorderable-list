@@ -33,10 +33,11 @@ Additional props:
 
 | Prop                      | Type                                  | Required   | Default   | Description                                           |
 |---------------------------|---------------------------------------|------------|-----------|-------------------------------------------------------|
+| renderItem                | `(info: {item: T, index: number, separators: ItemSeparators, drag?: () => void, isDragged?: boolean}) => ReactElement`  | yes        |           | Renders into the list an item from data. The function `drag` needs to be called when the drag gesture should be enabled, for example `onLongPress` event. The property `isDragged` becomes true for the dragged item. |
 | onReorder                 | `(from: number, to: number) => void`  | yes        |           | Function called when an item is released and the list is reordered. |
 | containerStyle            | `StyleProp<ViewStyle>`                | no         |           | Style for the FlatList container.                     |
-| scrollAreaHeight          | `number`                              | no         | `0.1`     | Portion on the bottom and top of the list which triggers scrolling when dragging an item. |
-| scrollSpeed               | `number`                              | no         | `2`       | Speed at which the list scrolls.                |
+| scrollAreaSize            | `number`                              | no         | `0.1`     | Portion at the extremeties of the list which triggers scrolling when dragging an item. Accepts a value between `0` and `0.5`. |
+| scrollSpeed               | `number`                              | no         | `2`       | Speed at which the list scrolls.                      |
 | dragScale                 | `number`                              | no         | `1`       | Size ratio to which an item scales when dragged.      |
 
 ## Known Limitations
@@ -67,7 +68,7 @@ interface CardInfo {
 }
 
 interface CardProps extends CardInfo {
-  onLongPress?: () => void;
+  drag?: () => void;
   isDragged?: boolean;
 }
 
@@ -85,10 +86,10 @@ const list: CardInfo[] = [
 ];
 
 const Card: React.FC<CardProps> = React.memo(
-  ({id, color, height, onLongPress, isDragged}) => (
+  ({id, color, height, drag, isDragged}) => (
     <Pressable
       style={[styles.card, isDragged && styles.dragged, {height}]}
-      onLongPress={onLongPress}>
+      onLongPress={drag}>
       <Text style={[styles.text, {color}]}>Card {id}</Text>
     </Pressable>
   ),
