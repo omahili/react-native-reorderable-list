@@ -9,13 +9,13 @@ A reorderable list for React Native applications, powered by Reanimated 2 🚀
 ### Npm
 
  ```
- npm install --save react-native-reorderable-list@0.1.0
+ npm install --save react-native-reorderable-list
  ```
 
 ### Yarn
 
  ```
- yarn add react-native-reorderable-list@0.1.0
+ yarn add react-native-reorderable-list
  ```
 
 Then you need to install these two peer dependencies:
@@ -36,7 +36,7 @@ Additional props:
 | onReorder                 | `(from: number, to: number) => void`  | yes        |           | Function called when an item is released and the list is reordered. |
 | containerStyle            | `StyleProp<ViewStyle>`                | no         |           | Style for the FlatList container.                     |
 | scrollAreaHeight          | `number`                              | no         | `0.1`     | Portion on the bottom and top of the list which triggers scrolling when dragging an item. |
-| scrollSpeed               | `number`                              | no         | `2`       | Speed ratio at which the list scrolls.                |
+| scrollSpeed               | `number`                              | no         | `2`       | Speed at which the list scrolls.                |
 | dragScale                 | `number`                              | no         | `1`       | Size ratio to which an item scales when dragged.      |
 
 ## Known Limitations
