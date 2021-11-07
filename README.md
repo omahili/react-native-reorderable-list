@@ -18,7 +18,7 @@ A reorderable list for React Native applications, powered by Reanimated 2 🚀
 
 Then you need to install these two peer dependencies:
 
-  - [**React Reanimated**](https://docs.swmansion.com/react-native-reanimated/docs/fundamentals/installation) >=2.2.0
+  - [**React Native Reanimated**](https://docs.swmansion.com/react-native-reanimated/docs/fundamentals/installation) >=2.2.0
   - [**React Native Gesture Handler**](https://docs.swmansion.com/react-native-gesture-handler/docs/#installation) >=1.10.0
 
 So head down to their docs and follow their instructions.
@@ -50,14 +50,13 @@ At the moment it doesn't support these FlatList props:
 ```typescript
 import React, {useState} from 'react';
 import {
-  GestureResponderEvent,
-  ListRenderItemInfo,
   Pressable,
   StyleSheet,
   Text,
 } from 'react-native';
-import {GestureHandlerRootView} from 'react-native-gesture-handler';
-import ReorderableList from 'react-native-reorderable-list';
+import ReorderableList, {
+  ReorderableListRenderItemInfo,
+} from 'react-native-reorderable-list';
 
 interface CardInfo {
   id: string;
@@ -66,7 +65,8 @@ interface CardInfo {
 }
 
 interface CardProps extends CardInfo {
-  onLongPress?: (event: GestureResponderEvent) => void;
+  onLongPress?: () => void;
+  isDragged?: boolean;
 }
 
 const list: CardInfo[] = [
@@ -83,9 +83,11 @@ const list: CardInfo[] = [
 ];
 
 const Card: React.FC<CardProps> = React.memo(
-  ({id, color, onLongPress, height}) => (
-    <Pressable style={[styles.card, {height}]} onLongPress={onLongPress}>
-      <Text style={{color}}>Card {id}</Text>
+  ({id, color, height, onLongPress, isDragged}) => (
+    <Pressable
+      style={[styles.card, isDragged && styles.dragged, {height}]}
+      onLongPress={onLongPress}>
+      <Text style={[styles.text, {color}]}>Card {id}</Text>
     </Pressable>
   ),
 );
@@ -94,9 +96,8 @@ const App = () => {
   const [data, setData] = useState(list);
 
   const renderItem = (
-    {item}: ListRenderItemInfo<CardInfo>,
-    onLongPress?: (event: GestureResponderEvent) => void,
-  ) => <Card {...item} onLongPress={onLongPress} />;
+    {item, ...rest}: ReorderableListRenderItemInfo<CardInfo>,
+  ) => <Card {...item} {...rest} />;
 
   const handleReorder = (from: number, to: number) => {
     const newData = [...data];
@@ -110,6 +111,7 @@ const App = () => {
       onReorder={handleReorder}
       renderItem={renderItem}
       keyExtractor={(item: CardInfo) => item.id}
+      dragScale={1.025}
     />
   );
 };
@@ -123,6 +125,12 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderWidth: 1,
     borderColor: '#ddd',
+  },
+  dragged: {
+    opacity: 0.7,
+  },
+  text: {
+    fontSize: 20,
   },
 });
 

@@ -46,16 +46,19 @@ import {
 } from 'types/common';
 import useAnimatedSharedValues from 'hooks/useAnimatedSharedValues';
 
+export interface ReorderableListRenderItemInfo<T>
+  extends ListRenderItemInfo<T> {
+  onLongPress?: () => void;
+  isDragged?: boolean;
+}
+
 export interface ReorderableListProps<T = any> extends FlatListProps<T> {
   data: T[];
   containerStyle?: StyleProp<Animated.AnimateStyle<StyleProp<ViewStyle>>>;
   scrollAreaHeight?: number;
   scrollSpeed?: number;
   dragScale?: number;
-  renderItem: (
-    info: ListRenderItemInfo<T>,
-    onLongPress?: () => void,
-  ) => React.ReactElement;
+  renderItem: (info: ReorderableListRenderItemInfo<T>) => React.ReactElement;
   onReorder: (from: number, to: number) => void;
 }
 
@@ -425,7 +428,7 @@ const ReorderableList = forwardRef<FlatList, ReorderableListProps>(
     const renderDraggableItem = useCallback(
       (info: ListRenderItemInfo<any>) => {
         itemSeparators.current[info.index] = info.separators;
-        return renderItem(info, onItemLongPress(info.index));
+        return renderItem({...info, onLongPress: onItemLongPress(info.index)});
       },
       [renderItem, onItemLongPress],
     );
@@ -479,6 +482,7 @@ const ReorderableList = forwardRef<FlatList, ReorderableListProps>(
       index: draggedInfoIndex.value,
       item: data[draggedInfoIndex.value],
       separators: itemSeparators.current[draggedInfoIndex.value],
+      isDragged: true,
     };
 
     // TODO: remove when this bug is fixed

@@ -1,6 +1,7 @@
 import ReorderableList, {
   ReorderableListProps,
+  ReorderableListRenderItemInfo,
 } from 'components/ReorderableList';
 
-export {ReorderableListProps};
+export {ReorderableListProps, ReorderableListRenderItemInfo};
 export default ReorderableList;
