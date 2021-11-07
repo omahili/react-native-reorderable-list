@@ -34,8 +34,8 @@ Additional props:
 | onReorder                 | `(from: number, to: number) => void`  | yes        |           | Function called when an item is released and the list is reordered. |
 | containerStyle            | `StyleProp<ViewStyle>`                | no         |           | Style for the FlatList container.                     |
 | scrollAreaHeight          | `number`                              | no         | `0.1`     | Portion on the bottom and top of the list which triggers scrolling when dragging an item. |
-| scrollSpeed               | `number`                              | no         | `1.5`     | Speed ratio at which the list scrolls.                |
-| dragScale                 | `number`                              | no         | `1.05`    | Size ratio to which an item scales when dragged.      |
+| scrollSpeed               | `number`                              | no         | `2`       | Speed ratio at which the list scrolls.                |
+| dragScale                 | `number`                              | no         | `1`       | Size ratio to which an item scales when dragged.      |
 
 ## Known Limitations
 
