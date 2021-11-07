@@ -1,14 +1,26 @@
 {
   "name": "react-native-reorderable-list",
-  "version": "0.0.1",
-  "description": "Reorderable list for React Native applications",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "version": "0.1.0",
+  "description": "Reorderable list for React Native applications, powered by Reanimated 2",
   "scripts": {
     "lint": "eslint ./src --ext .ts,.tsx",
     "build": "tsc & tsc-alias"
   },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/*"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/omahili/react-native-reorderable-list.git"
+  },
   "author": "Omar Mahili",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/omahili/react-native-reorderable-list/issues"
+  },
+  "homepage": "https://github.com/omahili/react-native-reorderable-list#readme",
   "dependencies": {
     "@seznam/compose-react-refs": "^1.0.6",
     "fast-memoize": "^2.5.2"
