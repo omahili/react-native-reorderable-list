@@ -2,6 +2,8 @@
 
 A reorderable list for React Native applications, powered by Reanimated 2 🚀
 
+![Example](https://media.giphy.com/media/EVQOjtGx61QS8s9Y0z/giphy.gif)
+
 ## Install
 
 ### Npm
