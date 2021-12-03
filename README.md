@@ -34,7 +34,7 @@ Additional props:
 | Prop                      | Type                                  | Required   | Default   | Description                                           |
 |---------------------------|---------------------------------------|------------|-----------|-------------------------------------------------------|
 | renderItem                | `(info: {item: T, index: number, separators: ItemSeparators, drag?: () => void, isDragged?: boolean}) => ReactElement`  | yes        |           | Renders into the list an item from data. The function `drag` needs to be called when the drag gesture should be enabled, for example `onLongPress` event. The property `isDragged` becomes true for the dragged item. |
-| onReorder                 | `(from: number, to: number) => void`  | yes        |           | Function called when an item is released and the list is reordered. |
+| onReorder                 | `(event: {fromIndex: number, toIndex: number}) => void`  | yes        |           | Function called when an item is released and the list is reordered. |
 | containerStyle            | `StyleProp<ViewStyle>`                | no         |           | Style for the FlatList container.                     |
 | scrollAreaSize            | `number`                              | no         | `0.1`     | Portion at the extremeties of the list which triggers scrolling when dragging an item. Accepts a value between `0` and `0.5`. |
 | scrollSpeed               | `number`                              | no         | `2`       | Speed at which the list scrolls.                      |
@@ -52,13 +52,10 @@ At the moment it doesn't support these FlatList props:
 
 ```typescript
 import React, {useState} from 'react';
-import {
-  Pressable,
-  StyleSheet,
-  Text,
-} from 'react-native';
+import {Pressable, StyleSheet, Text} from 'react-native';
 import ReorderableList, {
   ReorderableListRenderItemInfo,
+  ReorderableListReorderEvent,
 } from 'react-native-reorderable-list';
 
 interface CardInfo {
@@ -102,9 +99,9 @@ const App = () => {
     {item, ...rest}: ReorderableListRenderItemInfo<CardInfo>,
   ) => <Card {...item} {...rest} />;
 
-  const handleReorder = (from: number, to: number) => {
+  const handleReorder = ({fromIndex, toIndex}: ReorderableListReorderEvent) => {
     const newData = [...data];
-    newData.splice(to, 0, newData.splice(from, 1)[0]);
+    newData.splice(toIndex, 0, newData.splice(fromIndex, 1)[0]);
     setData(newData);
   };
 

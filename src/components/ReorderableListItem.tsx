@@ -8,7 +8,7 @@ import Animated, {
   useAnimatedReaction,
 } from 'react-native-reanimated';
 
-import {ItemOffset} from 'types/common';
+import {ItemOffset} from 'types/misc';
 
 interface ReorderableListItemProps extends Animated.AnimateProps<ViewProps> {
   index: number;

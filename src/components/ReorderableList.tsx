@@ -5,7 +5,6 @@ import {
   ListRenderItemInfo,
   ViewStyle,
   LayoutChangeEvent,
-  StyleProp,
   StatusBar,
   unstable_batchedUpdates,
 } from 'react-native';
@@ -32,29 +31,9 @@ import composeRefs from '@seznam/compose-react-refs';
 import memoize from 'fast-memoize';
 
 import ReorderableListItem from 'components/ReorderableListItem';
-import {
-  CellProps,
-  ItemOffset,
-  ItemSeparators,
-  ReorderableListState,
-} from 'types/common';
 import useAnimatedSharedValues from 'hooks/useAnimatedSharedValues';
-
-export interface ReorderableListRenderItemInfo<T>
-  extends ListRenderItemInfo<T> {
-  drag?: () => void;
-  isDragged?: boolean;
-}
-
-export interface ReorderableListProps<T> extends FlatListProps<T> {
-  data: T[];
-  containerStyle?: StyleProp<Animated.AnimateStyle<StyleProp<ViewStyle>>>;
-  scrollAreaSize?: number;
-  scrollSpeed?: number;
-  dragScale?: number;
-  renderItem: (info: ReorderableListRenderItemInfo<T>) => React.ReactElement;
-  onReorder: (from: number, to: number) => void;
-}
+import {ItemOffset, ItemSeparators, ReorderableListState} from 'types/misc';
+import {CellProps, ReorderableListProps} from 'types/props';
 
 const AnimatedFlatList = Animated.createAnimatedComponent(
   FlatList,
@@ -187,10 +166,10 @@ const ReorderableList = <T,>(
     [setDragged, flatList],
   );
 
-  const reorder = (from: number, to: number) => {
-    if (from !== to) {
+  const reorder = (fromIndex: number, toIndex: number) => {
+    if (fromIndex !== toIndex) {
       unstable_batchedUpdates(() => {
-        onReorder(from, to);
+        onReorder({fromIndex, toIndex});
         enableDragged(false);
       });
     } else {
