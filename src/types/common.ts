@@ -11,10 +11,10 @@ export interface ItemSeparators {
   updateProps: (select: 'leading' | 'trailing', newProps: any) => void;
 }
 
-export interface CellProps extends FlatListProps<any> {
+export interface CellProps<T> extends FlatListProps<T> {
   index: number;
   children?: React.ReactElement;
-  data: any[];
+  data: T[];
 }
 
 export enum ReorderableListState {
