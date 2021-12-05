@@ -1,6 +1,6 @@
 {
   "name": "react-native-reorderable-list",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "description": "Reorderable list for React Native applications, powered by Reanimated 2",
   "scripts": {
     "lint": "eslint ./src --ext .ts,.tsx",
