@@ -4,7 +4,7 @@
   "description": "Reorderable list for React Native applications, powered by Reanimated 2",
   "scripts": {
     "lint": "eslint ./src --ext .ts,.tsx",
-    "build": "tsc & tsc-alias"
+    "build": "tsc && tsc-alias"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
