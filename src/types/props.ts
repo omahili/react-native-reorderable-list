@@ -3,13 +3,16 @@ import {
   ListRenderItemInfo,
   StyleProp,
   ViewStyle,
+  LayoutChangeEvent,
 } from 'react-native';
 import Animated from 'react-native-reanimated';
 
-export interface CellProps<T> extends FlatListProps<T> {
+export interface CellProps<T> {
   index: number;
   children?: React.ReactElement;
   data: T[];
+  onLayout?: (e: LayoutChangeEvent) => void;
+  keyExtractor?: (item: T, index: number) => string;
 }
 
 export interface ReorderableListRenderItemInfo<T>

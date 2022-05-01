@@ -7,6 +7,7 @@ import {
   LayoutChangeEvent,
   StatusBar,
   unstable_batchedUpdates,
+  Platform,
 } from 'react-native';
 import {
   NativeViewGestureHandler,
@@ -310,7 +311,13 @@ const ReorderableList = <T,>(
         }
 
         if (speed !== 0) {
-          scrollTo(flatList, 0, autoScrollOffset.value + speed, true);
+          scrollTo(
+            flatList,
+            0,
+            autoScrollOffset.value + speed,
+            // animated set to true breaks autoscroll on iOS
+            Platform.OS === 'android',
+          );
           autoScrollOffset.value += speed;
         }
 
@@ -330,12 +337,19 @@ const ReorderableList = <T,>(
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleItemLayout = useCallback(
-    memoize((index: number) => (e: LayoutChangeEvent) => {
-      itemOffsets[index].value = {
-        offset: e.nativeEvent.layout.y,
-        length: e.nativeEvent.layout.height,
-      };
-    }),
+    memoize(
+      (index: number, onLayoutCell?: (e: LayoutChangeEvent) => void) =>
+        (e: LayoutChangeEvent) => {
+          itemOffsets[index].value = {
+            offset: e.nativeEvent.layout.y,
+            length: e.nativeEvent.layout.height,
+          };
+
+          if (onLayoutCell) {
+            onLayoutCell(e);
+          }
+        },
+    ),
     [itemOffsets],
   );
 
@@ -386,9 +400,9 @@ const ReorderableList = <T,>(
         draggedIndex={draggedIndex}
         itemOffsets={itemOffsets}
         enabledOpacity={enabledOpacity}
-        onLayout={handleItemLayout(index)}>
-        {children}
-      </ReorderableListItem>
+        onLayout={handleItemLayout(index, cellProps.onLayout)}
+        children={children}
+      />
     ),
     [currentIndex, draggedIndex, itemOffsets, enabledOpacity, handleItemLayout],
   );
