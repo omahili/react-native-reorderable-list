@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2022-05-01
+### Changed
+- Fixed autoscroll not working on iOS
+- Fixed problems when rendering big lists due to cell onLayout not called
+- Omitted unsupported `numColumns` from props
+
 ## [0.3.0] - 2021-12-05
 ### Added
 - Reorderable list component with draggable items
@@ -17,5 +23,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Items animation when moving a dragged item
 - Animation to position a dragged item on release
 
-[Unreleased]: https://github.com/omahili/react-native-reorderable-list/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/omahili/react-native-reorderable-list/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/omahili/react-native-reorderable-list/releases/tag/v0.4.0
 [0.3.0]: https://github.com/omahili/react-native-reorderable-list/releases/tag/v0.3.0
