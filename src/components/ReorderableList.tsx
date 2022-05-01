@@ -7,6 +7,7 @@ import {
   LayoutChangeEvent,
   StatusBar,
   unstable_batchedUpdates,
+  Platform,
 } from 'react-native';
 import {
   NativeViewGestureHandler,
@@ -310,7 +311,13 @@ const ReorderableList = <T,>(
         }
 
         if (speed !== 0) {
-          scrollTo(flatList, 0, autoScrollOffset.value + speed, true);
+          scrollTo(
+            flatList,
+            0,
+            autoScrollOffset.value + speed,
+            // animated set to true breaks autoscroll on iOS
+            Platform.OS === 'android',
+          );
           autoScrollOffset.value += speed;
         }
 
