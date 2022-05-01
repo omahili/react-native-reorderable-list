@@ -23,7 +23,11 @@ export interface ReorderableListReorderEvent {
   toIndex: number;
 }
 
-type UnsupportedProps = 'horizontal' | 'onScroll' | 'scrollEventThrottle';
+type UnsupportedProps =
+  | 'horizontal'
+  | 'onScroll'
+  | 'scrollEventThrottle'
+  | 'numColumns';
 
 export interface ReorderableListProps<T>
   extends Omit<FlatListProps<T>, UnsupportedProps> {

@@ -44,9 +44,10 @@ Additional props:
 
 At the moment it doesn't support these FlatList props:
 
-  - ```horizontal```
-  - ```onScroll```
-  - ```scrollEventThrottle```
+  - `horizontal`
+  - `onScroll`
+  - `scrollEventThrottle`
+  - `numColumns`
 
 ## Usage
 
