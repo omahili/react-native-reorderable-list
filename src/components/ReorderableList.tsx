@@ -490,6 +490,7 @@ const ReorderableList = <T,>(
             keyExtractor={keyExtractor}
             scrollEventThrottle={1}
             horizontal={false}
+            numColumns={1}
           />
         </NativeViewGestureHandler>
         {dragged && (
