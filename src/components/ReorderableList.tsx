@@ -53,6 +53,7 @@ const ReorderableList = <T,>(
     onLayout,
     onReorder,
     keyExtractor,
+    callReorderSameIndex = false,
     ...rest
   }: ReorderableListProps<T>,
   ref: React.ForwardedRef<FlatListProps<T>>,
@@ -168,7 +169,7 @@ const ReorderableList = <T,>(
   );
 
   const reorder = (fromIndex: number, toIndex: number) => {
-    if (fromIndex !== toIndex) {
+    if (fromIndex !== toIndex || callReorderSameIndex) {
       unstable_batchedUpdates(() => {
         onReorder({fromIndex, toIndex});
         enableDragged(false);
