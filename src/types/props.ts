@@ -39,6 +39,7 @@ export interface ReorderableListProps<T>
   scrollAreaSize?: number;
   scrollSpeed?: number;
   dragScale?: number;
+  callReorderSameIndex?: boolean;
   renderItem: (info: ReorderableListRenderItemInfo<T>) => React.ReactElement;
   onReorder: (event: ReorderableListReorderEvent) => void;
 }
