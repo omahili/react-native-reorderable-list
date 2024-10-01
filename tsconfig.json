@@ -1,23 +1,26 @@
 {
   "compilerOptions": {
-    "target": "es6",                          /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', 'ES2018', 'ES2019', 'ES2020', or 'ESNEXT'. */
-    "module": "es6",                          /* Specify module code generation: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', 'es2020', or 'ESNext'. */
-    "jsx": "react",                           /* Specify JSX code generation: 'preserve', 'react-native', or 'react'. */
-    "declaration": true,                      /* Generates corresponding '.d.ts' file. */
-    "outDir": "./dist",                       /* Redirect output structure to the directory. */
-    "strict": true,                           /* Enable all strict type-checking options. */
-    "moduleResolution": "node",               /* Specify module resolution strategy: 'node' (Node.js) or 'classic' (TypeScript pre-1.6). */
-    "baseUrl": "./src",                       /* Base directory to resolve non-absolute module names. */
-    "paths": {                                /* A series of entries which re-map imports to lookup locations relative to the 'baseUrl'. */
-      "components/*": ["components/*"],
-      "types/*": ["types/*"],
-      "hooks/*": ["hooks/*"]
+    "baseUrl": "./",
+    "paths": {
+      "react-native-reorderable-list": ["./src/index"]
     },
-    "esModuleInterop": true,                  /* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'. */
-    "removeComments": true,                   /* Disable emitting comments. */
-    "skipLibCheck": true,                     /* Skip type checking all .d.ts files. */
-    "lib": ["esnext"]                         /* Specify a set of bundled library declaration files that describe the target runtime environment. */
-  },
-  "include": ["src"],
-  "exclude": ["node_modules"]
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "jsx": "react",
+    "lib": ["esnext"],
+    "module": "esnext",
+    "moduleResolution": "node",
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "noImplicitUseStrict": false,
+    "noStrictGenericChecks": false,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "target": "esnext"
+  }
 }
