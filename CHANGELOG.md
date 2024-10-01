@@ -1,3 +1,12 @@
+
+
+# [0.5.0](https://github.com/omahili/react-native-reorderable-list/compare/v0.4.0...v0.5.0) (2024-10-01)
+
+
+### Features
+
+* refactor and introduce new api ([cffcd7e](https://github.com/omahili/react-native-reorderable-list/commit/cffcd7e7fcd0beac692b73151b7b6336b1d7fdd9))
+
 # Changelog
 All notable changes to this project will be documented in this file.
 
