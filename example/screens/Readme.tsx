@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, memo} from 'react';
 import {ListRenderItemInfo, Pressable, StyleSheet, Text} from 'react-native';
 
 import ReorderableList, {
@@ -27,7 +27,7 @@ const list: CardProps[] = [
   {id: '9', color: 'seagreen', height: 90},
 ];
 
-const Card: React.FC<CardProps> = React.memo(({id, color, height}) => {
+const Card: React.FC<CardProps> = memo(({id, color, height}) => {
   const drag = useReorderableDrag();
 
   return (
