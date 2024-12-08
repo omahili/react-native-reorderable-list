@@ -10,7 +10,7 @@ A reorderable list for React Native applications, powered by Reanimated 🚀
 - [Install](#install)
 - [Components](#components)
   - [ReorderableList](#reorderablelist)
-  - [ReorderableListItem](#reorderableitemanimation)
+  - [ReorderableListItem](#reorderablelistitem)
 - [Hooks](#hooks)
   - [useReorderableDrag](#usereorderabledrag)
   - [useReorderableDragStart](#usereorderabledragstart)
@@ -89,7 +89,7 @@ This hook allows handling the drag start event of a list item. It receives a wor
 
 - onStart: `(index: number) => void`
 
-### useReorderableDragEnd\*\*
+### useReorderableDragEnd
 
 This hook allows handling the drag end event of a list item. It receives a worklet callback that is called when the drag ends. It's recommended to wrap the handler function in a useCallback as follows: `useReorderableDragEnd(useCallback(...))`. This hook can only be used inside of a list item component.
 
