@@ -13,11 +13,7 @@ export const useReorderableDragEnd = (
     () => releasedIndex.value === index,
     newValue => {
       if (newValue) {
-        releasedIndex.value = -1;
-
-        if (onEnd) {
-          onEnd(index, currentIndex.value);
-        }
+        onEnd(index, currentIndex.value);
       }
     },
     [onEnd],

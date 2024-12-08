@@ -155,16 +155,20 @@ export const useReorderableList = <T>({
   const resetSharedValues = useCallback(() => {
     'worklet';
 
-    // reset indexes before arrays to avoid triggering animated reactions
+    // must be reset before the reorder function is called
+    // to avoid triggering on drag end event twice
+    releasedIndex.value = -1;
     draggedIndex.value = -1;
     // current index is reset on item render for the on end event
     dragY.value = 0;
     // released flag is reset after release is triggered in the item
     state.value = ReorderableListState.IDLE;
     dragScrollTranslationY.value = 0;
-  }, [draggedIndex, dragY, state, dragScrollTranslationY]);
+  }, [releasedIndex, draggedIndex, dragY, state, dragScrollTranslationY]);
 
   const reorder = (fromIndex: number, toIndex: number) => {
+    runOnUI(resetSharedValues)();
+
     if (fromIndex !== toIndex) {
       const updateState = () => {
         onReorder({from: fromIndex, to: toIndex});
@@ -176,8 +180,6 @@ export const useReorderableList = <T>({
         updateState();
       }
     }
-
-    runOnUI(resetSharedValues)();
   };
 
   const getIndexFromY = useCallback(
