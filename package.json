@@ -47,7 +47,10 @@
     "drag-and-drop",
     "dnd"
   ],
-  "repository": "https://github.com/omahili/react-native-reorderable-list",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/omahili/react-native-reorderable-list.git"
+  },
   "author": "Omar Mahili",
   "license": "MIT",
   "bugs": {
