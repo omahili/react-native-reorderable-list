@@ -59,13 +59,11 @@ const ReorderableList = <T,>(
   });
 
   const renderAnimatedCell = useCallback(
-    ({index, children, item, onLayout: onCellLayout}: CellRendererProps<T>) => (
+    ({cellKey, ...props}: CellRendererProps<T>) => (
       <ReorderableListCell
-        // forces remount of components with key change
-        key={keyExtractor ? keyExtractor(item, index) : index}
-        item={item}
-        extraData={extraData}
-        index={index}
+        {...props}
+        // forces remount with key change on reorder
+        key={`${cellKey}+${props.index}`}
         itemOffset={itemOffset}
         itemHeight={itemHeight}
         dragY={dragY}
@@ -73,20 +71,16 @@ const ReorderableList = <T,>(
         releasedIndex={releasedIndex}
         animationDuration={duration}
         startDrag={startDrag}
-        children={children}
-        onLayout={onCellLayout}
       />
     ),
     [
       itemOffset,
       itemHeight,
-      startDrag,
       dragY,
       draggedIndex,
       releasedIndex,
       duration,
-      keyExtractor,
-      extraData,
+      startDrag,
     ],
   );
 

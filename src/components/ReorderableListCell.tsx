@@ -1,5 +1,5 @@
 import React, {memo, useCallback, useMemo} from 'react';
-import type {LayoutChangeEvent} from 'react-native';
+import type {CellRendererProps, LayoutChangeEvent} from 'react-native';
 
 import Animated, {
   Easing,
@@ -14,24 +14,20 @@ import Animated, {
 import {ReorderableCellContext, ReorderableListContext} from '../contexts';
 import {useContext} from '../hooks';
 
-interface ReorderableListCellProps<T, U> {
-  index: number;
+interface ReorderableListCellProps<T>
+  extends Omit<CellRendererProps<T>, 'cellKey'> {
   startDrag: (index: number) => void;
   itemOffset: SharedValue<number[]>;
   itemHeight: SharedValue<number[]>;
   dragY: SharedValue<number>;
   draggedIndex: SharedValue<number>;
   releasedIndex: SharedValue<number>;
-  children: React.ReactNode;
-  onLayout?: (e: LayoutChangeEvent) => void;
   // animation duration as a shared value allows to avoid re-renders on value change
   animationDuration: SharedValue<number>;
-  item: T;
-  extraData: U;
 }
 
 export const ReorderableListCell = memo(
-  <T, U>({
+  <T,>({
     index,
     startDrag,
     children,
@@ -42,7 +38,7 @@ export const ReorderableListCell = memo(
     draggedIndex,
     releasedIndex,
     animationDuration,
-  }: ReorderableListCellProps<T, U>) => {
+  }: ReorderableListCellProps<T>) => {
     const dragHandler = useCallback(() => {
       'worklet';
 
@@ -139,5 +135,4 @@ export const ReorderableListCell = memo(
       </ReorderableCellContext.Provider>
     );
   },
-  (prev, next) => prev.item === next.item && prev.extraData === next.extraData,
 );
