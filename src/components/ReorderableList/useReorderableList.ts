@@ -24,7 +24,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import {AUTOSCROLL_INCREMENT} from './constants';
-import {ReorderableListState} from '../../types';
+import {ReorderableListDragEndEvent, ReorderableListState} from '../../types';
 import type {ReorderableListReorderEvent} from '../../types';
 
 const version = React.version.split('.');
@@ -40,8 +40,9 @@ interface UseReorderableListArgs<T> {
   animationDuration: number;
   dragReorderThreshold: number;
   onReorder: (event: ReorderableListReorderEvent) => void;
+  onDragEnd?: (event: ReorderableListDragEndEvent) => void;
   onScroll?: (event: NativeScrollEvent) => void;
-  onLayout?: (e: LayoutChangeEvent) => void;
+  onLayout?: (event: LayoutChangeEvent) => void;
 }
 
 export const useReorderableList = <T>({
@@ -51,9 +52,10 @@ export const useReorderableList = <T>({
   autoscrollDelay,
   animationDuration,
   dragReorderThreshold,
-  onLayout,
   onReorder,
+  onDragEnd,
   onScroll,
+  onLayout,
 }: UseReorderableListArgs<T>) => {
   const scrollEnabled = useSharedValue(true);
   const flatList = useAnimatedRef<FlatList>();
@@ -283,6 +285,8 @@ export const useReorderableList = <T>({
 
         // enable back scroll on releasing
         runOnJS(setScrollEnabled)(true);
+        // trigger onDragEnd event
+        onDragEnd?.({from: draggedIndex.value, to: currentIndex.value});
 
         // they are actually swapped on drag translation
         const currentItemOffset = itemOffset.value[draggedIndex.value];

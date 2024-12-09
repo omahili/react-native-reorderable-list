@@ -27,6 +27,7 @@ const ReorderableList = <T,>(
     onLayout,
     onReorder,
     onScroll,
+    onDragEnd,
     keyExtractor,
     extraData,
     ...rest
@@ -56,6 +57,7 @@ const ReorderableList = <T,>(
     onLayout,
     onReorder,
     onScroll,
+    onDragEnd,
   });
 
   const renderAnimatedCell = useCallback(

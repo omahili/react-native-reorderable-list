@@ -5,6 +5,7 @@ import {
   useReorderableDragStart,
 } from './hooks';
 import type {
+  ReorderableListDragEndEvent,
   ReorderableListItemConfig,
   ReorderableListItemProps,
   ReorderableListProps,
@@ -18,6 +19,7 @@ export {
   useReorderableDragEnd,
   ReorderableListProps,
   ReorderableListReorderEvent,
+  ReorderableListDragEndEvent,
   ReorderableListItem,
   ReorderableListItemConfig,
   ReorderableListItemProps,

@@ -13,6 +13,17 @@ export interface ReorderableListReorderEvent {
   to: number;
 }
 
+export interface ReorderableListDragEndEvent {
+  /**
+   * Index of the dragged item.
+   */
+  from: number;
+  /**
+   * Index where the dragged item was released.
+   */
+  to: number;
+}
+
 type OmittedProps =
   | 'horizontal'
   | 'onScroll'
@@ -60,6 +71,10 @@ export interface ReorderableListProps<T>
    * Event fired at most once per frame during scrolling. Needs to be a `worklet`. See [Reanimated docs](https://docs.swmansion.com/react-native-reanimated) for further info.
    */
   onScroll?: (event: NativeScrollEvent) => void;
+  /**
+   * Event fired when the dragged item is released. Needs to be a `worklet`. See [Reanimated docs](https://docs.swmansion.com/react-native-reanimated) for further info.
+   */
+  onDragEnd?: (event: ReorderableListDragEndEvent) => void;
 }
 
 export interface ReorderableListItemConfig {
