@@ -1,5 +1,13 @@
 
 
+## [0.5.1](https://github.com/omahili/react-native-reorderable-list/compare/v0.5.0...v0.5.1) (2024-12-09)
+
+
+### Bug Fixes
+
+* drag end hook not called ([bffbe0b](https://github.com/omahili/react-native-reorderable-list/commit/bffbe0b6d5137a63f50a89cf7c6bd36b045b4278)), closes [#13](https://github.com/omahili/react-native-reorderable-list/issues/13)
+* unstable cell causing remounts ([62145dd](https://github.com/omahili/react-native-reorderable-list/commit/62145dd5b1b4cd1af1332bbe37398608b0852af8))
+
 # [0.5.0](https://github.com/omahili/react-native-reorderable-list/compare/v0.4.0...v0.5.0) (2024-10-01)
 
 
