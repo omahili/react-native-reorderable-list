@@ -158,8 +158,10 @@ export const useReorderableList = <T>({
     'worklet';
 
     // must be reset before the reorder function is called
-    // to avoid triggering on drag end event twice
-    releasedIndex.value = -1;
+    // to avoid triggering on drag end event twice,
+    // update with a delay to avoid reanimated batching the
+    // change if updated immediately
+    releasedIndex.value = withDelay(1, withTiming(-1, {duration: 0}));
     draggedIndex.value = -1;
     // current index is reset on item render for the on end event
     dragY.value = 0;
