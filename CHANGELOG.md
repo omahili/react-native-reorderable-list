@@ -1,5 +1,12 @@
 
 
+## [0.6.1](https://github.com/omahili/react-native-reorderable-list/compare/v0.6.0...v0.6.1) (2024-12-12)
+
+
+### Bug Fixes
+
+* use a more stable drag end handling ([1035e08](https://github.com/omahili/react-native-reorderable-list/commit/1035e0815fd12d339ab9a1e0c57418396852653e))
+
 # [0.6.0](https://github.com/omahili/react-native-reorderable-list/compare/v0.5.1...v0.6.0) (2024-12-12)
 
 
