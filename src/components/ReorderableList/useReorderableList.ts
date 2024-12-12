@@ -79,8 +79,10 @@ export const useReorderableList = <T>({
   const previousIndex = useSharedValue(-1);
   const currentIndex = useSharedValue(-1);
   const draggedIndex = useSharedValue(-1);
-  const releasedIndex = useSharedValue(-1);
   const state = useSharedValue<ReorderableListState>(ReorderableListState.IDLE);
+  const dragEndHandlers = useSharedValue<
+    ((from: number, to: number) => void)[][]
+  >([]);
 
   // animation duration as a shared value allows to avoid re-rendering of all cells on value change
   const duration = useSharedValue(animationDuration);
@@ -93,8 +95,9 @@ export const useReorderableList = <T>({
       draggedHeight,
       currentIndex,
       draggedIndex,
+      dragEndHandlers,
     }),
-    [draggedHeight, currentIndex, draggedIndex],
+    [draggedHeight, currentIndex, draggedIndex, dragEndHandlers],
   );
 
   const startY = useSharedValue(0);
@@ -157,18 +160,13 @@ export const useReorderableList = <T>({
   const resetSharedValues = useCallback(() => {
     'worklet';
 
-    // must be reset before the reorder function is called
-    // to avoid triggering on drag end event twice,
-    // update with a delay to avoid reanimated batching the
-    // change if updated immediately
-    releasedIndex.value = withDelay(1, withTiming(-1, {duration: 0}));
     draggedIndex.value = -1;
     // current index is reset on item render for the on end event
     dragY.value = 0;
     // released flag is reset after release is triggered in the item
     state.value = ReorderableListState.IDLE;
     dragScrollTranslationY.value = 0;
-  }, [releasedIndex, draggedIndex, dragY, state, dragScrollTranslationY]);
+  }, [draggedIndex, dragY, state, dragScrollTranslationY]);
 
   const reorder = (fromIndex: number, toIndex: number) => {
     runOnUI(resetSharedValues)();
@@ -283,12 +281,17 @@ export const useReorderableList = <T>({
           state.value === ReorderableListState.AUTO_SCROLL)
       ) {
         state.value = ReorderableListState.RELEASING;
-        releasedIndex.value = draggedIndex.value;
 
         // enable back scroll on releasing
         runOnJS(setScrollEnabled)(true);
         // trigger onDragEnd event
-        onDragEnd?.({from: draggedIndex.value, to: currentIndex.value});
+        let e = {from: draggedIndex.value, to: currentIndex.value};
+        onDragEnd?.(e);
+
+        const handlers = dragEndHandlers.value[draggedIndex.value];
+        if (Array.isArray(handlers)) {
+          handlers.forEach(fn => fn(e.from, e.to));
+        }
 
         // they are actually swapped on drag translation
         const currentItemOffset = itemOffset.value[draggedIndex.value];
@@ -488,7 +491,6 @@ export const useReorderableList = <T>({
     itemOffset,
     itemHeight,
     draggedIndex,
-    releasedIndex,
     dragY,
     duration,
   };

@@ -45,7 +45,6 @@ const ReorderableList = <T,>(
     itemHeight,
     dragY,
     draggedIndex,
-    releasedIndex,
     duration,
   } = useReorderableList({
     ref,
@@ -70,20 +69,11 @@ const ReorderableList = <T,>(
         itemHeight={itemHeight}
         dragY={dragY}
         draggedIndex={draggedIndex}
-        releasedIndex={releasedIndex}
         animationDuration={duration}
         startDrag={startDrag}
       />
     ),
-    [
-      itemOffset,
-      itemHeight,
-      dragY,
-      draggedIndex,
-      releasedIndex,
-      duration,
-      startDrag,
-    ],
+    [itemOffset, itemHeight, dragY, draggedIndex, duration, startDrag],
   );
 
   return (

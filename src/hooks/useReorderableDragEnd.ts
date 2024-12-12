@@ -1,4 +1,4 @@
-import {useAnimatedReaction} from 'react-native-reanimated';
+import {useEffect} from 'react';
 
 import {useContext} from './useContext';
 import {ReorderableCellContext, ReorderableListContext} from '../contexts';
@@ -6,16 +6,32 @@ import {ReorderableCellContext, ReorderableListContext} from '../contexts';
 export const useReorderableDragEnd = (
   onEnd: (from: number, to: number) => void,
 ) => {
-  const {currentIndex} = useContext(ReorderableListContext);
-  const {releasedIndex, index} = useContext(ReorderableCellContext);
+  const {dragEndHandlers} = useContext(ReorderableListContext);
+  const {index} = useContext(ReorderableCellContext);
 
-  useAnimatedReaction(
-    () => releasedIndex.value === index,
-    newValue => {
-      if (newValue) {
-        onEnd(index, currentIndex.value);
+  useEffect(() => {
+    dragEndHandlers.modify(value => {
+      'worklet';
+
+      if (!Array.isArray(value[index])) {
+        value[index] = [];
       }
-    },
-    [onEnd],
-  );
+
+      value[index].push(onEnd);
+
+      return value;
+    });
+
+    return () => {
+      dragEndHandlers.modify(value => {
+        'worklet';
+
+        if (Array.isArray(value[index])) {
+          value[index] = value[index].filter(x => x.name !== onEnd.name);
+        }
+
+        return value;
+      });
+    };
+  }, [index, dragEndHandlers, onEnd]);
 };

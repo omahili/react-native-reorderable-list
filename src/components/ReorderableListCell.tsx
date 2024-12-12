@@ -21,7 +21,6 @@ interface ReorderableListCellProps<T>
   itemHeight: SharedValue<number[]>;
   dragY: SharedValue<number>;
   draggedIndex: SharedValue<number>;
-  releasedIndex: SharedValue<number>;
   // animation duration as a shared value allows to avoid re-renders on value change
   animationDuration: SharedValue<number>;
 }
@@ -36,7 +35,6 @@ export const ReorderableListCell = memo(
     itemHeight,
     dragY,
     draggedIndex,
-    releasedIndex,
     animationDuration,
   }: ReorderableListCellProps<T>) => {
     const dragHandler = useCallback(() => {
@@ -50,9 +48,8 @@ export const ReorderableListCell = memo(
         index,
         dragHandler,
         draggedIndex,
-        releasedIndex,
       }),
-      [index, dragHandler, draggedIndex, releasedIndex],
+      [index, dragHandler, draggedIndex],
     );
     const {currentIndex, draggedHeight} = useContext(ReorderableListContext);
 
