@@ -1,6 +1,18 @@
 
 
-## [0.5.1](https://github.com/omahili/react-native-reorderable-list/compare/v0.5.0...v0.5.1) (2024-12-09)
+# [0.6.0](https://github.com/omahili/react-native-reorderable-list/compare/v0.5.1...v0.6.0) (2024-12-12)
+
+
+### Bug Fixes
+
+* drag end not triggered if pressed only ([45a689e](https://github.com/omahili/react-native-reorderable-list/commit/45a689efbacc77547d347898c72091cbc86aef1d)), closes [#14](https://github.com/omahili/react-native-reorderable-list/issues/14)
+
+
+### Features
+
+* add drag end event to root list ([d7c19ed](https://github.com/omahili/react-native-reorderable-list/commit/d7c19eddd11aa0b760f3da4765acae612126951c)), closes [#10](https://github.com/omahili/react-native-reorderable-list/issues/10)
+
+# [0.5.1](https://github.com/omahili/react-native-reorderable-list/compare/v0.5.0...v0.5.1) (2024-12-09)
 
 
 ### Bug Fixes
