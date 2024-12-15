@@ -1,4 +1,9 @@
-import type {FlatListProps, NativeScrollEvent, ViewProps} from 'react-native';
+import type {
+  FlatListProps,
+  NativeScrollEvent,
+  ScrollViewProps,
+  ViewProps,
+} from 'react-native';
 
 import {EasingFunction} from 'react-native-reanimated';
 
@@ -113,4 +118,19 @@ export interface ReorderableListItemProps extends ViewProps {
    * Config for the `scale` animation. Enabled by default with custom default options.
    */
   scaleAnimationConfig?: ReorderableListItemConfig;
+}
+
+export interface ScrollViewContainerProps
+  extends Omit<ScrollViewProps, 'onScroll'> {
+  /**
+   * Event fired at most once per frame during scrolling. Needs to be a `worklet`. See [Reanimated docs](https://docs.swmansion.com/react-native-reanimated) for further info.
+   */
+  onScroll?: (event: NativeScrollEvent) => void;
+}
+
+export interface NestedReorderableListProps<T> extends ReorderableListProps<T> {
+  /**
+   * Whether the nested list is scrollable or not. If the nested list has a fixed height and it's scrollable it should be set to `true`, otherwise `false`. Default: `false`.
+   */
+  scrollable?: boolean;
 }

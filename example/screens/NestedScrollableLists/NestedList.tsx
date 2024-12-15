@@ -1,7 +1,14 @@
-import React, {useState, memo} from 'react';
-import {ListRenderItemInfo, Pressable, StyleSheet, Text} from 'react-native';
+import React, {memo, useState} from 'react';
+import {
+  ListRenderItemInfo,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 
-import ReorderableList, {
+import {
+  NestedReorderableList,
   ReorderableListItem,
   ReorderableListReorderEvent,
   reorderItems,
@@ -39,7 +46,11 @@ const Card: React.FC<CardProps> = memo(({id, color, height}) => {
   );
 });
 
-export const ReadmeScreen = () => {
+interface NestedListProps {
+  index: number;
+}
+
+export const NestedList: React.FC<NestedListProps> = ({index}) => {
   const [data, setData] = useState(list);
 
   const renderItem = ({item}: ListRenderItemInfo<CardProps>) => (
@@ -52,16 +63,29 @@ export const ReadmeScreen = () => {
   };
 
   return (
-    <ReorderableList
+    <NestedReorderableList
       data={data}
       onReorder={handleReorder}
       renderItem={renderItem}
       keyExtractor={item => item.id}
+      style={styles.list}
+      autoscrollThreshold={0.3} // increase scroll area
+      autoscrollSpeedScale={0.5} // decrease scroll speed
+      scrollable
+      stickyHeaderIndices={[0]}
+      ListHeaderComponent={
+        <View style={styles.header}>
+          <Text style={styles.text}>List {index}</Text>
+        </View>
+      }
     />
   );
 };
 
 const styles = StyleSheet.create({
+  list: {
+    height: 300,
+  },
   card: {
     justifyContent: 'center',
     alignItems: 'center',
@@ -73,5 +97,11 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 20,
+  },
+  header: {
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#eee',
   },
 });

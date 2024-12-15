@@ -1,4 +1,9 @@
-import {ReorderableList, ReorderableListItem} from './components';
+import {
+  NestedReorderableList,
+  ReorderableList,
+  ReorderableListItem,
+  ScrollViewContainer,
+} from './components';
 import {
   useReorderableDrag,
   useReorderableDragEnd,
@@ -10,6 +15,7 @@ import type {
   ReorderableListItemProps,
   ReorderableListProps,
   ReorderableListReorderEvent,
+  ScrollViewContainerProps,
 } from './types';
 import {reorderItems} from './utils';
 
@@ -23,6 +29,9 @@ export {
   ReorderableListItem,
   ReorderableListItemConfig,
   ReorderableListItemProps,
+  ScrollViewContainer,
+  ScrollViewContainerProps,
+  NestedReorderableList,
   reorderItems,
 };
 export default ReorderableList;

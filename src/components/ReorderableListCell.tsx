@@ -119,9 +119,7 @@ export const ReorderableListCell = memo(
         itemHeight.value[index] = height;
       })(e.nativeEvent.layout.y, e.nativeEvent.layout.height);
 
-      if (onLayout) {
-        onLayout(e);
-      }
+      onLayout?.(e);
     };
 
     return (

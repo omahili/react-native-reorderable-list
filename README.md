@@ -1,3 +1,10 @@
+![NPM Downloads](https://img.shields.io/npm/dm/react-native-reorderable-list)
+![GitHub License](https://img.shields.io/github/license/omahili/react-native-reorderable-list)
+![NPM Version](https://img.shields.io/npm/v/react-native-reorderable-list)
+<br />
+![iOS](https://img.shields.io/badge/platform-iOS-000.svg?logo=apple)
+![Android](https://img.shields.io/badge/platform-Android-3ddc84.svg?logo=android)
+
 # React Native Reorderable List
 
 A reorderable list for React Native applications, powered by Reanimated 🚀
@@ -11,6 +18,8 @@ A reorderable list for React Native applications, powered by Reanimated 🚀
 - [Components](#components)
   - [ReorderableList](#reorderablelist)
   - [ReorderableListItem](#reorderablelistitem)
+  - [ScrollViewContainer](#scrollviewcontainer)
+  - [NestedReorderableList](#nestedreorderablelist)
 - [Hooks](#hooks)
   - [useReorderableDrag](#usereorderabledrag)
   - [useReorderableDragStart](#usereorderabledragstart)
@@ -72,6 +81,22 @@ This component allows you to animate the item when it's dragged. It currently su
 | scaleAnimationConfig   | `{ enabled?: boolean, valueEnd?: number, valueStart?: number, easingEnd?: EasingFunction, easingStart?: EasingFunction, duration?: number }` | false    | `{ enabled: true, valueEnd: 1, valueStart: 1.025, easingStart: Easing.in(Easing.ease), easingEnd: Easing.out(Easing.ease), duration: 200 }` | Configures the scale animation of the reorderable item.   |
 | opacityAnimationConfig | `{ enabled?: boolean, valueEnd?: number, valueStart?: number, easingEnd?: EasingFunction, easingStart?: EasingFunction, duration?: number }` | false    | `{ enabled: true, valueEnd: 1, valueStart: 0.75, easingStart: Easing.in(Easing.ease), easingEnd: Easing.out(Easing.ease), duration: 200, }` | Configures the opacity animation of the reorderable item. |
 
+### ScrollViewContainer
+
+This component extends the [ScrollView](https://reactnative.dev/docs/scrollview) component and is used for nesting a [NestedReorderableList](#nestedreorderablelist) within a scrollable container:
+
+| Props    | Type                                 | Required | Default | Description                                                                                                                                                               |
+| -------- | ------------------------------------ | -------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| onScroll | `(event: NativeScrollEvent) => void` | No       | N/A     | Event fired at most once per frame during scrolling. Needs to be a `worklet`. See [Reanimated docs](https://docs.swmansion.com/react-native-reanimated) for further info. |
+
+### NestedReorderableList
+
+This component allows nesting a reorderable list within a [ScrollViewContainer](#scrollviewcontainer):
+
+| Props      | Type      | Required | Default | Description                                                                                                                                            |
+| ---------- | --------- | -------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| scrollable | `boolean` | No       | false   | Whether the nested list is scrollable or not. If the nested list has a fixed height and it's scrollable it should be set to `true`, otherwise `false`. |
+
 ## Hooks
 
 ### useReorderableDrag
@@ -106,7 +131,7 @@ This hook allows handling the drag end event of a list item. It receives a workl
 
 ## Example
 
-Here is an example of how to use this component. More examples can be found in the `example` directory of the repository.
+Here is simple example of how to use this component. Examples of nested lists and much more can be found in the [example](https://github.com/omahili/react-native-reorderable-list/tree/feat/nested-lists/example) directory.
 
 ```typescript
 import React, {useState} from 'react';
@@ -149,7 +174,7 @@ const Card: React.FC<CardProps> = React.memo(({id, color, height}) => {
   );
 });
 
-const App = () => {
+const Example = () => {
   const [data, setData] = useState(list);
 
   const renderItem = ({item}: ListRenderItemInfo<CardProps>) => (
@@ -186,7 +211,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export default App;
+export default Example;
 ```
 
 ## License

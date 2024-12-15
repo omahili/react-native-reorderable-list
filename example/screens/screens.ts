@@ -1,6 +1,10 @@
+import {HeaderFooterScreen} from './HeaderFooter';
+import {MultipleListsScreen} from './MultipleLists';
+import {NestedListsScreen} from './NestedLists';
+import {NestedScrollableListsScreen} from './NestedScrollableLists';
 import {PlaylistScreen} from './Playlist';
 import {RandomListScreen} from './RandomList';
-import {ReadmeScreen} from './Readme';
+import {ReadmeExampleScreen} from './ReadmeExample';
 
 const screens = [
   {
@@ -16,7 +20,27 @@ const screens = [
   {
     id: '2',
     name: 'Readme',
-    component: ReadmeScreen,
+    component: ReadmeExampleScreen,
+  },
+  {
+    id: '3',
+    name: 'Header Footer',
+    component: HeaderFooterScreen,
+  },
+  {
+    id: '4',
+    name: 'Multiple Lists',
+    component: MultipleListsScreen,
+  },
+  {
+    id: '5',
+    name: 'Nested Lists',
+    component: NestedListsScreen,
+  },
+  {
+    id: '6',
+    name: 'Nested Scrollable Lists',
+    component: NestedScrollableListsScreen,
   },
 ];
 
