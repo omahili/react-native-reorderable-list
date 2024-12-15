@@ -1,5 +1,12 @@
 
 
+# [0.7.0](https://github.com/omahili/react-native-reorderable-list/compare/v0.6.1...v0.7.0) (2024-12-15)
+
+
+### Features
+
+* support nested lists ([005dd07](https://github.com/omahili/react-native-reorderable-list/commit/005dd0766ba2f09a0c0e20d6c96039a02f4612c2))
+
 ## [0.6.1](https://github.com/omahili/react-native-reorderable-list/compare/v0.6.0...v0.6.1) (2024-12-12)
 
 
