@@ -71,4 +71,5 @@ android/keystores/debug.keystore
 lib/
 
 # yarn
-.yarn/
+.yarn/*
+!.yarn/releases

@@ -11,6 +11,7 @@ runs:
         cache: 'yarn'
 
     - name: Install dependencies
+      shell: bash
       run: |
         yarn --cwd example --immutable
         yarn --immutable
