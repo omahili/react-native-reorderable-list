@@ -1,0 +1,18 @@
+name: Feature request
+description: Request a new feature in Reorderable List.
+labels: ["feature-request"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Please provide a clear and concise description of the feature or improvement you would like to see in the library.
+    validations:
+      required: true
+
+  - type: textarea
+    id: possible-implementation
+    attributes:
+      label: Possible implementation
+      description: How do you think this can be implemented in the current codebase?
+
