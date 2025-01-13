@@ -3,6 +3,9 @@ const path = require('path');
 const {getDefaultConfig} = require('@react-native/metro-config');
 const escape = require('escape-string-regexp');
 const exclusionList = require('metro-config/src/defaults/exclusionList');
+const {
+  wrapWithReanimatedMetroConfig,
+} = require('react-native-reanimated/metro-config');
 
 const pak = require('../package.json');
 
@@ -14,7 +17,7 @@ const modules = Object.keys({
 
 const defaultConfig = getDefaultConfig(__dirname);
 
-module.exports = {
+const config = {
   ...defaultConfig,
 
   projectRoot: __dirname,
@@ -37,3 +40,5 @@ module.exports = {
     }, {}),
   },
 };
+
+module.exports = wrapWithReanimatedMetroConfig(config);

@@ -72,4 +72,5 @@ lib/
 
 # yarn
 .yarn/*
+**/.yarn/*
 !.yarn/releases
