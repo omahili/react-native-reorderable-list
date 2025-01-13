@@ -14,7 +14,7 @@ import {
 } from 'react-native-gesture-handler';
 import Animated, {SharedValue} from 'react-native-reanimated';
 
-import {AUTOSCROLL_DELAY} from './constants';
+import {AUTOSCROLL_CONFIG} from './constants';
 import {useReorderableListCore} from './useReorderableListCore';
 import {ReorderableListContext} from '../../contexts';
 import type {ReorderableListProps} from '../../types';
@@ -43,7 +43,7 @@ const ReorderableListCore = <T,>(
     data,
     autoscrollThreshold = 0.1,
     autoscrollSpeedScale = 1,
-    autoscrollDelay = AUTOSCROLL_DELAY,
+    autoscrollDelay = AUTOSCROLL_CONFIG.delay,
     animationDuration = 200,
     dragReorderThreshold = 0.2,
     onLayout,

@@ -12,7 +12,6 @@ import Animated, {
   AnimatedRef,
   Easing,
   SharedValue,
-  cancelAnimation,
   runOnJS,
   runOnUI,
   scrollTo,
@@ -24,7 +23,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import {AUTOSCROLL_INCREMENT} from './constants';
+import {AUTOSCROLL_CONFIG} from './constants';
 import {ReorderableListDragEndEvent, ReorderableListState} from '../../types';
 import type {ReorderableListReorderEvent} from '../../types';
 
@@ -493,14 +492,14 @@ export const useReorderableListCore = <T>({
       ) {
         setCurrentIndex(y);
 
-        if (scrollDirection(y)) {
+        if (scrollDirection(y) !== 0) {
           if (state.value !== ReorderableListState.AUTO_SCROLL) {
             // trigger autoscroll
             lastAutoscrollTrigger.value = autoscrollTrigger.value;
             autoscrollTrigger.value *= -1;
+            state.value = ReorderableListState.AUTO_SCROLL;
           }
-          state.value = ReorderableListState.AUTO_SCROLL;
-        } else {
+        } else if (state.value === ReorderableListState.AUTO_SCROLL) {
           state.value = ReorderableListState.DRAGGING;
         }
       }
@@ -516,7 +515,9 @@ export const useReorderableListCore = <T>({
       ) {
         let y = currentY.value + scrollViewDragScrollTranslationY.value;
         const autoscrollIncrement =
-          scrollDirection(y) * AUTOSCROLL_INCREMENT * autoscrollSpeedScale;
+          scrollDirection(y) *
+          AUTOSCROLL_CONFIG.increment *
+          autoscrollSpeedScale;
 
         if (autoscrollIncrement !== 0) {
           let scrollOffset = flatListScrollOffsetY.value;
@@ -545,7 +546,7 @@ export const useReorderableListCore = <T>({
 
     // checking if the list is not scrollable instead of the scrolling state
     // fixes a bug on iOS where the item is shifted after autoscrolling and then
-    // moving await from autoscroll area
+    // moving away from autoscroll area
     if (!scrollEnabled.value) {
       dragScrollTranslationY.value =
         flatListScrollOffsetY.value - dragInitialScrollOffsetY.value;
@@ -556,8 +557,6 @@ export const useReorderableListCore = <T>({
         currentTranslationY.value +
         dragScrollTranslationY.value +
         scrollViewDragScrollTranslationY.value;
-
-      cancelAnimation(autoscrollTrigger);
 
       lastAutoscrollTrigger.value = autoscrollTrigger.value;
       autoscrollTrigger.value = withDelay(
@@ -585,8 +584,6 @@ export const useReorderableListCore = <T>({
         if (state.value === ReorderableListState.AUTO_SCROLL) {
           dragY.value =
             currentTranslationY.value + scrollViewDragScrollTranslationY.value;
-
-          cancelAnimation(autoscrollTrigger);
 
           lastAutoscrollTrigger.value = autoscrollTrigger.value;
           autoscrollTrigger.value = withDelay(
