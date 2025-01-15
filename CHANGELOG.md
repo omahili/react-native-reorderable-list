@@ -1,5 +1,13 @@
 
 
+## [0.7.1](https://github.com/omahili/react-native-reorderable-list/compare/v0.7.0...v0.7.1) (2025-01-15)
+
+
+### Bug Fixes
+
+* **android:** slow autoscroll with fabric ([0f0f3e4](https://github.com/omahili/react-native-reorderable-list/commit/0f0f3e4872f631e728f1a8cf90786d5b4e0b734e))
+* reading shared value during render ([ac43fad](https://github.com/omahili/react-native-reorderable-list/commit/ac43fadc3f6fc44cf41ac16a39c9fb6bcb4c6d5d)), closes [#20](https://github.com/omahili/react-native-reorderable-list/issues/20)
+
 # [0.7.0](https://github.com/omahili/react-native-reorderable-list/compare/v0.6.1...v0.7.0) (2024-12-15)
 
 
