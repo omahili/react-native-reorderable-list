@@ -1,4 +1,4 @@
-import React, {useCallback, useMemo} from 'react';
+import React, {useCallback, useEffect, useMemo} from 'react';
 import {
   FlatList,
   LayoutChangeEvent,
@@ -98,12 +98,12 @@ export const useReorderableListCore = <T>({
   const dragEndHandlers = useSharedValue<
     ((from: number, to: number) => void)[][]
   >([]);
-
-  // animation duration as a shared value allows to avoid re-rendering of all cells on value change
+  const startY = useSharedValue(0);
   const duration = useSharedValue(animationDuration);
-  if (duration.value !== animationDuration) {
+
+  useEffect(() => {
     duration.value = animationDuration;
-  }
+  }, [duration, animationDuration]);
 
   const listContextValue = useMemo(
     () => ({
@@ -114,8 +114,6 @@ export const useReorderableListCore = <T>({
     }),
     [draggedHeight, currentIndex, draggedIndex, dragEndHandlers],
   );
-
-  const startY = useSharedValue(0);
 
   const panGestureHandler = useMemo(
     () =>
