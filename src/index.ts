@@ -1,7 +1,6 @@
 import {
   NestedReorderableList,
   ReorderableList,
-  ReorderableListItem,
   ScrollViewContainer,
 } from './components';
 import {
@@ -10,9 +9,9 @@ import {
   useReorderableDragStart,
 } from './hooks';
 import type {
+  ReorderableListCellAnimations,
   ReorderableListDragEndEvent,
-  ReorderableListItemConfig,
-  ReorderableListItemProps,
+  ReorderableListDragStartEvent,
   ReorderableListProps,
   ReorderableListReorderEvent,
   ScrollViewContainerProps,
@@ -25,10 +24,9 @@ export {
   useReorderableDragEnd,
   ReorderableListProps,
   ReorderableListReorderEvent,
+  ReorderableListCellAnimations,
+  ReorderableListDragStartEvent,
   ReorderableListDragEndEvent,
-  ReorderableListItem,
-  ReorderableListItemConfig,
-  ReorderableListItemProps,
   ScrollViewContainer,
   ScrollViewContainerProps,
   NestedReorderableList,

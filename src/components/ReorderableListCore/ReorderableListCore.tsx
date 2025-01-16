@@ -14,7 +14,7 @@ import {
 } from 'react-native-gesture-handler';
 import Animated, {SharedValue} from 'react-native-reanimated';
 
-import {AUTOSCROLL_CONFIG} from './constants';
+import {AUTOSCROLL_CONFIG} from './autoscrollConfig';
 import {useReorderableListCore} from './useReorderableListCore';
 import {ReorderableListContext} from '../../contexts';
 import type {ReorderableListProps} from '../../types';
@@ -49,6 +49,7 @@ const ReorderableListCore = <T,>(
     onLayout,
     onReorder,
     onScroll,
+    onDragStart,
     onDragEnd,
     keyExtractor,
     extraData,
@@ -60,6 +61,7 @@ const ReorderableListCore = <T,>(
     initialScrollViewScrollEnabled,
     scrollable,
     outerScrollGesture,
+    cellAnimations,
     ...rest
   }: ReorderableListCoreProps<T>,
   ref: React.ForwardedRef<FlatList<T>>,
@@ -86,6 +88,7 @@ const ReorderableListCore = <T,>(
     onLayout,
     onReorder,
     onScroll,
+    onDragStart,
     onDragEnd,
     scrollViewContainerRef,
     scrollViewHeightY,
@@ -100,6 +103,7 @@ const ReorderableListCore = <T,>(
         ? true
         : initialScrollViewScrollEnabled,
     nestedScrollable: scrollable,
+    cellAnimations,
   });
 
   const combinedGesture = useMemo(() => {

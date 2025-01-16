@@ -2,10 +2,9 @@ import type {
   FlatListProps,
   NativeScrollEvent,
   ScrollViewProps,
-  ViewProps,
 } from 'react-native';
 
-import {EasingFunction} from 'react-native-reanimated';
+import {SharedValue} from 'react-native-reanimated';
 
 export interface ReorderableListReorderEvent {
   /**
@@ -16,6 +15,13 @@ export interface ReorderableListReorderEvent {
    * Index where the dragged item was released.
    */
   to: number;
+}
+
+export interface ReorderableListDragStartEvent {
+  /**
+   * Index of the dragged item.
+   */
+  index: number;
 }
 
 export interface ReorderableListDragEndEvent {
@@ -69,6 +75,10 @@ export interface ReorderableListProps<T>
    */
   animationDuration?: number;
   /**
+   * Config map for cell animations.
+   */
+  cellAnimations?: ReorderableListCellAnimations;
+  /**
    * Event fired after an item is released and the list is reordered.
    */
   onReorder: (event: ReorderableListReorderEvent) => void;
@@ -77,47 +87,24 @@ export interface ReorderableListProps<T>
    */
   onScroll?: (event: NativeScrollEvent) => void;
   /**
+   * Event fired when an item is dragged. Needs to be a `worklet`. See [Reanimated docs](https://docs.swmansion.com/react-native-reanimated) for further info.
+   */
+  onDragStart?: (event: ReorderableListDragStartEvent) => void;
+  /**
    * Event fired when the dragged item is released. Needs to be a `worklet`. See [Reanimated docs](https://docs.swmansion.com/react-native-reanimated) for further info.
    */
   onDragEnd?: (event: ReorderableListDragEndEvent) => void;
 }
 
-export interface ReorderableListItemConfig {
+export interface ReorderableListCellAnimations {
   /**
-   * Value of the animated style on drag end.
+   * Shared value to animate the opacity of a dragged item. Set to false to disable default opacity animations.
    */
-  enabled?: boolean;
+  opacity?: SharedValue<number> | false;
   /**
-   * Value of the animated style on drag end.
+   * Shared value to animate the scale of a dragged item. Set to false to disable default scale animations.
    */
-  valueEnd?: number;
-  /**
-   * Value of the animated style on drag start.
-   */
-  valueStart?: number;
-  /**
-   * Easing function for the animation to the end value. Default: `Easing.in(Easing.ease)`.
-   */
-  easingEnd?: EasingFunction;
-  /**
-   * Easing function for the animation to the start value. Default: `Easing.out(Easing.ease)`.
-   */
-  easingStart?: EasingFunction;
-  /**
-   * Duration of the animations in milliseconds. Default: `200`.
-   */
-  duration?: number;
-}
-
-export interface ReorderableListItemProps extends ViewProps {
-  /**
-   * Config for the `opacity` animation. Enabled by default with custom default options.
-   */
-  opacityAnimationConfig?: ReorderableListItemConfig;
-  /**
-   * Config for the `scale` animation. Enabled by default with custom default options.
-   */
-  scaleAnimationConfig?: ReorderableListItemConfig;
+  scale?: SharedValue<number> | false;
 }
 
 export interface ScrollViewContainerProps

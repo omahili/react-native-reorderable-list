@@ -23,8 +23,17 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import {AUTOSCROLL_CONFIG} from './constants';
-import {ReorderableListDragEndEvent, ReorderableListState} from '../../types';
+import {
+  OPACITY_ANIMATION_CONFIG_DEFAULT,
+  SCALE_ANIMATION_CONFIG_DEFAULT,
+} from './animationDefaults';
+import {AUTOSCROLL_CONFIG} from './autoscrollConfig';
+import {
+  ReorderableListCellAnimations,
+  ReorderableListDragEndEvent,
+  ReorderableListDragStartEvent,
+  ReorderableListState,
+} from '../../types';
 import type {ReorderableListReorderEvent} from '../../types';
 
 const version = React.version.split('.');
@@ -40,6 +49,7 @@ interface UseReorderableListCoreArgs<T> {
   animationDuration: number;
   dragReorderThreshold: number;
   onReorder: (event: ReorderableListReorderEvent) => void;
+  onDragStart?: (event: ReorderableListDragStartEvent) => void;
   onDragEnd?: (event: ReorderableListDragEndEvent) => void;
   onScroll?: (event: NativeScrollEvent) => void;
   onLayout?: (event: LayoutChangeEvent) => void;
@@ -50,6 +60,7 @@ interface UseReorderableListCoreArgs<T> {
   initialScrollEnabled: boolean | undefined;
   initialScrollViewScrollEnabled: boolean | undefined;
   nestedScrollable: boolean | undefined;
+  cellAnimations: ReorderableListCellAnimations | undefined;
 }
 
 export const useReorderableListCore = <T>({
@@ -60,6 +71,7 @@ export const useReorderableListCore = <T>({
   animationDuration,
   dragReorderThreshold,
   onReorder,
+  onDragStart,
   onDragEnd,
   onScroll,
   onLayout,
@@ -70,6 +82,7 @@ export const useReorderableListCore = <T>({
   initialScrollEnabled,
   initialScrollViewScrollEnabled,
   nestedScrollable,
+  cellAnimations,
 }: UseReorderableListCoreArgs<T>) => {
   const flatListRef = useAnimatedRef<FlatList>();
   const scrollEnabled = useSharedValue(initialScrollEnabled);
@@ -100,6 +113,9 @@ export const useReorderableListCore = <T>({
   >([]);
   const startY = useSharedValue(0);
   const duration = useSharedValue(animationDuration);
+  const scaleDefault = useSharedValue(1);
+  const opacityDefault = useSharedValue(1);
+  const {scale, opacity} = cellAnimations || {};
 
   useEffect(() => {
     duration.value = animationDuration;
@@ -111,8 +127,19 @@ export const useReorderableListCore = <T>({
       currentIndex,
       draggedIndex,
       dragEndHandlers,
+      scale: scale || scaleDefault,
+      opacity: opacity || opacityDefault,
     }),
-    [draggedHeight, currentIndex, draggedIndex, dragEndHandlers],
+    [
+      draggedHeight,
+      currentIndex,
+      draggedIndex,
+      dragEndHandlers,
+      scale,
+      scaleDefault,
+      opacity,
+      opacityDefault,
+    ],
   );
 
   const panGestureHandler = useMemo(
@@ -124,22 +151,18 @@ export const useReorderableListCore = <T>({
             startY.value = e.y;
             currentY.value = e.y;
             currentTranslationY.value = e.translationY;
-            if (draggedIndex.value >= 0) {
-              dragY.value = e.translationY;
-            }
+            dragY.value = e.translationY;
             gestureState.value = e.state;
           }
         })
         .onUpdate(e => {
-          if (state.value !== ReorderableListState.RELEASING) {
+          if (state.value !== ReorderableListState.RELEASED) {
             currentY.value = startY.value + e.translationY;
             currentTranslationY.value = e.translationY;
-            if (draggedIndex.value >= 0) {
-              dragY.value =
-                e.translationY +
-                dragScrollTranslationY.value +
-                scrollViewDragScrollTranslationY.value;
-            }
+            dragY.value =
+              e.translationY +
+              dragScrollTranslationY.value +
+              scrollViewDragScrollTranslationY.value;
             gestureState.value = e.state;
           }
         })
@@ -150,7 +173,6 @@ export const useReorderableListCore = <T>({
       currentY,
       dragScrollTranslationY,
       scrollViewDragScrollTranslationY,
-      draggedIndex,
       gestureState,
       dragY,
       startY,
@@ -195,20 +217,22 @@ export const useReorderableListCore = <T>({
   const resetSharedValues = useCallback(() => {
     'worklet';
 
-    // current index is reset on item render for the on end event
-    draggedIndex.value = -1;
-    // released flag is reset after release is triggered in the item
     state.value = ReorderableListState.IDLE;
+    draggedIndex.value = -1;
     dragY.value = 0;
     dragScrollTranslationY.value = 0;
     scrollViewDragScrollTranslationY.value = 0;
   }, [
+    draggedIndex,
     dragY,
     dragScrollTranslationY,
     scrollViewDragScrollTranslationY,
-    draggedIndex,
     state,
   ]);
+
+  const resetSharedValuesAfterAnimations = useCallback(() => {
+    setTimeout(runOnUI(resetSharedValues), duration.value);
+  }, [resetSharedValues, duration]);
 
   const reorder = (fromIndex: number, toIndex: number) => {
     runOnUI(resetSharedValues)();
@@ -313,19 +337,39 @@ export const useReorderableListCore = <T>({
     ],
   );
 
+  const runDefaultDragAnimations = useCallback(
+    (type: 'start' | 'end') => {
+      'worklet';
+
+      // if animation is not disabled and not custom run the default
+      if (scale !== false && !scale) {
+        const scaleConfig = SCALE_ANIMATION_CONFIG_DEFAULT[type];
+        scaleDefault.value = withTiming(scaleConfig.toValue, scaleConfig);
+      }
+
+      // if animation is not disabled and not custom run the default
+      if (opacity !== false && !opacity) {
+        const opacityConfig = OPACITY_ANIMATION_CONFIG_DEFAULT[type];
+        opacityDefault.value = withTiming(opacityConfig.toValue, opacityConfig);
+      }
+    },
+    [scale, scaleDefault, opacity, opacityDefault],
+  );
+
   useAnimatedReaction(
     () => gestureState.value,
     () => {
       if (
         gestureState.value !== State.ACTIVE &&
         gestureState.value !== State.BEGAN &&
-        (state.value === ReorderableListState.DRAGGING ||
-          state.value === ReorderableListState.AUTO_SCROLL)
+        (state.value === ReorderableListState.DRAGGED ||
+          state.value === ReorderableListState.AUTOSCROLL)
       ) {
-        state.value = ReorderableListState.RELEASING;
+        state.value = ReorderableListState.RELEASED;
 
         // enable back scroll on releasing
         runOnJS(setScrollEnabled)(true);
+
         // trigger onDragEnd event
         let e = {from: draggedIndex.value, to: currentIndex.value};
         onDragEnd?.(e);
@@ -348,6 +392,8 @@ export const useReorderableListCore = <T>({
               currentItemOffset +
               (draggedItemHeight - currentItemHeight);
 
+        runDefaultDragAnimations('end');
+
         if (dragY.value !== newTopPosition) {
           // animate dragged item to its new position on release
           dragY.value = withTiming(
@@ -364,7 +410,7 @@ export const useReorderableListCore = <T>({
           // user might drag and release the item without moving it so,
           // since the animation end callback is not executed in that case
           // we need to reset values as the reorder function would do
-          resetSharedValues();
+          runOnJS(resetSharedValuesAfterAnimations)();
         }
       }
     },
@@ -485,20 +531,20 @@ export const useReorderableListCore = <T>({
     () => currentY.value + scrollViewDragScrollTranslationY.value,
     y => {
       if (
-        state.value === ReorderableListState.DRAGGING ||
-        state.value === ReorderableListState.AUTO_SCROLL
+        state.value === ReorderableListState.DRAGGED ||
+        state.value === ReorderableListState.AUTOSCROLL
       ) {
         setCurrentIndex(y);
 
         if (scrollDirection(y) !== 0) {
-          if (state.value !== ReorderableListState.AUTO_SCROLL) {
+          if (state.value !== ReorderableListState.AUTOSCROLL) {
             // trigger autoscroll
             lastAutoscrollTrigger.value = autoscrollTrigger.value;
             autoscrollTrigger.value *= -1;
-            state.value = ReorderableListState.AUTO_SCROLL;
+            state.value = ReorderableListState.AUTOSCROLL;
           }
-        } else if (state.value === ReorderableListState.AUTO_SCROLL) {
-          state.value = ReorderableListState.DRAGGING;
+        } else if (state.value === ReorderableListState.AUTOSCROLL) {
+          state.value = ReorderableListState.DRAGGED;
         }
       }
     },
@@ -509,7 +555,7 @@ export const useReorderableListCore = <T>({
     () => {
       if (
         autoscrollTrigger.value !== lastAutoscrollTrigger.value &&
-        state.value === ReorderableListState.AUTO_SCROLL
+        state.value === ReorderableListState.AUTOSCROLL
       ) {
         let y = currentY.value + scrollViewDragScrollTranslationY.value;
         const autoscrollIncrement =
@@ -550,7 +596,7 @@ export const useReorderableListCore = <T>({
         flatListScrollOffsetY.value - dragInitialScrollOffsetY.value;
     }
 
-    if (state.value === ReorderableListState.AUTO_SCROLL) {
+    if (state.value === ReorderableListState.AUTOSCROLL) {
       dragY.value =
         currentTranslationY.value +
         dragScrollTranslationY.value +
@@ -579,7 +625,7 @@ export const useReorderableListCore = <T>({
             value - scrollViewDragInitialScrollOffsetY.value;
         }
 
-        if (state.value === ReorderableListState.AUTO_SCROLL) {
+        if (state.value === ReorderableListState.AUTOSCROLL) {
           dragY.value =
             currentTranslationY.value + scrollViewDragScrollTranslationY.value;
 
@@ -612,9 +658,13 @@ export const useReorderableListCore = <T>({
         draggedIndex.value = index;
         previousIndex.value = -1;
         currentIndex.value = index;
-        state.value = ReorderableListState.DRAGGING;
+        state.value = ReorderableListState.DRAGGED;
 
         runOnJS(setScrollEnabled)(false);
+
+        // run animation before onDragStart to avoid potentially waiting for it
+        runDefaultDragAnimations('start');
+        onDragStart?.({index});
       }
     },
     [
@@ -630,6 +680,8 @@ export const useReorderableListCore = <T>({
       state,
       flatListScrollOffsetY,
       itemHeight,
+      onDragStart,
+      runDefaultDragAnimations,
     ],
   );
 

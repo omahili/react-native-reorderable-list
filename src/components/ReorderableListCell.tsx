@@ -1,5 +1,5 @@
 import React, {memo, useCallback, useMemo} from 'react';
-import type {CellRendererProps, LayoutChangeEvent} from 'react-native';
+import {CellRendererProps, LayoutChangeEvent} from 'react-native';
 
 import Animated, {
   Easing,
@@ -7,6 +7,7 @@ import Animated, {
   runOnUI,
   useAnimatedReaction,
   useAnimatedStyle,
+  useDerivedValue,
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
@@ -21,7 +22,6 @@ interface ReorderableListCellProps<T>
   itemHeight: SharedValue<number[]>;
   dragY: SharedValue<number>;
   draggedIndex: SharedValue<number>;
-  // animation duration as a shared value allows to avoid re-renders on value change
   animationDuration: SharedValue<number>;
 }
 
@@ -37,11 +37,13 @@ export const ReorderableListCell = memo(
     draggedIndex,
     animationDuration,
   }: ReorderableListCellProps<T>) => {
-    const dragHandler = useCallback(() => {
-      'worklet';
-
-      startDrag(index);
-    }, [startDrag, index]);
+    const {currentIndex, draggedHeight, scale, opacity} = useContext(
+      ReorderableListContext,
+    );
+    const dragHandler = useCallback(
+      () => runOnUI(startDrag)(index),
+      [startDrag, index],
+    );
 
     const contextValue = useMemo(
       () => ({
@@ -51,22 +53,22 @@ export const ReorderableListCell = memo(
       }),
       [index, dragHandler, draggedIndex],
     );
-    const {currentIndex, draggedHeight} = useContext(ReorderableListContext);
 
-    const itemZIndex = useSharedValue(0);
-    const itemPositionY = useSharedValue(0);
-    const itemDragY = useSharedValue(0);
-    const itemIndex = useSharedValue(index);
+    // Keep separate animated reactions that update itemTranslateY
+    // otherwise animations might stutter if multiple are triggered
+    // (even in other cells, e.g. released item and reordering cells)
+    const itemTranslateY = useSharedValue(0);
+    const isActive = useDerivedValue(() => draggedIndex.value === index);
 
     useAnimatedReaction(
       () => dragY.value,
       () => {
         if (
-          itemIndex.value === draggedIndex.value &&
+          index === draggedIndex.value &&
           currentIndex.value >= 0 &&
           draggedIndex.value >= 0
         ) {
-          itemDragY.value = dragY.value;
+          itemTranslateY.value = dragY.value;
         }
       },
     );
@@ -75,7 +77,7 @@ export const ReorderableListCell = memo(
       () => currentIndex.value,
       () => {
         if (
-          itemIndex.value !== draggedIndex.value &&
+          index !== draggedIndex.value &&
           currentIndex.value >= 0 &&
           draggedIndex.value >= 0
         ) {
@@ -84,12 +86,12 @@ export const ReorderableListCell = memo(
           const endMove = Math.max(draggedIndex.value, currentIndex.value);
           let newValue = 0;
 
-          if (itemIndex.value >= startMove && itemIndex.value <= endMove) {
+          if (index >= startMove && index <= endMove) {
             newValue = moveDown ? -draggedHeight.value : draggedHeight.value;
           }
 
-          if (newValue !== itemPositionY.value) {
-            itemPositionY.value = withTiming(newValue, {
+          if (newValue !== itemTranslateY.value) {
+            itemTranslateY.value = withTiming(newValue, {
               duration: animationDuration.value,
               easing: Easing.out(Easing.ease),
             });
@@ -98,20 +100,22 @@ export const ReorderableListCell = memo(
       },
     );
 
-    useAnimatedReaction(
-      () => draggedIndex.value === index,
-      newValue => {
-        itemZIndex.value = newValue ? 999 : 0;
-      },
-    );
+    const animatedStyle = useAnimatedStyle(() => {
+      if (isActive.value) {
+        return {
+          transform: [{translateY: itemTranslateY.value}, {scale: scale.value}],
+          opacity: opacity.value,
+          zIndex: 999,
+        };
+      }
 
-    const animatedStyle = useAnimatedStyle(() => ({
-      zIndex: itemZIndex.value,
-      transform: [
-        {translateY: itemDragY.value},
-        {translateY: itemPositionY.value},
-      ],
-    }));
+      return {
+        transform: [{translateY: itemTranslateY.value}],
+        // TODO: move to stylesheet when this is fixed
+        // https://github.com/software-mansion/react-native-reanimated/issues/6681#issuecomment-2514228447
+        zIndex: 0,
+      };
+    });
 
     const handleLayout = (e: LayoutChangeEvent) => {
       runOnUI((y: number, height: number) => {
