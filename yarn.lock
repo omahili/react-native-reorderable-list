@@ -1003,7 +1003,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/plugin-transform-class-properties@npm:^7.0.0-0, @babel/plugin-transform-class-properties@npm:^7.25.4":
+"@babel/plugin-transform-class-properties@npm:^7.25.4":
   version: 7.25.4
   resolution: "@babel/plugin-transform-class-properties@npm:7.25.4"
   dependencies:
@@ -1028,7 +1028,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/plugin-transform-classes@npm:^7.0.0-0, @babel/plugin-transform-classes@npm:^7.25.4":
+"@babel/plugin-transform-classes@npm:^7.25.4":
   version: 7.25.4
   resolution: "@babel/plugin-transform-classes@npm:7.25.4"
   dependencies:
@@ -1676,7 +1676,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/plugin-transform-unicode-regex@npm:^7.0.0-0, @babel/plugin-transform-unicode-regex@npm:^7.24.7":
+"@babel/plugin-transform-unicode-regex@npm:^7.24.7":
   version: 7.24.7
   resolution: "@babel/plugin-transform-unicode-regex@npm:7.24.7"
   dependencies:
@@ -10065,18 +10065,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-reanimated@npm:^3.15.3":
-  version: 3.15.3
-  resolution: "react-native-reanimated@npm:3.15.3"
+"react-native-reanimated@npm:3.12.0":
+  version: 3.12.0
+  resolution: "react-native-reanimated@npm:3.12.0"
   dependencies:
     "@babel/plugin-transform-arrow-functions": "npm:^7.0.0-0"
-    "@babel/plugin-transform-class-properties": "npm:^7.0.0-0"
-    "@babel/plugin-transform-classes": "npm:^7.0.0-0"
     "@babel/plugin-transform-nullish-coalescing-operator": "npm:^7.0.0-0"
     "@babel/plugin-transform-optional-chaining": "npm:^7.0.0-0"
     "@babel/plugin-transform-shorthand-properties": "npm:^7.0.0-0"
     "@babel/plugin-transform-template-literals": "npm:^7.0.0-0"
-    "@babel/plugin-transform-unicode-regex": "npm:^7.0.0-0"
     "@babel/preset-typescript": "npm:^7.16.7"
     convert-source-map: "npm:^2.0.0"
     invariant: "npm:^2.2.4"
@@ -10084,7 +10081,7 @@ __metadata:
     "@babel/core": ^7.0.0-0
     react: "*"
     react-native: "*"
-  checksum: 10/4934678b459968f62aad9d0a1e32e459a395a7c67b41e7c4fec39c83365f798969cfee979dc2af0db9d5475de862a5bcd9a76fc1558397dbedd70d2bb26888a4
+  checksum: 10/415fb2bfa3ef2134760358c017ae4919727e648a3615cf85d87a95604f17a5ab15fdb25601e266349a3532b0b8b47d73de43b31b2a5dce7d4301997da3c8c739
   languageName: node
   linkType: hard
 
@@ -10113,7 +10110,7 @@ __metadata:
     react-native: "npm:0.76.5"
     react-native-builder-bob: "npm:^0.20.0"
     react-native-gesture-handler: "npm:^2.12.0"
-    react-native-reanimated: "npm:^3.15.3"
+    react-native-reanimated: "npm:3.12.0"
     release-it: "npm:^17.6.0"
     tsc: "npm:^2.0.4"
     typescript: "npm:5.0.4"
@@ -10121,7 +10118,7 @@ __metadata:
     react: "*"
     react-native: "*"
     react-native-gesture-handler: ">=2.0.0"
-    react-native-reanimated: ">=3.6.0"
+    react-native-reanimated: ">=3.12.0"
   languageName: unknown
   linkType: soft
 

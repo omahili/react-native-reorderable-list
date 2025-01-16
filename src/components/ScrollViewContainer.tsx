@@ -5,6 +5,7 @@ import {Gesture, GestureDetector} from 'react-native-gesture-handler';
 import Animated, {
   useAnimatedRef,
   useAnimatedScrollHandler,
+  useComposedEventHandler,
   useSharedValue,
 } from 'react-native-reanimated';
 
@@ -27,11 +28,14 @@ export const ScrollViewContainer: React.FC<ScrollViewContainerProps> = ({
   const handleScroll = useAnimatedScrollHandler(
     e => {
       scrollViewScrollOffsetY.value = e.contentOffset.y;
-
-      onScroll?.(e);
     },
     [scrollViewScrollOffsetY],
   );
+
+  const composedScrollHandler = useComposedEventHandler([
+    handleScroll,
+    onScroll || null,
+  ]);
 
   const contextValue = useMemo(
     () => ({
@@ -64,7 +68,7 @@ export const ScrollViewContainer: React.FC<ScrollViewContainerProps> = ({
         <Animated.ScrollView
           {...rest}
           ref={scrollViewContainerRef}
-          onScroll={handleScroll}
+          onScroll={composedScrollHandler}
           onLayout={handleLayout}
           scrollEnabled={scrollEnabled}
         />

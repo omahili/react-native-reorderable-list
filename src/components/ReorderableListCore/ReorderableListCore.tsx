@@ -12,7 +12,10 @@ import {
   GestureDetector,
   NativeGesture,
 } from 'react-native-gesture-handler';
-import Animated, {SharedValue} from 'react-native-reanimated';
+import Animated, {
+  SharedValue,
+  useComposedEventHandler,
+} from 'react-native-reanimated';
 
 import {AUTOSCROLL_CONFIG} from './autoscrollConfig';
 import {useReorderableListCore} from './useReorderableListCore';
@@ -87,7 +90,6 @@ const ReorderableListCore = <T,>(
     dragReorderThreshold,
     onLayout,
     onReorder,
-    onScroll,
     onDragStart,
     onDragEnd,
     scrollViewContainerRef,
@@ -115,6 +117,11 @@ const ReorderableListCore = <T,>(
     return gestureHandler;
   }, [scrollable, outerScrollGesture, gestureHandler]);
 
+  const composedScrollHandler = useComposedEventHandler([
+    handleScroll,
+    onScroll || null,
+  ]);
+
   const renderAnimatedCell = useCallback(
     ({cellKey, ...props}: CellRendererProps<T>) => (
       <ReorderableListCell
@@ -141,7 +148,7 @@ const ReorderableListCore = <T,>(
           data={data}
           CellRendererComponent={renderAnimatedCell}
           onLayout={handleFlatListLayout}
-          onScroll={handleScroll}
+          onScroll={composedScrollHandler}
           scrollEventThrottle={1}
           horizontal={false}
           removeClippedSubviews={false}

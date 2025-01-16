@@ -1,10 +1,6 @@
-import type {
-  FlatListProps,
-  NativeScrollEvent,
-  ScrollViewProps,
-} from 'react-native';
+import type {FlatListProps, ScrollViewProps} from 'react-native';
 
-import {SharedValue} from 'react-native-reanimated';
+import {SharedValue, useAnimatedScrollHandler} from 'react-native-reanimated';
 
 export interface ReorderableListReorderEvent {
   /**
@@ -75,7 +71,7 @@ export interface ReorderableListProps<T>
    */
   animationDuration?: number;
   /**
-   * Config map for cell animations.
+   * Allows passing an object with shared values that can animate a cell by using the `onDragStart` and `onDragEnd` events.
    */
   cellAnimations?: ReorderableListCellAnimations;
   /**
@@ -83,9 +79,9 @@ export interface ReorderableListProps<T>
    */
   onReorder: (event: ReorderableListReorderEvent) => void;
   /**
-   * Event fired at most once per frame during scrolling. Needs to be a `worklet`. See [Reanimated docs](https://docs.swmansion.com/react-native-reanimated) for further info.
+   * An animated scroll handler created with useAnimatedScrollHandler. See [Reanimated docs](https://docs.swmansion.com/react-native-reanimated) for further info.
    */
-  onScroll?: (event: NativeScrollEvent) => void;
+  onScroll?: ReturnType<typeof useAnimatedScrollHandler>;
   /**
    * Event fired when an item is dragged. Needs to be a `worklet`. See [Reanimated docs](https://docs.swmansion.com/react-native-reanimated) for further info.
    */
@@ -110,9 +106,9 @@ export interface ReorderableListCellAnimations {
 export interface ScrollViewContainerProps
   extends Omit<ScrollViewProps, 'onScroll'> {
   /**
-   * Event fired at most once per frame during scrolling. Needs to be a `worklet`. See [Reanimated docs](https://docs.swmansion.com/react-native-reanimated) for further info.
+   * An animated scroll handler created with useAnimatedScrollHandler. See [Reanimated docs](https://docs.swmansion.com/react-native-reanimated) for further info.
    */
-  onScroll?: (event: NativeScrollEvent) => void;
+  onScroll?: ReturnType<typeof useAnimatedScrollHandler>;
 }
 
 export interface NestedReorderableListProps<T> extends ReorderableListProps<T> {

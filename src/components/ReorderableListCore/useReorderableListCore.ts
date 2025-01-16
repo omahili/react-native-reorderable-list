@@ -2,7 +2,6 @@ import React, {useCallback, useEffect, useMemo} from 'react';
 import {
   FlatList,
   LayoutChangeEvent,
-  NativeScrollEvent,
   ScrollView,
   unstable_batchedUpdates,
 } from 'react-native';
@@ -51,7 +50,6 @@ interface UseReorderableListCoreArgs<T> {
   onReorder: (event: ReorderableListReorderEvent) => void;
   onDragStart?: (event: ReorderableListDragStartEvent) => void;
   onDragEnd?: (event: ReorderableListDragEndEvent) => void;
-  onScroll?: (event: NativeScrollEvent) => void;
   onLayout?: (event: LayoutChangeEvent) => void;
   scrollViewContainerRef: React.RefObject<ScrollView> | undefined;
   scrollViewHeightY: SharedValue<number> | undefined;
@@ -73,7 +71,6 @@ export const useReorderableListCore = <T>({
   onReorder,
   onDragStart,
   onDragEnd,
-  onScroll,
   onLayout,
   scrollViewContainerRef,
   scrollViewHeightY,
@@ -608,8 +605,6 @@ export const useReorderableListCore = <T>({
         withTiming(autoscrollTrigger.value * -1, {duration: 0}),
       );
     }
-
-    onScroll?.(e);
   });
 
   // parent scroll handler
