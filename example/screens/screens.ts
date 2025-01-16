@@ -1,3 +1,4 @@
+import {CustomAnimationsScreen} from './CustomAnimations';
 import {HeaderFooterScreen} from './HeaderFooter';
 import {MultipleListsScreen} from './MultipleLists';
 import {NestedListsScreen} from './NestedLists';
@@ -41,6 +42,11 @@ const screens = [
     id: '6',
     name: 'Nested Scrollable Lists',
     component: NestedScrollableListsScreen,
+  },
+  {
+    id: '7',
+    name: 'Custom Animations',
+    component: CustomAnimationsScreen,
   },
 ];
 

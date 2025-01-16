@@ -1,10 +1,7 @@
 import React, {memo} from 'react';
 import {Image, Pressable, StyleSheet, Text, View} from 'react-native';
 
-import {
-  ReorderableListItem,
-  useReorderableDrag,
-} from 'react-native-reorderable-list';
+import {useReorderableDrag} from 'react-native-reorderable-list';
 
 interface PlaylistItemProps {
   image: string;
@@ -17,20 +14,18 @@ export const PlaylistItem: React.FC<PlaylistItemProps> = memo(
     const drag = useReorderableDrag();
 
     return (
-      <ReorderableListItem>
-        <Pressable style={styles.container} onLongPress={drag}>
-          <Image
-            style={styles.image}
-            source={{
-              uri: image,
-            }}
-          />
-          <View style={styles.right}>
-            <Text style={styles.title}>{title}</Text>
-            <Text style={styles.author}>{author}</Text>
-          </View>
-        </Pressable>
-      </ReorderableListItem>
+      <Pressable style={styles.container} onLongPress={drag}>
+        <Image
+          style={styles.image}
+          source={{
+            uri: image,
+          }}
+        />
+        <View style={styles.right}>
+          <Text style={styles.title}>{title}</Text>
+          <Text style={styles.author}>{author}</Text>
+        </View>
+      </Pressable>
     );
   },
 );

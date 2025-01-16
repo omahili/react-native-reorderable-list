@@ -8,7 +8,12 @@ import ReorderableList, {
 
 import {RandomListItem} from './RandomListItem';
 
-const list = Array(100)
+interface RandomItemData {
+  id: string;
+  height: number;
+}
+
+const list: RandomItemData[] = Array(500)
   .fill(null)
   .map((_, i) => ({
     id: i.toString(),
@@ -18,24 +23,21 @@ const list = Array(100)
 export const RandomListScreen = () => {
   const [data, setData] = useState(list);
 
-  const renderItem = ({
-    item,
-  }: ListRenderItemInfo<{id: string; height: number}>) => (
+  const handleReorder = ({from, to}: ReorderableListReorderEvent) => {
+    setData(value => reorderItems(value, from, to));
+  };
+
+  const renderItem = ({item}: ListRenderItemInfo<RandomItemData>) => (
     <RandomListItem {...item} />
   );
-
-  const handleReorder = ({from, to}: ReorderableListReorderEvent) => {
-    const newData = reorderItems(data, from, to);
-    setData(newData);
-  };
 
   return (
     <ReorderableList
       data={data}
       onReorder={handleReorder}
       renderItem={renderItem}
-      style={styles.fill}
       keyExtractor={item => item.id}
+      style={styles.fill}
     />
   );
 };

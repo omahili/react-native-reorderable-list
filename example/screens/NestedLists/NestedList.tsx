@@ -9,7 +9,6 @@ import {
 
 import {
   NestedReorderableList,
-  ReorderableListItem,
   ReorderableListReorderEvent,
   reorderItems,
   useReorderableDrag,
@@ -33,11 +32,9 @@ const Card: React.FC<CardProps> = memo(({id, color, height}) => {
   const drag = useReorderableDrag();
 
   return (
-    <ReorderableListItem>
-      <Pressable style={[styles.card, {height}]} onLongPress={drag}>
-        <Text style={[styles.text, {color}]}>Card {id}</Text>
-      </Pressable>
-    </ReorderableListItem>
+    <Pressable style={[styles.card, {height}]} onLongPress={drag}>
+      <Text style={[styles.text, {color}]}>Card {id}</Text>
+    </Pressable>
   );
 });
 
@@ -48,14 +45,13 @@ interface NestedListProps {
 export const NestedList: React.FC<NestedListProps> = ({index}) => {
   const [data, setData] = useState(list);
 
+  const handleReorder = ({from, to}: ReorderableListReorderEvent) => {
+    setData(value => reorderItems(value, from, to));
+  };
+
   const renderItem = ({item}: ListRenderItemInfo<CardProps>) => (
     <Card {...item} />
   );
-
-  const handleReorder = ({from, to}: ReorderableListReorderEvent) => {
-    const newData = reorderItems(data, from, to);
-    setData(newData);
-  };
 
   return (
     <NestedReorderableList

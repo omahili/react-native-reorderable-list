@@ -1,12 +1,7 @@
 import React, {memo, useState} from 'react';
 import {Pressable, StyleSheet, Text} from 'react-native';
 
-import {
-  ReorderableListItem,
-  useReorderableDrag,
-} from 'react-native-reorderable-list';
-
-const scaleAnimationConfig = {valueStart: 1.1};
+import {useReorderableDrag} from 'react-native-reorderable-list';
 
 interface RandomListItemProps {
   id: string;
@@ -19,16 +14,14 @@ export const RandomListItem: React.FC<RandomListItemProps> = memo(
     const [number, setNumber] = useState(0);
 
     return (
-      <ReorderableListItem scaleAnimationConfig={scaleAnimationConfig}>
-        <Pressable
-          style={[styles.card, {height}]}
-          onPress={() => setNumber(number + 1)}
-          onLongPress={drag}>
-          <Text style={styles.text}>
-            {id}-{number}
-          </Text>
-        </Pressable>
-      </ReorderableListItem>
+      <Pressable
+        style={[styles.card, {height}]}
+        onPress={() => setNumber(number + 1)}
+        onLongPress={drag}>
+        <Text style={styles.text}>
+          {id}-{number}
+        </Text>
+      </Pressable>
     );
   },
 );
@@ -45,5 +38,6 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 20,
+    color: 'black',
   },
 });
