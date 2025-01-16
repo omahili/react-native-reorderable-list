@@ -1,5 +1,29 @@
 
 
+# [0.8.0](https://github.com/omahili/react-native-reorderable-list/compare/v0.7.1...v0.8.0) (2025-01-16)
+
+
+### Features
+
+* bump peer dependency RNGH ([64dcbad](https://github.com/omahili/react-native-reorderable-list/commit/64dcbadadef6c6eee54586dd5000e52fd0d56040))
+* improve performance and add new props ([05626ef](https://github.com/omahili/react-native-reorderable-list/commit/05626efa86b108c3f0a0bfcd841c036a1c24c7fc)), closes [#18](https://github.com/omahili/react-native-reorderable-list/issues/18)
+* support animated scroll handlers ([e40dfae](https://github.com/omahili/react-native-reorderable-list/commit/e40dfae03f0716a0fbcb32b6a59d52e9c0935c41)), closes [#21](https://github.com/omahili/react-native-reorderable-list/issues/21)
+
+
+### BREAKING CHANGES
+
+* updated peer dependency requirement for
+react-native-gesture-handler to a minimum of 2.12.0
+* onScroll event handlers of ReorderableList and
+ScrollViewContainer now require animated scroll handlers. For this api
+to work Reanimated minimum version is bumped to 3.12.0.
+* items are optimized by reducing shared values in the
+parent cells and reducing the animated styles. ReorderableListItem
+animations have moved to the cell itself and are attached to the active
+cell only. A new prop cellAnimations and onDragStart were added to allow
+customizing opacity and scale, while ReorderableListItem is removed from
+the api.
+
 ## [0.7.1](https://github.com/omahili/react-native-reorderable-list/compare/v0.7.0...v0.7.1) (2025-01-15)
 
 
