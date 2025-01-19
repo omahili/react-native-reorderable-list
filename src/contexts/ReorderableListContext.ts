@@ -8,6 +8,7 @@ interface ReorderableListContextData {
   dragEndHandlers: SharedValue<((from: number, to: number) => void)[][]>;
   scale: SharedValue<number>;
   opacity: SharedValue<number>;
+  activeIndex: number;
 }
 
 export const ReorderableListContext = React.createContext<

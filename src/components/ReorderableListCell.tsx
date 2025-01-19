@@ -37,28 +37,29 @@ export const ReorderableListCell = memo(
     draggedIndex,
     animationDuration,
   }: ReorderableListCellProps<T>) => {
-    const {currentIndex, draggedHeight, scale, opacity} = useContext(
-      ReorderableListContext,
-    );
+    const {currentIndex, draggedHeight, scale, opacity, activeIndex} =
+      useContext(ReorderableListContext);
     const dragHandler = useCallback(
       () => runOnUI(startDrag)(index),
       [startDrag, index],
     );
 
+    const isActive = activeIndex === index;
     const contextValue = useMemo(
       () => ({
         index,
         dragHandler,
         draggedIndex,
+        isActive,
       }),
-      [index, dragHandler, draggedIndex],
+      [index, dragHandler, draggedIndex, isActive],
     );
 
     // Keep separate animated reactions that update itemTranslateY
     // otherwise animations might stutter if multiple are triggered
     // (even in other cells, e.g. released item and reordering cells)
     const itemTranslateY = useSharedValue(0);
-    const isActive = useDerivedValue(() => draggedIndex.value === index);
+    const isActiveCell = useDerivedValue(() => draggedIndex.value === index);
 
     useAnimatedReaction(
       () => dragY.value,
@@ -101,7 +102,7 @@ export const ReorderableListCell = memo(
     );
 
     const animatedStyle = useAnimatedStyle(() => {
-      if (isActive.value) {
+      if (isActiveCell.value) {
         return {
           transform: [{translateY: itemTranslateY.value}, {scale: scale.value}],
           opacity: opacity.value,

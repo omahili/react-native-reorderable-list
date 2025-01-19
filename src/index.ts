@@ -4,6 +4,7 @@ import {
   ScrollViewContainer,
 } from './components';
 import {
+  useIsActive,
   useReorderableDrag,
   useReorderableDragEnd,
   useReorderableDragStart,
@@ -19,6 +20,7 @@ import type {
 import {reorderItems} from './utils';
 
 export {
+  useIsActive,
   useReorderableDrag,
   useReorderableDragStart,
   useReorderableDragEnd,

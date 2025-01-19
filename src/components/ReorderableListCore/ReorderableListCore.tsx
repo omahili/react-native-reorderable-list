@@ -65,6 +65,7 @@ const ReorderableListCore = <T,>(
     scrollable,
     outerScrollGesture,
     cellAnimations,
+    shouldUpdateActiveItem,
     ...rest
   }: ReorderableListCoreProps<T>,
   ref: React.ForwardedRef<FlatList<T>>,
@@ -106,6 +107,7 @@ const ReorderableListCore = <T,>(
         : initialScrollViewScrollEnabled,
     nestedScrollable: scrollable,
     cellAnimations,
+    shouldUpdateActiveItem,
   });
 
   const combinedGesture = useMemo(() => {

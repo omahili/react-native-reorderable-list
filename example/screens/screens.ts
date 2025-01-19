@@ -1,3 +1,4 @@
+import {ActiveItemScreen} from './ActiveItem';
 import {CustomAnimationsScreen} from './CustomAnimations';
 import {HeaderFooterScreen} from './HeaderFooter';
 import {MultipleListsScreen} from './MultipleLists';
@@ -47,6 +48,11 @@ const screens = [
     id: '7',
     name: 'Custom Animations',
     component: CustomAnimationsScreen,
+  },
+  {
+    id: '8',
+    name: 'Active Item',
+    component: ActiveItemScreen,
   },
 ];
 

@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useMemo} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {
   FlatList,
   LayoutChangeEvent,
@@ -59,6 +59,7 @@ interface UseReorderableListCoreArgs<T> {
   initialScrollViewScrollEnabled: boolean | undefined;
   nestedScrollable: boolean | undefined;
   cellAnimations: ReorderableListCellAnimations | undefined;
+  shouldUpdateActiveItem: boolean | undefined;
 }
 
 export const useReorderableListCore = <T>({
@@ -80,8 +81,10 @@ export const useReorderableListCore = <T>({
   initialScrollViewScrollEnabled,
   nestedScrollable,
   cellAnimations,
+  shouldUpdateActiveItem,
 }: UseReorderableListCoreArgs<T>) => {
   const flatListRef = useAnimatedRef<FlatList>();
+  const [activeIndex, setActiveIndex] = useState(-1);
   const scrollEnabled = useSharedValue(initialScrollEnabled);
   const gestureState = useSharedValue<State>(State.UNDETERMINED);
   const currentY = useSharedValue(0);
@@ -124,6 +127,7 @@ export const useReorderableListCore = <T>({
       currentIndex,
       draggedIndex,
       dragEndHandlers,
+      activeIndex,
       scale: scale || scaleDefault,
       opacity: opacity || opacityDefault,
     }),
@@ -132,6 +136,7 @@ export const useReorderableListCore = <T>({
       currentIndex,
       draggedIndex,
       dragEndHandlers,
+      activeIndex,
       scale,
       scaleDefault,
       opacity,
@@ -366,6 +371,10 @@ export const useReorderableListCore = <T>({
 
         // enable back scroll on releasing
         runOnJS(setScrollEnabled)(true);
+
+        if (shouldUpdateActiveItem) {
+          runOnJS(setActiveIndex)(-1);
+        }
 
         // trigger onDragEnd event
         let e = {from: draggedIndex.value, to: currentIndex.value};
@@ -644,6 +653,10 @@ export const useReorderableListCore = <T>({
         // after scrolling the parent list it would offset the new dragged item in another nested list
         resetSharedValues();
 
+        if (shouldUpdateActiveItem) {
+          runOnJS(setActiveIndex)(index);
+        }
+
         dragInitialScrollOffsetY.value = flatListScrollOffsetY.value;
         scrollViewDragInitialScrollOffsetY.value = scrollViewScrollOffsetY
           ? scrollViewScrollOffsetY.value
@@ -664,6 +677,7 @@ export const useReorderableListCore = <T>({
     },
     [
       resetSharedValues,
+      shouldUpdateActiveItem,
       dragInitialScrollOffsetY,
       scrollViewScrollOffsetY,
       scrollViewDragInitialScrollOffsetY,

@@ -75,6 +75,10 @@ export interface ReorderableListProps<T>
    */
   cellAnimations?: ReorderableListCellAnimations;
   /**
+   * Whether the active item should be updated. Enables usage of `useIsActive` hook. Default: `false`.
+   */
+  shouldUpdateActiveItem?: boolean;
+  /**
    * Event fired after an item is released and the list is reordered.
    */
   onReorder: (event: ReorderableListReorderEvent) => void;
