@@ -79,6 +79,14 @@ export interface ReorderableListProps<T>
    */
   shouldUpdateActiveItem?: boolean;
   /**
+   * Wether the pan gestures necessary for dragging are enabled. Default: `true`.
+   */
+  panEnabled?: boolean;
+  /**
+   * Duration in milliseconds of a long press on the list before pan gestures, necessary for dragging, are allowed to activate.
+   */
+  panActivateAfterLongPress?: number;
+  /**
    * Event fired after an item is released and the list is reordered.
    */
   onReorder: (event: ReorderableListReorderEvent) => void;

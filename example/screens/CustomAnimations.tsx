@@ -9,7 +9,6 @@ import ReorderableList, {
   reorderItems,
 } from 'react-native-reorderable-list';
 
-// TODO: improve structure and create base example
 import {PlaylistItemData} from './Playlist';
 import playlistData from './Playlist/data.json';
 import {PlaylistItem} from './Playlist/PlaylistItem';

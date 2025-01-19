@@ -43,7 +43,6 @@ interface ReorderableListCoreProps<T> extends ReorderableListProps<T> {
 
 const ReorderableListCore = <T,>(
   {
-    data,
     autoscrollThreshold = 0.1,
     autoscrollSpeedScale = 1,
     autoscrollDelay = AUTOSCROLL_CONFIG.delay,
@@ -54,18 +53,17 @@ const ReorderableListCore = <T,>(
     onScroll,
     onDragStart,
     onDragEnd,
-    keyExtractor,
-    extraData,
     scrollViewContainerRef,
     scrollViewHeightY,
     scrollViewScrollOffsetY,
     scrollViewScrollEnabled,
-    scrollEnabled,
     initialScrollViewScrollEnabled,
     scrollable,
     outerScrollGesture,
     cellAnimations,
     shouldUpdateActiveItem,
+    panEnabled = true,
+    panActivateAfterLongPress,
     ...rest
   }: ReorderableListCoreProps<T>,
   ref: React.ForwardedRef<FlatList<T>>,
@@ -100,7 +98,7 @@ const ReorderableListCore = <T,>(
     // flatlist will default to true if we pass explicitly undefined,
     // but internally we would treat it as false, so we force true
     initialScrollEnabled:
-      typeof scrollEnabled === 'undefined' ? true : scrollEnabled,
+      typeof rest.scrollEnabled === 'undefined' ? true : rest.scrollEnabled,
     initialScrollViewScrollEnabled:
       typeof initialScrollViewScrollEnabled === 'undefined'
         ? true
@@ -108,6 +106,8 @@ const ReorderableListCore = <T,>(
     nestedScrollable: scrollable,
     cellAnimations,
     shouldUpdateActiveItem,
+    panEnabled,
+    panActivateAfterLongPress,
   });
 
   const combinedGesture = useMemo(() => {
@@ -147,17 +147,13 @@ const ReorderableListCore = <T,>(
         <AnimatedFlatList
           {...rest}
           ref={handleRef}
-          data={data}
           CellRendererComponent={renderAnimatedCell}
           onLayout={handleFlatListLayout}
           onScroll={composedScrollHandler}
           scrollEventThrottle={1}
           horizontal={false}
           removeClippedSubviews={false}
-          keyExtractor={keyExtractor}
-          extraData={extraData}
           numColumns={1}
-          scrollEnabled={scrollEnabled}
         />
       </GestureDetector>
     </ReorderableListContext.Provider>

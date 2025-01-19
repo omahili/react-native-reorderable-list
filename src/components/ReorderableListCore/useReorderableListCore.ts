@@ -60,6 +60,8 @@ interface UseReorderableListCoreArgs<T> {
   nestedScrollable: boolean | undefined;
   cellAnimations: ReorderableListCellAnimations | undefined;
   shouldUpdateActiveItem: boolean | undefined;
+  panEnabled: boolean;
+  panActivateAfterLongPress: number | undefined;
 }
 
 export const useReorderableListCore = <T>({
@@ -82,6 +84,8 @@ export const useReorderableListCore = <T>({
   nestedScrollable,
   cellAnimations,
   shouldUpdateActiveItem,
+  panActivateAfterLongPress,
+  panEnabled,
 }: UseReorderableListCoreArgs<T>) => {
   const flatListRef = useAnimatedRef<FlatList>();
   const [activeIndex, setActiveIndex] = useState(-1);
@@ -182,9 +186,21 @@ export const useReorderableListCore = <T>({
     ],
   );
 
+  const panGestureHandlerWithOptions = useMemo(() => {
+    if (typeof panActivateAfterLongPress === 'number') {
+      panGestureHandler.activateAfterLongPress(panActivateAfterLongPress);
+    }
+
+    if (!panEnabled) {
+      panGestureHandler.enabled(panEnabled);
+    }
+
+    return panGestureHandler;
+  }, [panActivateAfterLongPress, panEnabled, panGestureHandler]);
+
   const gestureHandler = useMemo(
-    () => Gesture.Simultaneous(Gesture.Native(), panGestureHandler),
-    [panGestureHandler],
+    () => Gesture.Simultaneous(Gesture.Native(), panGestureHandlerWithOptions),
+    [panGestureHandlerWithOptions],
   );
 
   const setScrollEnabled = useCallback(

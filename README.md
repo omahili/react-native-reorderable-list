@@ -25,6 +25,8 @@ A reorderable list for React Native applications, powered by Reanimated 🚀
   - [useReorderableDragEnd](#usereorderabledragend)
   - [useIsActive](#useisactive)
 - [Utils](#utils)
+- [Troubleshooting](#troubleshooting)
+  - [RefreshControl](#refreshcontrol)
 - [Example](#example)
 - [License](#license)
 
@@ -55,19 +57,21 @@ Then you need to install these two peer dependencies:
 
 This component uses a [FlatList](https://reactnative.dev/docs/flatlist) and it extends its props:
 
-| Props                  | Type                                                                             | Required | Default                    | Description                                                                                                                                                                                                                                                                                                   |
-| ---------------------- | -------------------------------------------------------------------------------- | -------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| autoscrollThreshold    | `number`                                                                         | No       | `0.1`                      | Threshold at the extremity of the list that triggers autoscroll when an item is dragged to it. A value of `0.1` means that 10% of the area at the top and 10% at the bottom will trigger autoscroll. Min value: `0`. Max value: `0.4`.                                                                        |
-| autoscrollSpeedScale   | `number`                                                                         | No       | `1`                        | Scales the autoscroll speed at which the list scrolls when an item is dragged to the scroll areas.                                                                                                                                                                                                            |
-| autoscrollDelay        | `number`                                                                         | No       | `0` (Android), `100` (iOS) | Delay in between autoscroll triggers. Can be used to tune the autoscroll smoothness. Default values differ between platforms: `0` for Android and `100` for iOS.                                                                                                                                              |
-| dragReorderThreshold   | `number`                                                                         | No       | `0.2`                      | Specifies the fraction of an item's size at which it will shift when a dragged item crosses over it. For example, `0.2` means the item shifts when the dragged item passes 20% of its height (in a vertical list).                                                                                            |
-| animationDuration      | `number`                                                                         | No       | `200`                      | Duration of the animations in milliseconds. Users won't be able to drag a new item until the dragged item is released and its animation to its new position ends.                                                                                                                                             |
-| shouldUpdateActiveItem | boolean                                                                          | No       | `false`                    | Whether the active item should be updated. Enables usage of `useIsActive` hook.                                                                                                                                                                                                                               |
-| cellAnimations         | `{ scale: SharedValue<number> \| false, opacity: SharedValue<number> \| false }` | No       | N/A                        | Allows passing an object with shared values that can animate a cell by using the `onDragStart` and `onDragEnd` events. Set the property in the object to false to disable the animation. Check the [examples](https://github.com/omahili/react-native-reorderable-list/tree/master/example) for more details. |
-| onReorder              | `(event: { from: number, to: number  }) => void`                                 | Yes      | N/A                        | Event fired after an item is released and the list is reordered.                                                                                                                                                                                                                                              |
-| onDragStart            | `(event: { index: number }) => void`                                             | No       | N/A                        | Event fired when an item is dragged. Needs to be a `worklet`. See [Reanimated docs](https://docs.swmansion.com/react-native-reanimated) for further info.                                                                                                                                                     |
-| onDragEnd              | `(event: { from: number, to: number  }) => void`                                 | No       | N/A                        | Event fired when the dragged item is released. Needs to be a `worklet`. See [Reanimated docs](https://docs.swmansion.com/react-native-reanimated) for further info.                                                                                                                                           |
-| onScroll               | `ReturnType<typeof useAnimatedScrollHandler>`                                    | No       | N/A                        | An animated scroll handler created with useAnimatedScrollHandler. See [Reanimated docs](https://docs.swmansion.com/react-native-reanimated) for further info.                                                                                                                                                 |
+| Props                     | Type                                                                             | Required | Default                    | Description                                                                                                                                                                                                                                                                                                   |
+| ------------------------- | -------------------------------------------------------------------------------- | -------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| autoscrollThreshold       | `number`                                                                         | No       | `0.1`                      | Threshold at the extremity of the list that triggers autoscroll when an item is dragged to it. A value of `0.1` means that 10% of the area at the top and 10% at the bottom will trigger autoscroll. Min value: `0`. Max value: `0.4`.                                                                        |
+| autoscrollSpeedScale      | `number`                                                                         | No       | `1`                        | Scales the autoscroll speed at which the list scrolls when an item is dragged to the scroll areas.                                                                                                                                                                                                            |
+| autoscrollDelay           | `number`                                                                         | No       | `0` (Android), `100` (iOS) | Delay in between autoscroll triggers. Can be used to tune the autoscroll smoothness. Default values differ between platforms: `0` for Android and `100` for iOS.                                                                                                                                              |
+| dragReorderThreshold      | `number`                                                                         | No       | `0.2`                      | Specifies the fraction of an item's size at which it will shift when a dragged item crosses over it. For example, `0.2` means the item shifts when the dragged item passes 20% of its height (in a vertical list).                                                                                            |
+| animationDuration         | `number`                                                                         | No       | `200`                      | Duration of the animations in milliseconds. Users won't be able to drag a new item until the dragged item is released and its animation to its new position ends.                                                                                                                                             |
+| cellAnimations            | `{ scale: SharedValue<number> \| false, opacity: SharedValue<number> \| false }` | No       | N/A                        | Allows passing an object with shared values that can animate a cell by using the `onDragStart` and `onDragEnd` events. Set the property in the object to false to disable the animation. Check the [examples](https://github.com/omahili/react-native-reorderable-list/tree/master/example) for more details. |
+| shouldUpdateActiveItem    | boolean                                                                          | No       | `false`                    | Whether the active item should be updated. Enables usage of `useIsActive` hook.                                                                                                                                                                                                                               |
+| panEnabled                | `boolean`                                                                        | No       | `true`                     | Wether the pan gestures necessary for dragging are enabled.                                                                                                                                                                                                                                                   |
+| panActivateAfterLongPress | `number`                                                                         | No       | N/A                        | Duration in milliseconds a the long press on the list before pan gestures, necessary for dragging, are allowed to activate.                                                                                                                                                                                   |
+| onReorder                 | `(event: { from: number, to: number  }) => void`                                 | Yes      | N/A                        | Event fired after an item is released and the list is reordered.                                                                                                                                                                                                                                              |
+| onDragStart               | `(event: { index: number }) => void`                                             | No       | N/A                        | Event fired when an item is dragged. Needs to be a `worklet`. See [Reanimated docs](https://docs.swmansion.com/react-native-reanimated) for further info.                                                                                                                                                     |
+| onDragEnd                 | `(event: { from: number, to: number  }) => void`                                 | No       | N/A                        | Event fired when the dragged item is released. Needs to be a `worklet`. See [Reanimated docs](https://docs.swmansion.com/react-native-reanimated) for further info.                                                                                                                                           |
+| onScroll                  | `ReturnType<typeof useAnimatedScrollHandler>`                                    | No       | N/A                        | An animated scroll handler created with useAnimatedScrollHandler. See [Reanimated docs](https://docs.swmansion.com/react-native-reanimated) for further info.                                                                                                                                                 |
 
 The following props from FlatList are not supported:
 
@@ -157,6 +161,61 @@ Additionally this hook requires setting `shouldUpdateActiveItem` to true on the 
 - **reorderItems**: `<T>(data: T[], from: number, to: number) => T[]`
 
   This function receives an array of items, the index of the item to be moved, and the index of the new position and it returns a new array with the items reordered.
+
+## Troubleshooting
+
+### RefreshControl
+
+If you want to use RefreshControl with ReorderableList you might encounter some issues on Android, where gestures are conflicting making one or both of the components non responsive. To overcome this issues you can delay the activation of pan gestures necessary for dragging items by using the `panActivateAfterLongPress` prop. This duration should be slightly longer than the long press delay necessary to drag your items. If you're using Pressable the `delayLongPress` is 500 ms by default.
+
+```typescript
+<ReorderableList
+  // ...
+  panActivateAfterLongPress={Platform.OS === 'android' ? 520 : undefined}
+/>
+```
+
+If you change `delayLongPress` on your Pressable, update this prop accordingly.
+
+Another issue you'll encounter is that when you drag your items the RefreshControl might animate. To avoid this you can enable and disable it on drag start and drag end like so:
+
+```typescript
+const [refreshEnabled, setRefreshEnabled] = useState(true);
+
+const handleDragStart = useCallback(() => {
+  'worklet';
+
+  // NOTE: if it's refreshing we don't want the refresh control to disappear
+  // and we can keep it enabled since it won't conflict with the drag
+  if (Platform.OS === 'android' && !refreshing) {
+    runOnJS(setRefreshEnabled)(false);
+  }
+}, [refreshing]);
+
+const handleDragEnd = useCallback(() => {
+  'worklet';
+
+  // NOTE: if it's refreshing we don't want the refresh control to disappear
+  // and we can keep it enabled since it won't conflict with the drag
+  if (Platform.OS === 'android' && !refreshing) {
+    runOnJS(setRefreshEnabled)(true);
+  }
+}, [refreshing]);
+
+return (
+  <ReorderableList
+    // ...
+    onDragStart={handleDragStart}
+    onDragEnd={handleDragEnd}
+    refreshControl={
+      <RefreshControl
+        // ...
+        enabled={refreshEnabled}
+      />
+    }
+  />
+);
+```
 
 ## Example
 

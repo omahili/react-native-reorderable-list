@@ -7,6 +7,7 @@ import {NestedScrollableListsScreen} from './NestedScrollableLists';
 import {PlaylistScreen} from './Playlist';
 import {RandomListScreen} from './RandomList';
 import {ReadmeExampleScreen} from './ReadmeExample';
+import {RefreshControlScreen} from './RefreshControl';
 
 const screens = [
   {
@@ -53,6 +54,11 @@ const screens = [
     id: '8',
     name: 'Active Item',
     component: ActiveItemScreen,
+  },
+  {
+    id: '9',
+    name: 'Refresh Control',
+    component: RefreshControlScreen,
   },
 ];
 
