@@ -1,5 +1,13 @@
 
 
+# [0.9.0](https://github.com/omahili/react-native-reorderable-list/compare/v0.8.0...v0.9.0) (2025-01-19)
+
+
+### Features
+
+* add panEnabled and panActivateAfterLongPress ([47803d2](https://github.com/omahili/react-native-reorderable-list/commit/47803d2aaf07c06d2febbcff438e457ce313523b))
+* add useIsActive hook ([6e45ada](https://github.com/omahili/react-native-reorderable-list/commit/6e45ada8e4e0c4db1691f1b97a79447a2528ce4e))
+
 # [0.8.0](https://github.com/omahili/react-native-reorderable-list/compare/v0.7.1...v0.8.0) (2025-01-16)
 
 
