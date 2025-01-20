@@ -20,14 +20,13 @@ export const HomeScreen = () => {
         </PressableOpacity>
       )}
       keyExtractor={item => item.id}
-      contentContainerStyle={styles.container}
+      style={styles.list}
     />
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
+  list: {
     backgroundColor: 'white',
   },
   item: {

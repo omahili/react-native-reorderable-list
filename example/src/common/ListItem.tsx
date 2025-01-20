@@ -1,18 +1,17 @@
 import React, {memo} from 'react';
 import {Image, Pressable, StyleSheet, Text, View} from 'react-native';
 
-import {useIsActive, useReorderableDrag} from 'react-native-reorderable-list';
+import {useReorderableDrag} from 'react-native-reorderable-list';
 
-interface PlaylistItemProps {
+export interface ListItemProps {
   image: string;
   title: string;
-  author: string;
+  description: string;
 }
 
-export const PlaylistItem: React.FC<PlaylistItemProps> = memo(
-  ({image, title, author}) => {
+export const ListItem: React.FC<ListItemProps> = memo(
+  ({image, title, description}) => {
     const drag = useReorderableDrag();
-    const isActive = useIsActive();
 
     return (
       <Pressable style={styles.container} onLongPress={drag}>
@@ -22,9 +21,9 @@ export const PlaylistItem: React.FC<PlaylistItemProps> = memo(
             uri: image,
           }}
         />
-        <View style={styles.right}>
+        <View style={styles.details}>
           <Text style={styles.title}>{title}</Text>
-          <Text style={styles.author}>{isActive ? 'ACTIVE' : author}</Text>
+          <Text style={styles.description}>{description}</Text>
         </View>
       </Pressable>
     );
@@ -34,7 +33,6 @@ export const PlaylistItem: React.FC<PlaylistItemProps> = memo(
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    alignItems: 'center',
     backgroundColor: 'white',
     padding: 12,
   },
@@ -42,17 +40,20 @@ const styles = StyleSheet.create({
     height: 50,
     width: 50,
     borderRadius: 4,
+    marginTop: 4,
   },
-  right: {
-    marginLeft: 12,
+  details: {
+    flex: 1,
+    gap: 4,
+    paddingHorizontal: 12,
   },
   title: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '500',
     color: 'black',
   },
-  author: {
+  description: {
     fontSize: 14,
-    color: 'gray',
+    color: '#707070',
   },
 });

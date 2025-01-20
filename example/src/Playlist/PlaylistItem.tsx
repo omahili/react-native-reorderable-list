@@ -21,8 +21,10 @@ export const PlaylistItem: React.FC<PlaylistItemProps> = memo(
             uri: image,
           }}
         />
-        <View style={styles.right}>
-          <Text style={styles.title}>{title}</Text>
+        <View style={styles.details}>
+          <Text style={styles.title} numberOfLines={1}>
+            {title}
+          </Text>
           <Text style={styles.author}>{author}</Text>
         </View>
       </Pressable>
@@ -42,8 +44,9 @@ const styles = StyleSheet.create({
     width: 50,
     borderRadius: 4,
   },
-  right: {
-    marginLeft: 12,
+  details: {
+    paddingHorizontal: 12,
+    flex: 1,
   },
   title: {
     fontSize: 16,

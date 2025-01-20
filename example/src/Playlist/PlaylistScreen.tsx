@@ -1,12 +1,12 @@
-import React, {useState} from 'react';
-import {ListRenderItemInfo, StyleSheet} from 'react-native';
+import React, {useMemo, useState} from 'react';
+import {ListRenderItemInfo} from 'react-native';
 
+import {faker} from '@faker-js/faker';
 import ReorderableList, {
   ReorderableListReorderEvent,
   reorderItems,
 } from 'react-native-reorderable-list';
 
-import playlistData from './data.json';
 import {PlaylistItem} from './PlaylistItem';
 import {PlaylistItemSeparator} from './PlaylistItemSeparator';
 
@@ -18,7 +18,22 @@ export interface PlaylistItemData {
 }
 
 export const PlaylistScreen = () => {
-  const [data, setData] = useState(playlistData);
+  const seedData = useMemo(
+    () =>
+      faker.helpers.multiple(
+        () => ({
+          id: faker.string.uuid(),
+          image: faker.image.url(),
+          title: faker.music.songName(),
+          author: faker.music.artist(),
+        }),
+        {
+          count: 20,
+        },
+      ),
+    [],
+  );
+  const [data, setData] = useState(seedData);
 
   const handleReorder = ({from, to}: ReorderableListReorderEvent) => {
     setData(value => reorderItems(value, from, to));
@@ -35,14 +50,6 @@ export const PlaylistScreen = () => {
       renderItem={renderItem}
       keyExtractor={item => item.id}
       ItemSeparatorComponent={PlaylistItemSeparator}
-      style={styles.list}
     />
   );
 };
-
-const styles = StyleSheet.create({
-  list: {
-    flex: 1,
-    backgroundColor: 'white',
-  },
-});
