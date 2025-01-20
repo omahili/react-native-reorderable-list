@@ -25,6 +25,7 @@ import Animated, {
 import {
   OPACITY_ANIMATION_CONFIG_DEFAULT,
   SCALE_ANIMATION_CONFIG_DEFAULT,
+  SHADOW_OPACITY_ANIMATION_CONFIG_DEFAULT,
 } from './animationDefaults';
 import {AUTOSCROLL_CONFIG} from './autoscrollConfig';
 import {
@@ -119,7 +120,8 @@ export const useReorderableListCore = <T>({
   const duration = useSharedValue(animationDuration);
   const scaleDefault = useSharedValue(1);
   const opacityDefault = useSharedValue(1);
-  const {scale, opacity} = cellAnimations || {};
+  const shadowOpacityDefault = useSharedValue(0);
+  const {scale, opacity, shadow} = cellAnimations || {};
 
   useEffect(() => {
     duration.value = animationDuration;
@@ -134,6 +136,19 @@ export const useReorderableListCore = <T>({
       activeIndex,
       scale: scale || scaleDefault,
       opacity: opacity || opacityDefault,
+      shadow: !shadow
+        ? {
+            opacity: shadowOpacityDefault,
+            radius: 5,
+            color: 'black',
+            elevation: 10,
+          }
+        : {
+            opacity: shadow?.opacity || shadowOpacityDefault,
+            radius: shadow?.radius || 5,
+            color: shadow?.color || 'black',
+            elevation: shadow?.elevation || 10,
+          },
     }),
     [
       draggedHeight,
@@ -145,6 +160,8 @@ export const useReorderableListCore = <T>({
       scaleDefault,
       opacity,
       opacityDefault,
+      shadow,
+      shadowOpacityDefault,
     ],
   );
 
@@ -370,8 +387,25 @@ export const useReorderableListCore = <T>({
         const opacityConfig = OPACITY_ANIMATION_CONFIG_DEFAULT[type];
         opacityDefault.value = withTiming(opacityConfig.toValue, opacityConfig);
       }
+
+      // // if animation is not disabled and not custom run the default
+      if (shadow !== false && !shadow) {
+        const shadowOpacityConfig =
+          SHADOW_OPACITY_ANIMATION_CONFIG_DEFAULT[type];
+        shadowOpacityDefault.value = withTiming(
+          shadowOpacityConfig.toValue,
+          shadowOpacityConfig,
+        );
+      }
     },
-    [scale, scaleDefault, opacity, opacityDefault],
+    [
+      scale,
+      scaleDefault,
+      opacity,
+      opacityDefault,
+      shadow,
+      shadowOpacityDefault,
+    ],
   );
 
   useAnimatedReaction(

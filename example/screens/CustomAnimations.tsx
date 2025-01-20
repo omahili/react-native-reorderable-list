@@ -17,6 +17,7 @@ import {PlaylistItemSeparator} from './Playlist/PlaylistItemSeparator';
 export const CustomAnimationsScreen = () => {
   const [data, setData] = useState(playlistData);
   const scale = useSharedValue(1);
+  const shadowOpacity = useSharedValue(0);
 
   const handleReorder = ({from, to}: ReorderableListReorderEvent) => {
     setData(value => reorderItems(value, from, to));
@@ -29,12 +30,22 @@ export const CustomAnimationsScreen = () => {
       easing: Easing.in(Easing.elastic(5)),
       duration: 150,
     });
+
+    shadowOpacity.value = withTiming(1, {
+      easing: Easing.in(Easing.elastic(5)),
+      duration: 150,
+    });
   };
 
   const handleDragEnd = (_: ReorderableListDragEndEvent) => {
     'worklet';
 
     scale.value = withTiming(1, {
+      easing: Easing.in(Easing.elastic(3)),
+      duration: 200,
+    });
+
+    shadowOpacity.value = withTiming(0, {
       easing: Easing.in(Easing.elastic(3)),
       duration: 200,
     });
@@ -56,6 +67,9 @@ export const CustomAnimationsScreen = () => {
       cellAnimations={{
         scale,
         opacity: false,
+        shadow: {
+          opacity: shadowOpacity,
+        },
       }}
       style={styles.list}
     />

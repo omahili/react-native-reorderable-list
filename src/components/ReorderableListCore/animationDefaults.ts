@@ -33,3 +33,16 @@ export const OPACITY_ANIMATION_CONFIG_DEFAULT: AnimationConfig = {
     duration: DURATION_END,
   },
 };
+
+export const SHADOW_OPACITY_ANIMATION_CONFIG_DEFAULT: AnimationConfig = {
+  start: {
+    toValue: 0.25,
+    easing: Easing.in(Easing.ease),
+    duration: DURATION_START,
+  },
+  end: {
+    toValue: 0,
+    easing: Easing.out(Easing.ease),
+    duration: DURATION_END,
+  },
+};

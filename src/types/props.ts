@@ -113,6 +113,33 @@ export interface ReorderableListCellAnimations {
    * Shared value to animate the scale of a dragged item. Set to false to disable default scale animations.
    */
   scale?: SharedValue<number> | false;
+  shadow?:
+    | {
+        /**
+         * Shared value to animate the shadow opacity of a dragged item. Set to false to disable default shadow opacity animations.
+         * Default: `0.25`.
+         */
+        opacity?: SharedValue<number> | false;
+        /**
+         * Shared value to animate the shadow radius of a dragged item. Set to false to disable default shadow radius animations.
+         * Default: `5`.
+         */
+        radius?: number;
+        /**
+         * Shared value to animate the shadow offset of a dragged item. Set to false to disable default shadow offset animations.
+         * Default: `black`
+         */
+        color?: string;
+        /**
+         * Shared value to animate the shadow elevation of a dragged item. Set to false to disable default shadow elevation
+         * animations.
+         * Default: `10`.
+         * Android only.
+         * iOS uses `opacity` instead.
+         * */
+        elevation?: number;
+      }
+    | false;
 }
 
 export interface ScrollViewContainerProps

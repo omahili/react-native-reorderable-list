@@ -37,7 +37,7 @@ export const ReorderableListCell = memo(
     draggedIndex,
     animationDuration,
   }: ReorderableListCellProps<T>) => {
-    const {currentIndex, draggedHeight, scale, opacity, activeIndex} =
+    const {currentIndex, draggedHeight, scale, opacity, shadow, activeIndex} =
       useContext(ReorderableListContext);
     const dragHandler = useCallback(
       () => runOnUI(startDrag)(index),
@@ -107,6 +107,15 @@ export const ReorderableListCell = memo(
           transform: [{translateY: itemTranslateY.value}, {scale: scale.value}],
           opacity: opacity.value,
           zIndex: 999,
+          ...(shadow
+            ? {
+                elevation: shadow.elevation,
+                shadowRadius: shadow.radius,
+                shadowOffset: {width: 0, height: 0},
+                shadowColor: shadow.color,
+                shadowOpacity: shadow.opacity.value,
+              }
+            : {}),
         };
       }
 

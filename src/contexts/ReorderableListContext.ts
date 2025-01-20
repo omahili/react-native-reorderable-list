@@ -9,6 +9,12 @@ interface ReorderableListContextData {
   scale: SharedValue<number>;
   opacity: SharedValue<number>;
   activeIndex: number;
+  shadow: {
+    opacity: SharedValue<number>;
+    radius: number;
+    color: string;
+    elevation: number;
+  };
 }
 
 export const ReorderableListContext = React.createContext<
