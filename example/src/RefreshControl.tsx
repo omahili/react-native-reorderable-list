@@ -1,10 +1,5 @@
 import React, {useCallback, useState} from 'react';
-import {
-  ListRenderItemInfo,
-  Platform,
-  RefreshControl,
-  StyleSheet,
-} from 'react-native';
+import {ListRenderItemInfo, Platform, RefreshControl} from 'react-native';
 
 import {runOnJS} from 'react-native-reanimated';
 import ReorderableList, {
@@ -12,13 +7,11 @@ import ReorderableList, {
   reorderItems,
 } from 'react-native-reorderable-list';
 
-import {PlaylistItemData} from './Playlist';
-import playlistData from './Playlist/data.json';
-import {PlaylistItem} from './Playlist/PlaylistItem';
-import {PlaylistItemSeparator} from './Playlist/PlaylistItemSeparator';
+import {ItemSeparator, ListItem, SeedDataItem, useSeedData} from './common';
 
 export const RefreshControlScreen = () => {
-  const [data, setData] = useState(playlistData);
+  const seedData = useSeedData();
+  const [data, setData] = useState(seedData);
   const [refreshing, setRefreshing] = useState(false);
   const [refreshEnabled, setRefreshEnabled] = useState(true);
 
@@ -30,9 +23,7 @@ export const RefreshControlScreen = () => {
   );
 
   const renderItem = useCallback(
-    ({item}: ListRenderItemInfo<PlaylistItemData>) => (
-      <PlaylistItem {...item} />
-    ),
+    ({item}: ListRenderItemInfo<SeedDataItem>) => <ListItem {...item} />,
     [],
   );
 
@@ -67,8 +58,7 @@ export const RefreshControlScreen = () => {
       onReorder={handleReorder}
       renderItem={renderItem}
       keyExtractor={item => item.id}
-      ItemSeparatorComponent={PlaylistItemSeparator}
-      style={styles.list}
+      ItemSeparatorComponent={ItemSeparator}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
       refreshControl={
@@ -82,10 +72,3 @@ export const RefreshControlScreen = () => {
     />
   );
 };
-
-const styles = StyleSheet.create({
-  list: {
-    flex: 1,
-    backgroundColor: 'white',
-  },
-});

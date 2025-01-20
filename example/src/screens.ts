@@ -1,11 +1,11 @@
 import {ActiveItemScreen} from './ActiveItem';
 import {CustomAnimationsScreen} from './CustomAnimations';
+import {DynamicHeightsScreen} from './DynamicHeights';
 import {HeaderFooterScreen} from './HeaderFooter';
 import {MultipleListsScreen} from './MultipleLists';
 import {NestedListsScreen} from './NestedLists';
 import {NestedScrollableListsScreen} from './NestedScrollableLists';
 import {PlaylistScreen} from './Playlist';
-import {RandomListScreen} from './RandomList';
 import {ReadmeExampleScreen} from './ReadmeExample';
 import {RefreshControlScreen} from './RefreshControl';
 
@@ -17,17 +17,17 @@ const screens = [
   },
   {
     id: '1',
-    name: 'Random List',
-    component: RandomListScreen,
+    name: 'Dynamic Heights',
+    component: DynamicHeightsScreen,
   },
   {
     id: '2',
-    name: 'Readme',
+    name: 'Readme Example',
     component: ReadmeExampleScreen,
   },
   {
     id: '3',
-    name: 'Header Footer',
+    name: 'Header and Footer',
     component: HeaderFooterScreen,
   },
   {

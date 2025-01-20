@@ -1,14 +1,7 @@
 import React, {memo, useState} from 'react';
-import {
-  ListRenderItemInfo,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import {ListRenderItemInfo, Pressable, StyleSheet, Text} from 'react-native';
 
-import {
-  NestedReorderableList,
+import ReorderableList, {
   ReorderableListReorderEvent,
   reorderItems,
   useReorderableDrag,
@@ -20,13 +13,15 @@ interface CardProps {
   height: number;
 }
 
-const list: CardProps[] = [
-  {id: '0', color: 'red', height: 100},
-  {id: '1', color: 'blue', height: 150},
-  {id: '2', color: 'green', height: 80},
-  {id: '3', color: 'violet', height: 100},
-  {id: '4', color: 'orange', height: 120},
-];
+const rand = () => Math.floor(Math.random() * 256);
+
+const seedData: CardProps[] = Array(20)
+  .fill(null)
+  .map((_, i) => ({
+    id: i.toString(),
+    color: `rgb(${rand()}, ${rand()}, ${rand()})`,
+    height: Math.max(60, Math.floor(Math.random() * 100)),
+  }));
 
 const Card: React.FC<CardProps> = memo(({id, color, height}) => {
   const drag = useReorderableDrag();
@@ -38,12 +33,8 @@ const Card: React.FC<CardProps> = memo(({id, color, height}) => {
   );
 });
 
-interface NestedListProps {
-  index: number;
-}
-
-export const NestedList: React.FC<NestedListProps> = ({index}) => {
-  const [data, setData] = useState(list);
+export const ReadmeExampleScreen = () => {
+  const [data, setData] = useState(seedData);
 
   const handleReorder = ({from, to}: ReorderableListReorderEvent) => {
     setData(value => reorderItems(value, from, to));
@@ -54,17 +45,11 @@ export const NestedList: React.FC<NestedListProps> = ({index}) => {
   );
 
   return (
-    <NestedReorderableList
+    <ReorderableList
       data={data}
       onReorder={handleReorder}
       renderItem={renderItem}
       keyExtractor={item => item.id}
-      scrollEnabled={false}
-      ListHeaderComponent={
-        <View style={styles.header}>
-          <Text style={styles.text}>List {index}</Text>
-        </View>
-      }
     />
   );
 };
@@ -73,18 +58,11 @@ const styles = StyleSheet.create({
   card: {
     justifyContent: 'center',
     alignItems: 'center',
-    margin: 6,
-    borderRadius: 5,
     backgroundColor: 'white',
-    borderWidth: 1,
-    borderColor: '#ddd',
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
   },
   text: {
     fontSize: 20,
-  },
-  header: {
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
 });

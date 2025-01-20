@@ -9,8 +9,7 @@
 
 A reorderable list for React Native applications, powered by Reanimated 🚀
 
-![Playlist](https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExM3JpY200bHoxeDVneGV1YTUxaHIxaGNuNjQ3ZjRlZWZ1NmluYjFlZSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/rk5aZKXYVMBktawoTr/giphy.gif)
-![Example](https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExNzBhdWZoM3F4bGlnajB6NGdsbjA3MW54aHk5NGxkZnp3aXJrdDJ6ciZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/oJhSawgWA1OtR1IPgT/giphy.gif)
+![Demo](https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExanBuODMwN29scmxoNXY0MmZkcHpzZnFxYXE5eTVydzBsbHIyY3ZqMyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/T9uQrEnUCijeJOzSs9/giphy.gif)
 
 ## Index
 
@@ -219,11 +218,12 @@ return (
 
 ## Example
 
-Here is simple example of how to use this component. Examples of nested lists and much more can be found in the [example](https://github.com/omahili/react-native-reorderable-list/tree/feat/nested-lists/example) directory.
+Here is simple example of how to use this component. Examples of nested lists and much more can be found in the [example](https://github.com/omahili/react-native-reorderable-list/tree/master/example) directory.
 
 ```typescript
 import React, {memo, useState} from 'react';
 import {ListRenderItemInfo, Pressable, StyleSheet, Text} from 'react-native';
+
 import ReorderableList, {
   ReorderableListReorderEvent,
   reorderItems,
@@ -236,18 +236,15 @@ interface CardProps {
   height: number;
 }
 
-const list: CardProps[] = [
-  {id: '0', color: 'red', height: 100},
-  {id: '1', color: 'blue', height: 150},
-  {id: '2', color: 'green', height: 80},
-  {id: '3', color: 'violet', height: 100},
-  {id: '4', color: 'orange', height: 120},
-  {id: '5', color: 'coral', height: 100},
-  {id: '6', color: 'purple', height: 110},
-  {id: '7', color: 'chocolate', height: 80},
-  {id: '8', color: 'crimson', height: 90},
-  {id: '9', color: 'seagreen', height: 90},
-];
+const rand = () => Math.floor(Math.random() * 256);
+
+const seedData: CardProps[] = Array(20)
+  .fill(null)
+  .map((_, i) => ({
+    id: i.toString(),
+    color: `rgb(${rand()}, ${rand()}, ${rand()})`,
+    height: Math.max(60, Math.floor(Math.random() * 100)),
+  }));
 
 const Card: React.FC<CardProps> = memo(({id, color, height}) => {
   const drag = useReorderableDrag();
@@ -260,7 +257,7 @@ const Card: React.FC<CardProps> = memo(({id, color, height}) => {
 });
 
 const Example = () => {
-  const [data, setData] = useState(list);
+  const [data, setData] = useState(seedData);
 
   const handleReorder = ({from, to}: ReorderableListReorderEvent) => {
     setData(value => reorderItems(value, from, to));
@@ -284,11 +281,9 @@ const styles = StyleSheet.create({
   card: {
     justifyContent: 'center',
     alignItems: 'center',
-    margin: 6,
-    borderRadius: 5,
     backgroundColor: 'white',
-    borderWidth: 1,
-    borderColor: '#ddd',
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
   },
   text: {
     fontSize: 20,

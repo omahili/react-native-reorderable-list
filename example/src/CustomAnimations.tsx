@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {ListRenderItemInfo, StyleSheet} from 'react-native';
+import {ListRenderItemInfo} from 'react-native';
 
 import {Easing, useSharedValue, withTiming} from 'react-native-reanimated';
 import ReorderableList, {
@@ -9,13 +9,11 @@ import ReorderableList, {
   reorderItems,
 } from 'react-native-reorderable-list';
 
-import {PlaylistItemData} from './Playlist';
-import playlistData from './Playlist/data.json';
-import {PlaylistItem} from './Playlist/PlaylistItem';
-import {PlaylistItemSeparator} from './Playlist/PlaylistItemSeparator';
+import {ItemSeparator, ListItem, SeedDataItem, useSeedData} from './common';
 
 export const CustomAnimationsScreen = () => {
-  const [data, setData] = useState(playlistData);
+  const seedData = useSeedData();
+  const [data, setData] = useState(seedData);
   const scale = useSharedValue(1);
   const shadowOpacity = useSharedValue(0);
 
@@ -51,8 +49,8 @@ export const CustomAnimationsScreen = () => {
     });
   };
 
-  const renderItem = ({item}: ListRenderItemInfo<PlaylistItemData>) => (
-    <PlaylistItem {...item} />
+  const renderItem = ({item}: ListRenderItemInfo<SeedDataItem>) => (
+    <ListItem {...item} />
   );
 
   return (
@@ -63,7 +61,7 @@ export const CustomAnimationsScreen = () => {
       onDragEnd={handleDragEnd}
       renderItem={renderItem}
       keyExtractor={item => item.id}
-      ItemSeparatorComponent={PlaylistItemSeparator}
+      ItemSeparatorComponent={ItemSeparator}
       cellAnimations={{
         scale,
         opacity: false,
@@ -71,14 +69,6 @@ export const CustomAnimationsScreen = () => {
           opacity: shadowOpacity,
         },
       }}
-      style={styles.list}
     />
   );
 };
-
-const styles = StyleSheet.create({
-  list: {
-    flex: 1,
-    backgroundColor: 'white',
-  },
-});
