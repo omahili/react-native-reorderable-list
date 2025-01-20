@@ -107,15 +107,11 @@ export const ReorderableListCell = memo(
           transform: [{translateY: itemTranslateY.value}, {scale: scale.value}],
           opacity: opacity.value,
           zIndex: 999,
-          ...(shadow
-            ? {
-                elevation: shadow.elevation,
-                shadowRadius: shadow.radius,
-                shadowOffset: {width: 0, height: 0},
-                shadowColor: shadow.color,
-                shadowOpacity: shadow.opacity.value,
-              }
-            : {}),
+          elevation: shadow.elevation,
+          shadowRadius: shadow.radius,
+          shadowOffset: {width: 0, height: 0},
+          shadowColor: shadow.color,
+          shadowOpacity: shadow.opacity.value,
         };
       }
 
