@@ -126,8 +126,6 @@ export const useReorderableListCore = <T>({
     duration.value = animationDuration;
   }, [duration, animationDuration]);
 
-  console.log(cellAnimations?.opacity);
-
   const listContextValue = useMemo(
     () => ({
       draggedHeight,

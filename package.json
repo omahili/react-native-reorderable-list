@@ -147,6 +147,7 @@
     ],
     "rules": {
       "@typescript-eslint/no-explicit-any": "error",
+      "no-console": "error",
       "prettier/prettier": [
         "error",
         {
