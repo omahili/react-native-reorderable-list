@@ -1,5 +1,27 @@
 
 
+# [0.10.0](https://github.com/omahili/react-native-reorderable-list/compare/v0.9.0...v0.10.0) (2025-01-26)
+
+
+### Bug Fixes
+
+* remove console log ([b66e306](https://github.com/omahili/react-native-reorderable-list/commit/b66e30673ecb872c7ec69db5b2cfa54c8397487d))
+
+
+### Features
+
+* add autoscrollThresholdOffset prop ([0d2a889](https://github.com/omahili/react-native-reorderable-list/commit/0d2a88947801b4bfe4c63daa42746ee43420433d))
+* support all view style animations for cell ([f019ab1](https://github.com/omahili/react-native-reorderable-list/commit/f019ab19254011166982a43c2c8e7113bda0450f))
+
+
+### BREAKING CHANGES
+
+* The scale style animation is now part of the transform
+property. The default scale animation can be disabled by overriding
+transform. Similarly, the default opacity animation can be disabled by
+overriding its value, instead of setting it to false.
+cellAnimations properties can be either a value or shared value.
+
 # [0.9.0](https://github.com/omahili/react-native-reorderable-list/compare/v0.8.0...v0.9.0) (2025-01-19)
 
 
