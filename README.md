@@ -185,8 +185,8 @@ const [refreshEnabled, setRefreshEnabled] = useState(true);
 const handleDragStart = useCallback(() => {
   'worklet';
 
-  // NOTE: if it's refreshing we don't want the refresh control to disappear
-  // and we can keep it enabled since it won't conflict with the drag
+  // NOTE: If it's refreshing we don't want the refresh control to disappear
+  // and we can keep it enabled since it won't conflict with the drag.
   if (Platform.OS === 'android' && !refreshing) {
     runOnJS(setRefreshEnabled)(false);
   }
@@ -195,12 +195,10 @@ const handleDragStart = useCallback(() => {
 const handleDragEnd = useCallback(() => {
   'worklet';
 
-  // NOTE: if it's refreshing we don't want the refresh control to disappear
-  // and we can keep it enabled since it won't conflict with the drag
-  if (Platform.OS === 'android' && !refreshing) {
+  if (Platform.OS === 'android') {
     runOnJS(setRefreshEnabled)(true);
   }
-}, [refreshing]);
+}, []);
 
 return (
   <ReorderableList
