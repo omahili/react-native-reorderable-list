@@ -4,10 +4,10 @@ import {FlatList, StyleSheet, Text} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {PressableOpacity} from 'react-native-pressable-opacity';
 
-import screens from './screens';
+import screens, {StackNavigationParams} from './screens';
 
 export const HomeScreen = () => {
-  const navigation = useNavigation<any>();
+  const navigation = useNavigation<StackNavigationParams>();
 
   return (
     <FlatList

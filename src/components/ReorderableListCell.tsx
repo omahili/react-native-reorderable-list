@@ -14,6 +14,7 @@ import Animated, {
 
 import {ReorderableCellContext, ReorderableListContext} from '../contexts';
 import {useContext} from '../hooks';
+import {applyAnimatedStyles} from './helpers';
 
 interface ReorderableListCellProps<T>
   extends Omit<CellRendererProps<T>, 'cellKey'> {
@@ -37,7 +38,7 @@ export const ReorderableListCell = memo(
     draggedIndex,
     animationDuration,
   }: ReorderableListCellProps<T>) => {
-    const {currentIndex, draggedHeight, scale, opacity, activeIndex} =
+    const {currentIndex, draggedHeight, activeIndex, cellAnimations} =
       useContext(ReorderableListContext);
     const dragHandler = useCallback(
       () => runOnUI(startDrag)(index),
@@ -103,11 +104,22 @@ export const ReorderableListCell = memo(
 
     const animatedStyle = useAnimatedStyle(() => {
       if (isActiveCell.value) {
-        return {
-          transform: [{translateY: itemTranslateY.value}, {scale: scale.value}],
-          opacity: opacity.value,
-          zIndex: 999,
-        };
+        const transform = [{translateY: itemTranslateY.value}];
+        if (Array.isArray(cellAnimations.transform)) {
+          const customTransform = cellAnimations.transform.map(x =>
+            applyAnimatedStyles({}, x),
+          ) as [];
+          transform.push(...customTransform);
+        }
+
+        return applyAnimatedStyles(
+          {
+            transform,
+            zIndex: 999,
+          },
+          cellAnimations,
+          ['transform'],
+        );
       }
 
       return {

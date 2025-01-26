@@ -119,11 +119,12 @@ export const useReorderableListCore = <T>({
   const duration = useSharedValue(animationDuration);
   const scaleDefault = useSharedValue(1);
   const opacityDefault = useSharedValue(1);
-  const {scale, opacity} = cellAnimations || {};
 
   useEffect(() => {
     duration.value = animationDuration;
   }, [duration, animationDuration]);
+
+  console.log(cellAnimations?.opacity);
 
   const listContextValue = useMemo(
     () => ({
@@ -132,8 +133,17 @@ export const useReorderableListCore = <T>({
       draggedIndex,
       dragEndHandlers,
       activeIndex,
-      scale: scale || scaleDefault,
-      opacity: opacity || opacityDefault,
+      cellAnimations: {
+        ...cellAnimations,
+        transform:
+          cellAnimations && 'transform' in cellAnimations
+            ? cellAnimations.transform
+            : [{scale: scaleDefault}],
+        opacity:
+          cellAnimations && 'opacity' in cellAnimations
+            ? cellAnimations.opacity
+            : opacityDefault,
+      },
     }),
     [
       draggedHeight,
@@ -141,9 +151,8 @@ export const useReorderableListCore = <T>({
       draggedIndex,
       dragEndHandlers,
       activeIndex,
-      scale,
+      cellAnimations,
       scaleDefault,
-      opacity,
       opacityDefault,
     ],
   );
@@ -359,19 +368,19 @@ export const useReorderableListCore = <T>({
     (type: 'start' | 'end') => {
       'worklet';
 
-      // if animation is not disabled and not custom run the default
-      if (scale !== false && !scale) {
+      // if no custom scale run default
+      if (!(cellAnimations && 'transformtra' in cellAnimations)) {
         const scaleConfig = SCALE_ANIMATION_CONFIG_DEFAULT[type];
         scaleDefault.value = withTiming(scaleConfig.toValue, scaleConfig);
       }
 
-      // if animation is not disabled and not custom run the default
-      if (opacity !== false && !opacity) {
+      // if no custom opacity run the default
+      if (!(cellAnimations && 'opacity' in cellAnimations)) {
         const opacityConfig = OPACITY_ANIMATION_CONFIG_DEFAULT[type];
         opacityDefault.value = withTiming(opacityConfig.toValue, opacityConfig);
       }
     },
-    [scale, scaleDefault, opacity, opacityDefault],
+    [cellAnimations, scaleDefault, opacityDefault],
   );
 
   useAnimatedReaction(

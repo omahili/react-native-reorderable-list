@@ -1,3 +1,6 @@
+import {ParamListBase} from '@react-navigation/native';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+
 import {ActiveItemScreen} from './ActiveItem';
 import {CustomAnimationsScreen} from './CustomAnimations';
 import {DynamicHeightsScreen} from './DynamicHeights';
@@ -60,6 +63,15 @@ const screens = [
     name: 'Refresh Control',
     component: RefreshControlScreen,
   },
-];
+] as const;
 
+const names = screens.map(x => x.name);
+
+type Screens = {
+  [Key in keyof typeof names]: undefined;
+};
+
+interface ScreenParams extends Screens, ParamListBase {}
+
+export type StackNavigationParams = NativeStackNavigationProp<ScreenParams>;
 export default screens;

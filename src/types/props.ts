@@ -1,6 +1,25 @@
-import type {FlatListProps, ScrollViewProps} from 'react-native';
+import type {
+  FlatListProps,
+  MatrixTransform,
+  PerspectiveTransform,
+  RotateTransform,
+  RotateXTransform,
+  RotateYTransform,
+  RotateZTransform,
+  ScaleTransform,
+  ScaleXTransform,
+  ScaleYTransform,
+  ScrollViewProps,
+  SkewXTransform,
+  SkewYTransform,
+  TranslateXTransform,
+  TranslateYTransform,
+  ViewStyle,
+} from 'react-native';
 
 import {SharedValue, useAnimatedScrollHandler} from 'react-native-reanimated';
+
+import {MaximumOneOf, SharedValueOrType} from './misc';
 
 export interface ReorderableListReorderEvent {
   /**
@@ -71,7 +90,7 @@ export interface ReorderableListProps<T>
    */
   animationDuration?: number;
   /**
-   * Allows passing an object with shared values that can animate a cell by using the `onDragStart` and `onDragEnd` events.
+   * Allows passing an object with values and/or shared values that can animate a cell, for example by using the `onDragStart` and `onDragEnd` events. Supports view style properties. Override opacity and/or transform to disable the default animation, e.g. `{opacity: 1, transform: []}`.
    */
   cellAnimations?: ReorderableListCellAnimations;
   /**
@@ -104,15 +123,42 @@ export interface ReorderableListProps<T>
   onDragEnd?: (event: ReorderableListDragEndEvent) => void;
 }
 
-export interface ReorderableListCellAnimations {
+export type Transforms = PerspectiveTransform &
+  RotateTransform &
+  RotateXTransform &
+  RotateYTransform &
+  RotateZTransform &
+  ScaleTransform &
+  ScaleXTransform &
+  ScaleYTransform &
+  TranslateXTransform &
+  TranslateYTransform &
+  SkewXTransform &
+  SkewYTransform &
+  MatrixTransform;
+
+export type ReorderableListCellAnimatedStyles = Omit<
+  {
+    [StyleKey in keyof ViewStyle]?:
+      | SharedValue<ViewStyle[StyleKey]>
+      | ViewStyle[StyleKey];
+  },
+  // omit custom type and type with JSDoc
+  'transform' | 'opacity'
+>;
+
+export interface ReorderableListCellAnimations
+  extends ReorderableListCellAnimatedStyles {
   /**
-   * Shared value to animate the opacity of a dragged item. Set to false to disable default opacity animations.
+   * Transform animations for a dragged item.
+   * Disable default animation by overriding transform, e.g. `[]` or `[{ scale: customSharedValue }]`.
    */
-  opacity?: SharedValue<number> | false;
+  transform?: Readonly<MaximumOneOf<SharedValueOrType<Transforms>>[]>;
   /**
-   * Shared value to animate the scale of a dragged item. Set to false to disable default scale animations.
+   * Shared value to animate the opacity of a dragged item.
+   * Disable default animation by overriding opacity, e.g `1`.
    */
-  scale?: SharedValue<number> | false;
+  opacity?: SharedValue<number> | number;
 }
 
 export interface ScrollViewContainerProps
