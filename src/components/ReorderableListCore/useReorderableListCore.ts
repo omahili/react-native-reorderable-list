@@ -43,6 +43,7 @@ const hasAutomaticBatching = version.length
 interface UseReorderableListCoreArgs<T> {
   ref: React.ForwardedRef<FlatList<T>>;
   autoscrollThreshold: number;
+  autoscrollThresholdOffset: {top?: number; bottom?: number} | undefined;
   autoscrollSpeedScale: number;
   autoscrollDelay: number;
   animationDuration: number;
@@ -67,6 +68,7 @@ interface UseReorderableListCoreArgs<T> {
 export const useReorderableListCore = <T>({
   ref,
   autoscrollThreshold,
+  autoscrollThresholdOffset,
   autoscrollSpeedScale,
   autoscrollDelay,
   animationDuration,
@@ -476,24 +478,33 @@ export const useReorderableListCore = <T>({
   const calculateThresholdArea = useCallback(
     (hiddenArea: {top: number; bottom: number}) => {
       'worklet';
+      const offsetTop = Math.max(0, autoscrollThresholdOffset?.top || 0);
+      const offsetBottom = Math.max(0, autoscrollThresholdOffset?.bottom || 0);
       const threshold = Math.max(0, Math.min(autoscrollThreshold, 0.4));
       const visibleHeight =
-        flatListHeightY.value - (hiddenArea.top + hiddenArea.bottom);
+        flatListHeightY.value -
+        (hiddenArea.top + hiddenArea.bottom) -
+        (offsetTop + offsetBottom);
 
-      const top = visibleHeight * threshold;
-      const bottom = flatListHeightY.value - top;
+      const area = visibleHeight * threshold;
+      const top = area + offsetTop;
+      const bottom = flatListHeightY.value - area - offsetBottom;
 
       return {top, bottom};
     },
-    [autoscrollThreshold, flatListHeightY],
+    [autoscrollThreshold, autoscrollThresholdOffset, flatListHeightY],
   );
 
   const calculateThresholdAreaParent = useCallback(
     (hiddenArea: {top: number; bottom: number}) => {
       'worklet';
+      const offsetTop = Math.max(0, autoscrollThresholdOffset?.top || 0);
+      const offsetBottom = Math.max(0, autoscrollThresholdOffset?.bottom || 0);
       const threshold = Math.max(0, Math.min(autoscrollThreshold, 0.4));
-      const top = flatListHeightY.value * threshold;
-      const bottom = flatListHeightY.value - top;
+
+      const area = flatListHeightY.value * threshold;
+      const top = area + offsetTop;
+      const bottom = flatListHeightY.value - area - offsetBottom;
 
       // if the hidden area is 0 then we don't have a threshold area
       // we might have floating errors like 0.0001 which we should ignore
@@ -502,7 +513,7 @@ export const useReorderableListCore = <T>({
         bottom: hiddenArea.bottom > 0.1 ? bottom - hiddenArea.bottom : 0,
       };
     },
-    [autoscrollThreshold, flatListHeightY],
+    [autoscrollThreshold, autoscrollThresholdOffset, flatListHeightY],
   );
 
   const shouldScrollParent = useCallback(

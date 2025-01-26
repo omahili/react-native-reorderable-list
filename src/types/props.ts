@@ -62,11 +62,16 @@ export interface ReorderableListProps<T>
   extends Omit<FlatListProps<T>, OmittedProps> {
   data: T[];
   /**
-   * Threshold  at the extremety of the list which triggers autoscroll when an item is dragged to it.
+   * Threshold at the extremety of the list which triggers autoscroll when an item is dragged to it.
    * A value of 0.1 means that 10% of the area at the top and 10% at the bottom of the list will trigger autoscroll
    * when an item is dragged to it. Min value: `0`. Max value: `0.4`. Default: `0.1`.
    */
   autoscrollThreshold?: number;
+  /**
+   * Amount by which the threshold is offset at the extremety of the list.
+   * For example, setting `{top: 50}` will make the autoscroll trigger 50 pixels earlier at the top.
+   */
+  autoscrollThresholdOffset?: {top?: number; bottom?: number};
   /**
    * Scales the autoscroll spreed at which the list scrolls when an item is dragged to the scroll areas. Default: `1`.
    */

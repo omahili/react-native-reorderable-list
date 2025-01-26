@@ -44,6 +44,7 @@ interface ReorderableListCoreProps<T> extends ReorderableListProps<T> {
 const ReorderableListCore = <T,>(
   {
     autoscrollThreshold = 0.1,
+    autoscrollThresholdOffset,
     autoscrollSpeedScale = 1,
     autoscrollDelay = AUTOSCROLL_CONFIG.delay,
     animationDuration = 200,
@@ -83,6 +84,7 @@ const ReorderableListCore = <T,>(
   } = useReorderableListCore({
     ref,
     autoscrollThreshold,
+    autoscrollThresholdOffset,
     autoscrollSpeedScale,
     autoscrollDelay,
     animationDuration,

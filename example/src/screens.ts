@@ -4,6 +4,7 @@ import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {ActiveItemScreen} from './ActiveItem';
 import {CustomAnimationsScreen} from './CustomAnimations';
 import {DynamicHeightsScreen} from './DynamicHeights';
+import {FloatingHeaderScreen} from './FloatingHeader';
 import {HeaderFooterScreen} from './HeaderFooter';
 import {MultipleListsScreen} from './MultipleLists';
 import {NestedListsScreen} from './NestedLists';
@@ -62,6 +63,11 @@ const screens = [
     id: '9',
     name: 'Refresh Control',
     component: RefreshControlScreen,
+  },
+  {
+    id: '10',
+    name: 'Floating Header',
+    component: FloatingHeaderScreen,
   },
 ] as const;
 

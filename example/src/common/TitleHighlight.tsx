@@ -1,12 +1,16 @@
 import React from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import {StyleSheet, Text, View, ViewProps} from 'react-native';
 
-interface TitleHighlightProps {
+interface TitleHighlightProps extends ViewProps {
   title: string;
 }
 
-export const TitleHighlight: React.FC<TitleHighlightProps> = ({title}) => (
-  <View style={styles.container}>
+export const TitleHighlight: React.FC<TitleHighlightProps> = ({
+  title,
+  style,
+  ...rest
+}) => (
+  <View style={[styles.container, style]} {...rest}>
     <Text style={styles.text}>{title}</Text>
   </View>
 );
