@@ -1,5 +1,12 @@
 
 
+# [0.11.0](https://github.com/omahili/react-native-reorderable-list/compare/v0.10.0...v0.11.0) (2025-01-27)
+
+
+### Features
+
+* add onIndexChange event ([5ea588b](https://github.com/omahili/react-native-reorderable-list/commit/5ea588bf75a2603425f54cfb932df663eef5d83a))
+
 # [0.10.0](https://github.com/omahili/react-native-reorderable-list/compare/v0.9.0...v0.10.0) (2025-01-26)
 
 
