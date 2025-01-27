@@ -6,6 +6,7 @@ import {CustomAnimationsScreen} from './CustomAnimations';
 import {DynamicHeightsScreen} from './DynamicHeights';
 import {FloatingHeaderScreen} from './FloatingHeader';
 import {HeaderFooterScreen} from './HeaderFooter';
+import {IndexChangeScreen} from './IndexChange';
 import {MultipleListsScreen} from './MultipleLists';
 import {NestedListsScreen} from './NestedLists';
 import {NestedScrollableListsScreen} from './NestedScrollableLists';
@@ -68,6 +69,11 @@ const screens = [
     id: '10',
     name: 'Floating Header',
     component: FloatingHeaderScreen,
+  },
+  {
+    id: '11',
+    name: 'Index Change',
+    component: IndexChangeScreen,
   },
 ] as const;
 

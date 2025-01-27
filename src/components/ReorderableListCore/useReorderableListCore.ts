@@ -31,6 +31,7 @@ import {
   ReorderableListCellAnimations,
   ReorderableListDragEndEvent,
   ReorderableListDragStartEvent,
+  ReorderableListIndexChangeEvent,
   ReorderableListState,
 } from '../../types';
 import type {ReorderableListReorderEvent} from '../../types';
@@ -51,6 +52,7 @@ interface UseReorderableListCoreArgs<T> {
   onReorder: (event: ReorderableListReorderEvent) => void;
   onDragStart?: (event: ReorderableListDragStartEvent) => void;
   onDragEnd?: (event: ReorderableListDragEndEvent) => void;
+  onIndexChange?: (event: ReorderableListIndexChangeEvent) => void;
   onLayout?: (event: LayoutChangeEvent) => void;
   scrollViewContainerRef: React.RefObject<ScrollView> | undefined;
   scrollViewHeightY: SharedValue<number> | undefined;
@@ -77,6 +79,7 @@ export const useReorderableListCore = <T>({
   onDragStart,
   onDragEnd,
   onLayout,
+  onIndexChange,
   scrollViewContainerRef,
   scrollViewHeightY,
   scrollViewScrollOffsetY,
@@ -351,6 +354,8 @@ export const useReorderableListCore = <T>({
         previousDirection.value = newDirection;
         previousIndex.value = currentIndex.value;
         currentIndex.value = newIndex;
+
+        onIndexChange?.({index: newIndex});
       }
     },
     [
@@ -361,6 +366,7 @@ export const useReorderableListCore = <T>({
       itemOffset,
       itemHeight,
       getIndexFromY,
+      onIndexChange,
     ],
   );
 

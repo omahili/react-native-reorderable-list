@@ -39,6 +39,13 @@ export interface ReorderableListDragStartEvent {
   index: number;
 }
 
+export interface ReorderableListIndexChangeEvent {
+  /**
+   * Index of the dragged item.
+   */
+  index: number;
+}
+
 export interface ReorderableListDragEndEvent {
   /**
    * Index of the dragged item.
@@ -107,7 +114,7 @@ export interface ReorderableListProps<T>
    */
   panEnabled?: boolean;
   /**
-   * Duration in milliseconds of a long press on the list before pan gestures, necessary for dragging, are allowed to activate.
+   * Duration in milliseconds of the long press on the list before the pan gesture for dragging is allowed to activate.
    */
   panActivateAfterLongPress?: number;
   /**
@@ -126,6 +133,10 @@ export interface ReorderableListProps<T>
    * Event fired when the dragged item is released. Needs to be a `worklet`. See [Reanimated docs](https://docs.swmansion.com/react-native-reanimated) for further info.
    */
   onDragEnd?: (event: ReorderableListDragEndEvent) => void;
+  /**
+   * Event fired when the index of the dragged item changes. Needs to be a `worklet`. See [Reanimated docs](https://docs.swmansion.com/react-native-reanimated) for further info.
+   */
+  onIndexChange?: (event: ReorderableListIndexChangeEvent) => void;
 }
 
 export type Transforms = PerspectiveTransform &
