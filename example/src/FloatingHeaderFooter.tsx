@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {ListRenderItemInfo, StyleSheet, View} from 'react-native';
+import {ListRenderItemInfo, Platform, StyleSheet, View} from 'react-native';
 
 import ReorderableList, {
   ReorderableListReorderEvent,
@@ -17,7 +17,11 @@ import {
 const TOP_HEIGHT = 150;
 const BOTTOM_HEIGHT = 100;
 
-export const FloatingHeaderScreen = () => {
+const contentInset = {top: TOP_HEIGHT, bottom: BOTTOM_HEIGHT};
+const autoscrollThresholdOffset = Platform.select({ios: contentInset});
+const contentOffset = Platform.select({ios: {y: -TOP_HEIGHT, x: 0}});
+
+export const FloatingHeaderFooterScreen = () => {
   const seedData = useSeedData();
   const [data, setData] = useState(seedData);
 
@@ -33,7 +37,7 @@ export const FloatingHeaderScreen = () => {
     <View style={styles.container}>
       <TitleHighlight
         title="Floating Top"
-        style={[styles.absoluteContainer, styles.top]}
+        style={[Platform.select({ios: styles.absoluteContainer}), styles.top]}
       />
       <ReorderableList
         data={data}
@@ -41,13 +45,16 @@ export const FloatingHeaderScreen = () => {
         renderItem={renderItem}
         keyExtractor={item => item.id}
         ItemSeparatorComponent={ItemSeparator}
-        autoscrollThresholdOffset={{top: TOP_HEIGHT, bottom: BOTTOM_HEIGHT}}
-        contentInset={{top: TOP_HEIGHT, bottom: BOTTOM_HEIGHT}}
-        contentOffset={{y: -TOP_HEIGHT, x: 0}}
+        autoscrollThresholdOffset={autoscrollThresholdOffset}
+        contentInset={contentInset}
+        contentOffset={contentOffset}
       />
       <TitleHighlight
         title="Floating Bottom"
-        style={[styles.absoluteContainer, styles.bottom]}
+        style={[
+          Platform.select({ios: styles.absoluteContainer}),
+          styles.bottom,
+        ]}
       />
     </View>
   );

@@ -4,7 +4,7 @@ import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {ActiveItemScreen} from './ActiveItem';
 import {CustomAnimationsScreen} from './CustomAnimations';
 import {DynamicHeightsScreen} from './DynamicHeights';
-import {FloatingHeaderScreen} from './FloatingHeader';
+import {FloatingHeaderFooterScreen} from './FloatingHeaderFooter';
 import {HeaderFooterScreen} from './HeaderFooter';
 import {IndexChangeScreen} from './IndexChange';
 import {MultipleListsScreen} from './MultipleLists';
@@ -67,8 +67,8 @@ const screens = [
   },
   {
     id: '10',
-    name: 'Floating Header',
-    component: FloatingHeaderScreen,
+    name: 'Floating Header and Footer',
+    component: FloatingHeaderFooterScreen,
   },
   {
     id: '11',
