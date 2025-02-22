@@ -162,6 +162,7 @@ Additionally this hook requires setting `shouldUpdateActiveItem` to true on the 
 - **reorderItems**: `<T>(data: T[], from: number, to: number) => T[]`
 
   This function receives an array of items, the index of the item to be moved, and the index of the new position and it returns a new array with the items reordered.
+> **NOTE**: Each item is required to have an id. Use an array of objects like `[ {id: 1, text: text other: other}, {id: 2, text: text other: other}, ...]`. In other words: do not just use an array of string.
 
 ## Troubleshooting
 
@@ -272,7 +273,7 @@ const Example = () => {
       data={data}
       onReorder={handleReorder}
       renderItem={renderItem}
-      keyExtractor={item => item.id}
+      keyExtractor={item => item.id} //note: do not use index of the data array here!
     />
   );
 };
