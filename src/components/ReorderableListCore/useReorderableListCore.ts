@@ -588,7 +588,7 @@ export const useReorderableListCore = <T>({
         // 3. Not already in autoscroll mode
         const currentDragDirection = currentTranslationY.value > 0 ? 1 : -1;
         if (currentDragDirection === scrollDirection(y)) {
-          // If the first two conditions are met, but it's already in autoscroll mode we let it continue (no-op)
+          // When the first two conditions are met and it's already in autoscroll mode, we let it continue (no-op)
           if (state.value !== ReorderableListState.AUTOSCROLL) {
             state.value = ReorderableListState.AUTOSCROLL;
             lastAutoscrollTrigger.value = autoscrollTrigger.value;
