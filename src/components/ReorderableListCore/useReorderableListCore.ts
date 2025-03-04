@@ -582,17 +582,18 @@ export const useReorderableListCore = <T>({
       ) {
         setCurrentIndex(y);
 
-        // Trigger scrolls when:
+        // Trigger autoscroll when:
         // 1. Within the threshold area (top or bottom of list)
         // 2. Have dragged in the same direction as the scroll
+        // 3. Not already in autoscroll mode
         const currentDragDirection = currentTranslationY.value > 0 ? 1 : -1;
-        if (
-          state.value === ReorderableListState.DRAGGED &&
-          currentDragDirection === scrollDirection(y)
-        ) {
-          lastAutoscrollTrigger.value = autoscrollTrigger.value;
-          autoscrollTrigger.value *= -1;
-          state.value = ReorderableListState.AUTOSCROLL;
+        if (currentDragDirection === scrollDirection(y)) {
+          // If the first two conditions are met, but it's already in autoscroll mode we let it continue (no-op)
+          if (state.value !== ReorderableListState.AUTOSCROLL) {
+            state.value = ReorderableListState.AUTOSCROLL;
+            lastAutoscrollTrigger.value = autoscrollTrigger.value;
+            autoscrollTrigger.value *= -1;
+          }
         } else if (state.value === ReorderableListState.AUTOSCROLL) {
           state.value = ReorderableListState.DRAGGED;
         }
