@@ -124,6 +124,8 @@ export const useReorderableListCore = <T>({
   const duration = useSharedValue(animationDuration);
   const scaleDefault = useSharedValue(1);
   const opacityDefault = useSharedValue(1);
+  const dragDirection = useSharedValue(0);
+  const lastDragDirectionPivot = useSharedValue<null | number>(null);
 
   useEffect(() => {
     duration.value = animationDuration;
@@ -175,6 +177,23 @@ export const useReorderableListCore = <T>({
         })
         .onUpdate(e => {
           if (state.value !== ReorderableListState.RELEASED) {
+            // `dragDirection` determines if the user intends to autoscroll.
+            // We only update it if a threshold is passed to account for noise,
+            // especially while holding a dragged item within the scroll zone.
+            const direction = e.velocityY > 0 ? 1 : -1;
+            if (direction !== dragDirection.value) {
+              if (lastDragDirectionPivot.value === null) {
+                lastDragDirectionPivot.value = e.absoluteY;
+              } else {
+                if (
+                  Math.abs(e.absoluteY - lastDragDirectionPivot.value) >= 10
+                ) {
+                  dragDirection.value = direction;
+                  lastDragDirectionPivot.value = e.absoluteY;
+                }
+              }
+            }
+
             currentY.value = startY.value + e.translationY;
             currentTranslationY.value = e.translationY;
             dragY.value =
@@ -187,14 +206,16 @@ export const useReorderableListCore = <T>({
         .onEnd(e => (gestureState.value = e.state))
         .onFinalize(e => (gestureState.value = e.state)),
     [
-      currentTranslationY,
-      currentY,
-      dragScrollTranslationY,
-      scrollViewDragScrollTranslationY,
-      gestureState,
-      dragY,
+      state.value,
       startY,
-      state,
+      currentY,
+      currentTranslationY,
+      dragY,
+      gestureState,
+      dragDirection,
+      dragScrollTranslationY.value,
+      scrollViewDragScrollTranslationY.value,
+      lastDragDirectionPivot,
     ],
   );
 
@@ -252,12 +273,16 @@ export const useReorderableListCore = <T>({
     dragY.value = 0;
     dragScrollTranslationY.value = 0;
     scrollViewDragScrollTranslationY.value = 0;
+    dragDirection.value = 0;
+    lastDragDirectionPivot.value = null;
   }, [
+    state,
     draggedIndex,
     dragY,
     dragScrollTranslationY,
     scrollViewDragScrollTranslationY,
-    state,
+    dragDirection,
+    lastDragDirectionPivot,
   ]);
 
   const resetSharedValuesAfterAnimations = useCallback(() => {
@@ -586,8 +611,7 @@ export const useReorderableListCore = <T>({
         // 1. Within the threshold area (top or bottom of list)
         // 2. Have dragged in the same direction as the scroll
         // 3. Not already in autoscroll mode
-        const currentDragDirection = currentTranslationY.value > 0 ? 1 : -1;
-        if (currentDragDirection === scrollDirection(y)) {
+        if (dragDirection.value === scrollDirection(y)) {
           // When the first two conditions are met and it's already in autoscroll mode, we let it continue (no-op)
           if (state.value !== ReorderableListState.AUTOSCROLL) {
             state.value = ReorderableListState.AUTOSCROLL;
