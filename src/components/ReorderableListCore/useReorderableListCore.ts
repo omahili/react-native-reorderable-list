@@ -6,7 +6,12 @@ import {
   unstable_batchedUpdates,
 } from 'react-native';
 
-import {Gesture, State} from 'react-native-gesture-handler';
+import {
+  Gesture,
+  GestureUpdateEvent,
+  PanGestureHandlerEventPayload,
+  State,
+} from 'react-native-gesture-handler';
 import Animated, {
   AnimatedRef,
   Easing,
@@ -162,6 +167,29 @@ export const useReorderableListCore = <T>({
     ],
   );
 
+  /**
+   * Decides the intended drag direction of the user.
+   * This is used to to determine if the user intends to autoscroll
+   * when within the threshold area.
+   */
+  const setDragDirection = useCallback(
+    (e: GestureUpdateEvent<PanGestureHandlerEventPayload>) => {
+      'worklet';
+      const direction = e.velocityY > 0 ? 1 : -1;
+      if (direction !== dragDirection.value) {
+        if (lastDragDirectionPivot.value === null) {
+          lastDragDirectionPivot.value = e.absoluteY;
+        } else {
+          if (Math.abs(e.absoluteY - lastDragDirectionPivot.value) >= 10) {
+            dragDirection.value = direction;
+            lastDragDirectionPivot.value = e.absoluteY;
+          }
+        }
+      }
+    },
+    [dragDirection, lastDragDirectionPivot],
+  );
+
   const panGestureHandler = useMemo(
     () =>
       Gesture.Pan()
@@ -176,24 +204,13 @@ export const useReorderableListCore = <T>({
           }
         })
         .onUpdate(e => {
+          if (
+            state.value === ReorderableListState.DRAGGED ||
+            state.value === ReorderableListState.AUTOSCROLL // <- comment this out to try only canceling when leaving the region
+          ) {
+            setDragDirection(e);
+          }
           if (state.value !== ReorderableListState.RELEASED) {
-            // `dragDirection` determines if the user intends to autoscroll.
-            // We only update it if a threshold is passed to account for noise,
-            // especially while holding a dragged item within the scroll zone.
-            const direction = e.velocityY > 0 ? 1 : -1;
-            if (direction !== dragDirection.value) {
-              if (lastDragDirectionPivot.value === null) {
-                lastDragDirectionPivot.value = e.absoluteY;
-              } else {
-                if (
-                  Math.abs(e.absoluteY - lastDragDirectionPivot.value) >= 10
-                ) {
-                  dragDirection.value = direction;
-                  lastDragDirectionPivot.value = e.absoluteY;
-                }
-              }
-            }
-
             currentY.value = startY.value + e.translationY;
             currentTranslationY.value = e.translationY;
             dragY.value =
@@ -212,10 +229,9 @@ export const useReorderableListCore = <T>({
       currentTranslationY,
       dragY,
       gestureState,
-      dragDirection,
-      dragScrollTranslationY.value,
-      scrollViewDragScrollTranslationY.value,
-      lastDragDirectionPivot,
+      setDragDirection,
+      dragScrollTranslationY,
+      scrollViewDragScrollTranslationY,
     ],
   );
 
