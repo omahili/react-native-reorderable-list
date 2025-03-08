@@ -204,10 +204,7 @@ export const useReorderableListCore = <T>({
           }
         })
         .onUpdate(e => {
-          if (
-            state.value === ReorderableListState.DRAGGED ||
-            state.value === ReorderableListState.AUTOSCROLL // <- comment this out to try only canceling when leaving the region
-          ) {
+          if (state.value === ReorderableListState.DRAGGED) {
             setDragDirection(e);
           }
           if (state.value !== ReorderableListState.RELEASED) {
