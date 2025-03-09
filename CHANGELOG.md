@@ -1,5 +1,17 @@
 
 
+# [0.12.0](https://github.com/omahili/react-native-reorderable-list/compare/v0.11.0...v0.12.0) (2025-03-09)
+
+
+### Bug Fixes
+
+* autoscroll activation on drag ([#41](https://github.com/omahili/react-native-reorderable-list/issues/41)) ([1189917](https://github.com/omahili/react-native-reorderable-list/commit/1189917ddfe2cc9848e6ea49f9d0cab349ba0384)), closes [#33](https://github.com/omahili/react-native-reorderable-list/issues/33)
+
+
+### Features
+
+* add autoscroll activation delta ([181c308](https://github.com/omahili/react-native-reorderable-list/commit/181c308f0f6933507e48c13480804d89d02674ff)), closes [#41](https://github.com/omahili/react-native-reorderable-list/issues/41)
+
 # [0.11.0](https://github.com/omahili/react-native-reorderable-list/compare/v0.10.0...v0.11.0) (2025-01-27)
 
 
