@@ -52,6 +52,7 @@ interface UseReorderableListCoreArgs<T> {
   autoscrollThresholdOffset: {top?: number; bottom?: number} | undefined;
   autoscrollSpeedScale: number;
   autoscrollDelay: number;
+  autoscrollActivationDelta: number;
   animationDuration: number;
   dragReorderThreshold: number;
   onReorder: (event: ReorderableListReorderEvent) => void;
@@ -78,6 +79,7 @@ export const useReorderableListCore = <T>({
   autoscrollThresholdOffset,
   autoscrollSpeedScale,
   autoscrollDelay,
+  autoscrollActivationDelta,
   animationDuration,
   dragReorderThreshold,
   onReorder,
@@ -130,11 +132,13 @@ export const useReorderableListCore = <T>({
   const scaleDefault = useSharedValue(1);
   const opacityDefault = useSharedValue(1);
   const dragDirection = useSharedValue(0);
-  const lastDragDirectionPivot = useSharedValue<null | number>(null);
+  const lastDragDirectionPivot = useSharedValue<number | null>(null);
+  const autoscrollDelta = useSharedValue(autoscrollActivationDelta);
 
   useEffect(() => {
     duration.value = animationDuration;
-  }, [duration, animationDuration]);
+    autoscrollDelta.value = autoscrollActivationDelta;
+  }, [duration, animationDuration, autoscrollDelta, autoscrollActivationDelta]);
 
   const listContextValue = useMemo(
     () => ({
@@ -180,13 +184,16 @@ export const useReorderableListCore = <T>({
       if (direction !== dragDirection.value) {
         if (lastDragDirectionPivot.value === null) {
           lastDragDirectionPivot.value = e.absoluteY;
-        } else if (Math.abs(e.absoluteY - lastDragDirectionPivot.value) >= 10) {
+        } else if (
+          Math.abs(e.absoluteY - lastDragDirectionPivot.value) >=
+          autoscrollDelta.value
+        ) {
           dragDirection.value = direction;
           lastDragDirectionPivot.value = e.absoluteY;
         }
       }
     },
-    [dragDirection, lastDragDirectionPivot],
+    [dragDirection, lastDragDirectionPivot, autoscrollDelta],
   );
 
   const panGestureHandler = useMemo(

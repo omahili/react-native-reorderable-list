@@ -90,6 +90,12 @@ export interface ReorderableListProps<T>
    */
   autoscrollDelay?: number;
   /**
+   * Allows configuring the delta for autoscroll activation when dragging an item in the same direction as the autoscroll.
+   * This is particularly useful when an item is dragged within the autoscroll area to account for minor unintentional movements.
+   * Default: `5`.
+   */
+  autoscrollActivationDelta?: number;
+  /**
    * Specifies the fraction of an item's size at which it will shift when a dragged item crosses over it.
    * For example, a value of 0.2 means the item shifts when the dragged item passes 20% of its height (vertical list). Default is `0.2`.
    */
