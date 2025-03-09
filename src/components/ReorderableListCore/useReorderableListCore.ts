@@ -6,7 +6,12 @@ import {
   unstable_batchedUpdates,
 } from 'react-native';
 
-import {Gesture, State} from 'react-native-gesture-handler';
+import {
+  Gesture,
+  GestureUpdateEvent,
+  PanGestureHandlerEventPayload,
+  State,
+} from 'react-native-gesture-handler';
 import Animated, {
   AnimatedRef,
   Easing,
@@ -124,6 +129,8 @@ export const useReorderableListCore = <T>({
   const duration = useSharedValue(animationDuration);
   const scaleDefault = useSharedValue(1);
   const opacityDefault = useSharedValue(1);
+  const dragDirection = useSharedValue(0);
+  const lastDragDirectionPivot = useSharedValue<null | number>(null);
 
   useEffect(() => {
     duration.value = animationDuration;
@@ -160,6 +167,28 @@ export const useReorderableListCore = <T>({
     ],
   );
 
+  /**
+   * Decides the intended drag direction of the user.
+   * This is used to to determine if the user intends to autoscroll
+   * when within the threshold area.
+   */
+  const setDragDirection = useCallback(
+    (e: GestureUpdateEvent<PanGestureHandlerEventPayload>) => {
+      'worklet';
+
+      const direction = e.velocityY > 0 ? 1 : -1;
+      if (direction !== dragDirection.value) {
+        if (lastDragDirectionPivot.value === null) {
+          lastDragDirectionPivot.value = e.absoluteY;
+        } else if (Math.abs(e.absoluteY - lastDragDirectionPivot.value) >= 10) {
+          dragDirection.value = direction;
+          lastDragDirectionPivot.value = e.absoluteY;
+        }
+      }
+    },
+    [dragDirection, lastDragDirectionPivot],
+  );
+
   const panGestureHandler = useMemo(
     () =>
       Gesture.Pan()
@@ -174,6 +203,10 @@ export const useReorderableListCore = <T>({
           }
         })
         .onUpdate(e => {
+          if (state.value === ReorderableListState.DRAGGED) {
+            setDragDirection(e);
+          }
+
           if (state.value !== ReorderableListState.RELEASED) {
             currentY.value = startY.value + e.translationY;
             currentTranslationY.value = e.translationY;
@@ -187,14 +220,15 @@ export const useReorderableListCore = <T>({
         .onEnd(e => (gestureState.value = e.state))
         .onFinalize(e => (gestureState.value = e.state)),
     [
-      currentTranslationY,
+      state,
+      startY,
       currentY,
+      currentTranslationY,
+      dragY,
+      gestureState,
+      setDragDirection,
       dragScrollTranslationY,
       scrollViewDragScrollTranslationY,
-      gestureState,
-      dragY,
-      startY,
-      state,
     ],
   );
 
@@ -252,12 +286,16 @@ export const useReorderableListCore = <T>({
     dragY.value = 0;
     dragScrollTranslationY.value = 0;
     scrollViewDragScrollTranslationY.value = 0;
+    dragDirection.value = 0;
+    lastDragDirectionPivot.value = null;
   }, [
+    state,
     draggedIndex,
     dragY,
     dragScrollTranslationY,
     scrollViewDragScrollTranslationY,
-    state,
+    dragDirection,
+    lastDragDirectionPivot,
   ]);
 
   const resetSharedValuesAfterAnimations = useCallback(() => {
@@ -582,12 +620,16 @@ export const useReorderableListCore = <T>({
       ) {
         setCurrentIndex(y);
 
-        if (scrollDirection(y) !== 0) {
+        // Trigger autoscroll when:
+        // 1. Within the threshold area (top or bottom of list)
+        // 2. Have dragged in the same direction as the scroll
+        // 3. Not already in autoscroll mode
+        if (dragDirection.value === scrollDirection(y)) {
+          // When the first two conditions are met and it's already in autoscroll mode, we let it continue (no-op)
           if (state.value !== ReorderableListState.AUTOSCROLL) {
-            // trigger autoscroll
+            state.value = ReorderableListState.AUTOSCROLL;
             lastAutoscrollTrigger.value = autoscrollTrigger.value;
             autoscrollTrigger.value *= -1;
-            state.value = ReorderableListState.AUTOSCROLL;
           }
         } else if (state.value === ReorderableListState.AUTOSCROLL) {
           state.value = ReorderableListState.DRAGGED;

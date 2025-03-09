@@ -2540,7 +2540,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/preset-typescript@npm:^7.25.0":
+"@babel/preset-typescript@npm:^7.16.7":
   version: 7.26.0
   resolution: "@babel/preset-typescript@npm:7.26.0"
   dependencies:
@@ -4017,22 +4017,21 @@ __metadata:
   linkType: hard
 
 "@types/react-test-renderer@npm:^18.3.1":
-  version: 18.3.0
-  resolution: "@types/react-test-renderer@npm:18.3.0"
+  version: 18.3.1
+  resolution: "@types/react-test-renderer@npm:18.3.1"
   dependencies:
-    "@types/react": "npm:*"
-  checksum: 10/c53683990bd194cb68e3987bda79c78eff41517f7a747e92f3e54217c2ce3addd031b8a45bf631982c909cc2caeeb905372f322758e05bb76c03754a3f24426e
+    "@types/react": "npm:^18"
+  checksum: 10/f8cc23cc8decdb6068cdc8f8c306e189eab8e569443ce97b216e757ee42eb20b18d2280ef41e2955668413f14be92765a3ba86cfcfeeae6b20c965acd9674786
   languageName: node
   linkType: hard
 
-"@types/react@npm:*":
-  version: 18.2.14
-  resolution: "@types/react@npm:18.2.14"
+"@types/react@npm:^18":
+  version: 18.3.18
+  resolution: "@types/react@npm:18.3.18"
   dependencies:
     "@types/prop-types": "npm:*"
-    "@types/scheduler": "npm:*"
     csstype: "npm:^3.0.2"
-  checksum: 10/9a8e9a6e6d39dba32a449ac986add435ee30d1f5af336efa7b0cb0e8e31eefa2b85ab2ef921284b373e820c47d184c7161f826cc77f1e528cc13642be3596110
+  checksum: 10/7fdd8b853e0d291d4138133f93f8d5c333da918e5804afcea61a923aab4bdfc9bb15eb21a5640959b452972b8715ddf10ffb12b3bd071898b9e37738636463f2
   languageName: node
   linkType: hard
 
@@ -4043,13 +4042,6 @@ __metadata:
     "@types/prop-types": "npm:*"
     csstype: "npm:^3.0.2"
   checksum: 10/d1321e874e6523b0a944d4ce514c071cbe44501b04591e17c0b265c9a03fb3e4486337ae1bec74541b72a41f34beef157342205dd07b31d116f4d06fa39cf32f
-  languageName: node
-  linkType: hard
-
-"@types/scheduler@npm:*":
-  version: 0.16.3
-  resolution: "@types/scheduler@npm:0.16.3"
-  checksum: 10/2b0aec39c24268e3ce938c5db2f2e77f5c3dd280e05c262d9c2fe7d890929e4632a6b8e94334017b66b45e4f92a5aa42ba3356640c2a1175fa37bef2f5200767
   languageName: node
   linkType: hard
 
@@ -10030,7 +10022,7 @@ __metadata:
     "@babel/plugin-transform-shorthand-properties": "npm:^7.0.0-0"
     "@babel/plugin-transform-template-literals": "npm:^7.0.0-0"
     "@babel/plugin-transform-unicode-regex": "npm:^7.0.0-0"
-    "@babel/preset-typescript": "npm:^7.25.0"
+    "@babel/preset-typescript": "npm:^7.16.7"
     convert-source-map: "npm:^2.0.0"
     invariant: "npm:^2.2.4"
   peerDependencies:
