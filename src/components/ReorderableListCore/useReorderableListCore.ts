@@ -175,15 +175,14 @@ export const useReorderableListCore = <T>({
   const setDragDirection = useCallback(
     (e: GestureUpdateEvent<PanGestureHandlerEventPayload>) => {
       'worklet';
+
       const direction = e.velocityY > 0 ? 1 : -1;
       if (direction !== dragDirection.value) {
         if (lastDragDirectionPivot.value === null) {
           lastDragDirectionPivot.value = e.absoluteY;
-        } else {
-          if (Math.abs(e.absoluteY - lastDragDirectionPivot.value) >= 10) {
-            dragDirection.value = direction;
-            lastDragDirectionPivot.value = e.absoluteY;
-          }
+        } else if (Math.abs(e.absoluteY - lastDragDirectionPivot.value) >= 10) {
+          dragDirection.value = direction;
+          lastDragDirectionPivot.value = e.absoluteY;
         }
       }
     },
@@ -207,6 +206,7 @@ export const useReorderableListCore = <T>({
           if (state.value === ReorderableListState.DRAGGED) {
             setDragDirection(e);
           }
+
           if (state.value !== ReorderableListState.RELEASED) {
             currentY.value = startY.value + e.translationY;
             currentTranslationY.value = e.translationY;
@@ -220,7 +220,7 @@ export const useReorderableListCore = <T>({
         .onEnd(e => (gestureState.value = e.state))
         .onFinalize(e => (gestureState.value = e.state)),
     [
-      state.value,
+      state,
       startY,
       currentY,
       currentTranslationY,
