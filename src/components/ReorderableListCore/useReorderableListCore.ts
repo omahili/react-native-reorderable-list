@@ -420,7 +420,7 @@ export const useReorderableListCore = <T>({
       'worklet';
 
       // if no custom scale run default
-      if (!(cellAnimations && 'transformtra' in cellAnimations)) {
+      if (!(cellAnimations && 'transform' in cellAnimations)) {
         const scaleConfig = SCALE_ANIMATION_CONFIG_DEFAULT[type];
         scaleDefault.value = withTiming(scaleConfig.toValue, scaleConfig);
       }
