@@ -1,5 +1,25 @@
 
 
+# [0.13.0](https://github.com/omahili/react-native-reorderable-list/compare/v0.12.0...v0.13.0) (2025-03-16)
+
+
+### Bug Fixes
+
+* disable default scale animation if overridden ([a977cc8](https://github.com/omahili/react-native-reorderable-list/commit/a977cc8ac41bb09f058b37c17a62c821bd17de1a))
+
+
+### Features
+
+* use closest center algorithm for items reorder ([8f39644](https://github.com/omahili/react-native-reorderable-list/commit/8f396447cfae5684f70110d666cbd6bca0eb04fd)), closes [#34](https://github.com/omahili/react-native-reorderable-list/issues/34)
+
+
+### BREAKING CHANGES
+
+* dragReorderThreshold prop is no longer supported and is
+removed from the API. The closest center algorithm provides a better
+experience, it fixes the current issues when swapping short and tall items
+and is more efficient.
+
 # [0.12.0](https://github.com/omahili/react-native-reorderable-list/compare/v0.11.0...v0.12.0) (2025-03-09)
 
 
