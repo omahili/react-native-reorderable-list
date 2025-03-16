@@ -96,11 +96,6 @@ export interface ReorderableListProps<T>
    */
   autoscrollActivationDelta?: number;
   /**
-   * Specifies the fraction of an item's size at which it will shift when a dragged item crosses over it.
-   * For example, a value of 0.2 means the item shifts when the dragged item passes 20% of its height (vertical list). Default is `0.2`.
-   */
-  dragReorderThreshold?: number;
-  /**
    * Duration of the animations in milliseconds.
    * Be aware that users won't be able to drag a new item until the dragged item is released and
    * its animation to its new position ends.

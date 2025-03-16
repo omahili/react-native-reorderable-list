@@ -83,13 +83,13 @@ export const ReorderableListCell = memo(
           currentIndex.value >= 0 &&
           draggedIndex.value >= 0
         ) {
-          const moveDown = currentIndex.value > draggedIndex.value;
+          const moveUp = currentIndex.value > draggedIndex.value;
           const startMove = Math.min(draggedIndex.value, currentIndex.value);
           const endMove = Math.max(draggedIndex.value, currentIndex.value);
-          let newValue = 0;
 
+          let newValue = 0;
           if (index >= startMove && index <= endMove) {
-            newValue = moveDown ? -draggedHeight.value : draggedHeight.value;
+            newValue = moveUp ? -draggedHeight.value : draggedHeight.value;
           }
 
           if (newValue !== itemTranslateY.value) {
