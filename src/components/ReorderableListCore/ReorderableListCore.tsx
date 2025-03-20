@@ -32,6 +32,7 @@ const AnimatedFlatList = Animated.createAnimatedComponent(
 interface ReorderableListCoreProps<T> extends ReorderableListProps<T> {
   // not optional but undefined to avoid forgetting to pass a prop
   scrollViewContainerRef: React.RefObject<ScrollView> | undefined;
+  scrollViewPageY: SharedValue<number> | undefined;
   scrollViewHeightY: SharedValue<number> | undefined;
   scrollViewScrollOffsetY: SharedValue<number> | undefined;
   scrollViewScrollEnabled: SharedValue<boolean> | undefined;
@@ -56,6 +57,7 @@ const ReorderableListCore = <T,>(
     onDragEnd,
     onIndexChange,
     scrollViewContainerRef,
+    scrollViewPageY,
     scrollViewHeightY,
     scrollViewScrollOffsetY,
     scrollViewScrollEnabled,
@@ -96,6 +98,7 @@ const ReorderableListCore = <T,>(
     onDragEnd,
     onIndexChange,
     scrollViewContainerRef,
+    scrollViewPageY,
     scrollViewHeightY,
     scrollViewScrollOffsetY,
     scrollViewScrollEnabled,

@@ -16,12 +16,14 @@ import Animated, {
   AnimatedRef,
   Easing,
   SharedValue,
+  measure,
   runOnJS,
   runOnUI,
   scrollTo,
   useAnimatedReaction,
   useAnimatedRef,
   useAnimatedScrollHandler,
+  useDerivedValue,
   useSharedValue,
   withDelay,
   withTiming,
@@ -60,6 +62,7 @@ interface UseReorderableListCoreArgs<T> {
   onIndexChange?: (event: ReorderableListIndexChangeEvent) => void;
   onLayout?: (event: LayoutChangeEvent) => void;
   scrollViewContainerRef: React.RefObject<ScrollView> | undefined;
+  scrollViewPageY: SharedValue<number> | undefined;
   scrollViewHeightY: SharedValue<number> | undefined;
   scrollViewScrollOffsetY: SharedValue<number> | undefined;
   scrollViewScrollEnabled: SharedValue<boolean> | undefined;
@@ -86,6 +89,7 @@ export const useReorderableListCore = <T>({
   onLayout,
   onIndexChange,
   scrollViewContainerRef,
+  scrollViewPageY,
   scrollViewHeightY,
   scrollViewScrollOffsetY,
   scrollViewScrollEnabled,
@@ -107,7 +111,7 @@ export const useReorderableListCore = <T>({
   const startItemDragCenterY = useSharedValue<number>(0);
   const flatListScrollOffsetY = useSharedValue(0);
   const flatListHeightY = useSharedValue(0);
-  const nestedFlatListPositionY = useSharedValue(0);
+  const flatListPageY = useSharedValue(0);
   // The scroll y translation of the list since drag start
   const dragScrollTranslationY = useSharedValue(0);
   // The initial scroll offset y of the list on drag start
@@ -135,6 +139,11 @@ export const useReorderableListCore = <T>({
   const dragDirection = useSharedValue(0);
   const lastDragDirectionPivot = useSharedValue<number | null>(null);
   const autoscrollDelta = useSharedValue(autoscrollActivationDelta);
+
+  // Position of the list relative to the scroll container
+  const nestedFlatListPositionY = useDerivedValue(
+    () => flatListPageY.value - (scrollViewPageY?.value || 0),
+  );
 
   useEffect(() => {
     duration.value = animationDuration;
@@ -826,12 +835,20 @@ export const useReorderableListCore = <T>({
 
   const handleFlatListLayout = useCallback(
     (e: LayoutChangeEvent) => {
-      nestedFlatListPositionY.value = e.nativeEvent.layout.y;
       flatListHeightY.value = e.nativeEvent.layout.height;
+
+      runOnUI(() => {
+        const measurement = measure(flatListRef);
+        if (!measurement) {
+          return;
+        }
+
+        flatListPageY.value = measurement.pageY;
+      })();
 
       onLayout?.(e);
     },
-    [nestedFlatListPositionY, flatListHeightY, onLayout],
+    [flatListRef, flatListPageY, flatListHeightY, onLayout],
   );
 
   const handleRef = (value: FlatList<T>) => {

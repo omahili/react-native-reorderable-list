@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {ListRenderItemInfo, LogBox, StyleSheet} from 'react-native';
+import {ListRenderItemInfo, LogBox, StyleSheet, View} from 'react-native';
 
 import {
   NestedReorderableList,
@@ -45,7 +45,10 @@ const NestedList: React.FC<NestedListProps> = ({index}) => {
 export const NestedListsScreen = () => (
   <ScrollViewContainer style={styles.container}>
     <NestedList index={0} />
-    <NestedList index={1} />
+    {/* Test nested list in a nested view */}
+    <View>
+      <NestedList index={1} />
+    </View>
     <NestedList index={2} />
   </ScrollViewContainer>
 );

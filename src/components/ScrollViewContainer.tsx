@@ -1,8 +1,10 @@
-import React, {useMemo} from 'react';
+import React, {useCallback, useMemo} from 'react';
 import {LayoutChangeEvent} from 'react-native';
 
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
 import Animated, {
+  measure,
+  runOnUI,
   useAnimatedRef,
   useAnimatedScrollHandler,
   useComposedEventHandler,
@@ -21,6 +23,7 @@ export const ScrollViewContainer: React.FC<ScrollViewContainerProps> = ({
   const scrollViewScrollEnabled = useSharedValue(scrollEnabled);
   const scrollViewContainerRef = useAnimatedRef<Animated.ScrollView>();
   const scrollViewScrollOffsetY = useSharedValue(0);
+  const scrollViewPageY = useSharedValue(0);
   const scrollViewHeightY = useSharedValue(0);
 
   const outerScrollGesture = useMemo(() => Gesture.Native(), []);
@@ -40,6 +43,7 @@ export const ScrollViewContainer: React.FC<ScrollViewContainerProps> = ({
   const contextValue = useMemo(
     () => ({
       scrollViewContainerRef,
+      scrollViewPageY,
       scrollViewHeightY,
       scrollViewScrollOffsetY,
       scrollViewScrollEnabled,
@@ -48,6 +52,7 @@ export const ScrollViewContainer: React.FC<ScrollViewContainerProps> = ({
     }),
     [
       scrollViewContainerRef,
+      scrollViewPageY,
       scrollViewHeightY,
       scrollViewScrollOffsetY,
       scrollViewScrollEnabled,
@@ -56,11 +61,24 @@ export const ScrollViewContainer: React.FC<ScrollViewContainerProps> = ({
     ],
   );
 
-  const handleLayout = (e: LayoutChangeEvent) => {
-    scrollViewHeightY.value = e.nativeEvent.layout.height;
+  const handleLayout = useCallback(
+    (e: LayoutChangeEvent) => {
+      scrollViewHeightY.value = e.nativeEvent.layout.height;
 
-    onLayout?.(e);
-  };
+      // measuring pageY allows wrapping nested lists in other views
+      runOnUI(() => {
+        const measurement = measure(scrollViewContainerRef);
+        if (!measurement) {
+          return;
+        }
+
+        scrollViewPageY.value = measurement.pageY;
+      })();
+
+      onLayout?.(e);
+    },
+    [onLayout, scrollViewContainerRef, scrollViewHeightY, scrollViewPageY],
+  );
 
   return (
     <ScrollViewContainerContext.Provider value={contextValue}>

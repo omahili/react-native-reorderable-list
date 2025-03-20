@@ -6,6 +6,7 @@ import {SharedValue} from 'react-native-reanimated';
 
 interface ScrollViewContainerContextData {
   scrollViewContainerRef: React.RefObject<ScrollView>;
+  scrollViewPageY: SharedValue<number>;
   scrollViewHeightY: SharedValue<number>;
   scrollViewScrollOffsetY: SharedValue<number>;
   scrollViewScrollEnabled: SharedValue<boolean>;
