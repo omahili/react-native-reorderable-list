@@ -102,6 +102,7 @@ const ReorderableListCore = <T,>(
     scrollViewHeightY,
     scrollViewScrollOffsetY,
     scrollViewScrollEnabled,
+    scrollable,
     // flatlist will default to true if we pass explicitly undefined,
     // but internally we would treat it as false, so we force true
     initialScrollEnabled:
@@ -110,7 +111,6 @@ const ReorderableListCore = <T,>(
       typeof initialScrollViewScrollEnabled === 'undefined'
         ? true
         : initialScrollViewScrollEnabled,
-    nestedScrollable: scrollable,
     cellAnimations,
     shouldUpdateActiveItem,
     panEnabled,

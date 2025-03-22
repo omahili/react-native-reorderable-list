@@ -39,9 +39,9 @@ import {
   ReorderableListDragEndEvent,
   ReorderableListDragStartEvent,
   ReorderableListIndexChangeEvent,
+  ReorderableListReorderEvent,
   ReorderableListState,
 } from '../../types';
-import type {ReorderableListReorderEvent} from '../../types';
 
 const version = React.version.split('.');
 const hasAutomaticBatching = version.length
@@ -66,9 +66,9 @@ interface UseReorderableListCoreArgs<T> {
   scrollViewHeightY: SharedValue<number> | undefined;
   scrollViewScrollOffsetY: SharedValue<number> | undefined;
   scrollViewScrollEnabled: SharedValue<boolean> | undefined;
+  scrollable: boolean | undefined;
   initialScrollEnabled: boolean | undefined;
   initialScrollViewScrollEnabled: boolean | undefined;
-  nestedScrollable: boolean | undefined;
   cellAnimations: ReorderableListCellAnimations | undefined;
   shouldUpdateActiveItem: boolean | undefined;
   panEnabled: boolean;
@@ -93,9 +93,9 @@ export const useReorderableListCore = <T>({
   scrollViewHeightY,
   scrollViewScrollOffsetY,
   scrollViewScrollEnabled,
+  scrollable,
   initialScrollEnabled,
   initialScrollViewScrollEnabled,
-  nestedScrollable,
   cellAnimations,
   shouldUpdateActiveItem,
   panActivateAfterLongPress,
@@ -552,7 +552,7 @@ export const useReorderableListCore = <T>({
     },
   );
 
-  const calculateHiddenArea = useCallback(() => {
+  const computeHiddenArea = useCallback(() => {
     'worklet';
     if (!scrollViewScrollOffsetY || !scrollViewHeightY) {
       return {top: 0, bottom: 0};
@@ -578,103 +578,121 @@ export const useReorderableListCore = <T>({
     flatListHeightY,
   ]);
 
-  const calculateThresholdArea = useCallback(
-    (hiddenArea: {top: number; bottom: number}) => {
-      'worklet';
-      const offsetTop = Math.max(0, autoscrollThresholdOffset?.top || 0);
-      const offsetBottom = Math.max(0, autoscrollThresholdOffset?.bottom || 0);
-      const threshold = Math.max(0, Math.min(autoscrollThreshold, 0.4));
-      const visibleHeight =
-        flatListHeightY.value -
-        (hiddenArea.top + hiddenArea.bottom) -
-        (offsetTop + offsetBottom);
+  const computeThresholdArea = useCallback(() => {
+    'worklet';
 
-      const area = visibleHeight * threshold;
-      const top = area + offsetTop;
-      const bottom = flatListHeightY.value - area - offsetBottom;
+    const hiddenArea = computeHiddenArea();
 
-      return {top, bottom};
-    },
-    [autoscrollThreshold, autoscrollThresholdOffset, flatListHeightY],
-  );
+    const offsetTop = Math.max(0, autoscrollThresholdOffset?.top || 0);
+    const offsetBottom = Math.max(0, autoscrollThresholdOffset?.bottom || 0);
+    const threshold = Math.max(0, Math.min(autoscrollThreshold, 0.4));
+    const visibleHeight =
+      flatListHeightY.value -
+      (hiddenArea.top + hiddenArea.bottom) -
+      (offsetTop + offsetBottom);
 
-  const calculateThresholdAreaParent = useCallback(
-    (hiddenArea: {top: number; bottom: number}) => {
-      'worklet';
-      const offsetTop = Math.max(0, autoscrollThresholdOffset?.top || 0);
-      const offsetBottom = Math.max(0, autoscrollThresholdOffset?.bottom || 0);
-      const threshold = Math.max(0, Math.min(autoscrollThreshold, 0.4));
+    const area = visibleHeight * threshold;
+    const top = area + offsetTop;
+    const bottom = flatListHeightY.value - area - offsetBottom;
 
-      const area = flatListHeightY.value * threshold;
-      const top = area + offsetTop;
-      const bottom = flatListHeightY.value - area - offsetBottom;
+    return {top, bottom};
+  }, [
+    computeHiddenArea,
+    autoscrollThreshold,
+    autoscrollThresholdOffset,
+    flatListHeightY,
+  ]);
 
-      // if the hidden area is 0 then we don't have a threshold area
-      // we might have floating errors like 0.0001 which we should ignore
-      return {
-        top: hiddenArea.top > 0.1 ? top + hiddenArea.top : 0,
-        bottom: hiddenArea.bottom > 0.1 ? bottom - hiddenArea.bottom : 0,
-      };
-    },
-    [autoscrollThreshold, autoscrollThresholdOffset, flatListHeightY],
-  );
+  const computeContainerThresholdArea = useCallback(() => {
+    'worklet';
+    if (!scrollViewHeightY) {
+      return {top: -Infinity, bottom: Infinity};
+    }
 
-  const shouldScrollParent = useCallback(
+    const offsetTop = Math.max(0, autoscrollThresholdOffset?.top || 0);
+    const offsetBottom = Math.max(0, autoscrollThresholdOffset?.bottom || 0);
+    const threshold = Math.max(0, Math.min(autoscrollThreshold, 0.4));
+    const visibleHeight = scrollViewHeightY.value - (offsetTop + offsetBottom);
+
+    const area = visibleHeight * threshold;
+    const top = area + offsetTop;
+    const bottom = visibleHeight - area - offsetBottom;
+
+    return {top, bottom};
+  }, [autoscrollThreshold, autoscrollThresholdOffset, scrollViewHeightY]);
+
+  const shouldScrollContainer = useCallback(
     (y: number) => {
       'worklet';
-      const hiddenArea = calculateHiddenArea();
-      const thresholdAreaParent = calculateThresholdAreaParent(hiddenArea);
+      const containerThresholdArea = computeContainerThresholdArea();
+      const nestedListHiddenArea = computeHiddenArea();
 
-      // we might have floating errors like 0.0001 which we should ignore
+      // We should scroll the container if there's a hidden part of the nested list.
+      // We might have floating errors like 0.0001 which we should ignore.
       return (
-        (hiddenArea.top > 0.1 && y <= thresholdAreaParent.top) ||
-        (hiddenArea.bottom > 0.1 && y >= thresholdAreaParent.bottom)
+        (nestedListHiddenArea.top > 0.01 && y <= containerThresholdArea.top) ||
+        (nestedListHiddenArea.bottom > 0.01 &&
+          y >= containerThresholdArea.bottom)
       );
     },
-    [calculateHiddenArea, calculateThresholdAreaParent],
+    [computeHiddenArea, computeContainerThresholdArea],
   );
 
-  const scrollDirection = useCallback(
-    (y: number) => {
-      'worklet';
-      const hiddenArea = calculateHiddenArea();
+  const getRelativeContainerY = useCallback(() => {
+    'worklet';
 
-      if (shouldScrollParent(y)) {
-        const thresholdAreaParent = calculateThresholdAreaParent(hiddenArea);
-        if (y <= thresholdAreaParent.top) {
-          return -1;
-        }
+    return (
+      currentY.value +
+      nestedFlatListPositionY.value -
+      scrollViewDragInitialScrollOffsetY.value
+    );
+  }, [currentY, nestedFlatListPositionY, scrollViewDragInitialScrollOffsetY]);
 
-        if (y >= thresholdAreaParent.bottom) {
-          return 1;
-        }
+  const getRelativeListY = useCallback(() => {
+    'worklet';
 
-        return 0;
-      } else if (nestedScrollable) {
-        const thresholdArea = calculateThresholdArea(hiddenArea);
-        if (y <= thresholdArea.top) {
-          return -1;
-        }
+    return currentY.value + scrollViewDragScrollTranslationY.value;
+  }, [currentY, scrollViewDragScrollTranslationY]);
 
-        if (y >= thresholdArea.bottom) {
-          return 1;
-        }
+  const scrollDirection = useCallback(() => {
+    'worklet';
+
+    const relativeContainerY = getRelativeContainerY();
+    if (shouldScrollContainer(relativeContainerY)) {
+      const containerThresholdArea = computeContainerThresholdArea();
+      if (relativeContainerY <= containerThresholdArea.top) {
+        return -1;
       }
 
-      return 0;
-    },
-    [
-      nestedScrollable,
-      shouldScrollParent,
-      calculateHiddenArea,
-      calculateThresholdArea,
-      calculateThresholdAreaParent,
-    ],
-  );
+      if (relativeContainerY >= containerThresholdArea.bottom) {
+        return 1;
+      }
+    } else if (scrollable) {
+      const relativeListY = getRelativeListY();
+      const thresholdArea = computeThresholdArea();
+
+      if (relativeListY <= thresholdArea.top) {
+        return -1;
+      }
+
+      if (relativeListY >= thresholdArea.bottom) {
+        return 1;
+      }
+    }
+
+    return 0;
+  }, [
+    shouldScrollContainer,
+    computeThresholdArea,
+    computeContainerThresholdArea,
+    getRelativeContainerY,
+    getRelativeListY,
+    scrollable,
+  ]);
 
   useAnimatedReaction(
-    () => currentY.value + scrollViewDragScrollTranslationY.value,
-    y => {
+    () => currentY.value,
+    () => {
       if (
         state.value === ReorderableListState.DRAGGED ||
         state.value === ReorderableListState.AUTOSCROLL
@@ -685,7 +703,7 @@ export const useReorderableListCore = <T>({
         // 1. Within the threshold area (top or bottom of list)
         // 2. Have dragged in the same direction as the scroll
         // 3. Not already in autoscroll mode
-        if (dragDirection.value === scrollDirection(y)) {
+        if (dragDirection.value === scrollDirection()) {
           // When the first two conditions are met and it's already in autoscroll mode, we let it continue (no-op)
           if (state.value !== ReorderableListState.AUTOSCROLL) {
             state.value = ReorderableListState.AUTOSCROLL;
@@ -706,9 +724,8 @@ export const useReorderableListCore = <T>({
         autoscrollTrigger.value !== lastAutoscrollTrigger.value &&
         state.value === ReorderableListState.AUTOSCROLL
       ) {
-        let y = currentY.value + scrollViewDragScrollTranslationY.value;
         const autoscrollIncrement =
-          scrollDirection(y) *
+          dragDirection.value *
           AUTOSCROLL_CONFIG.increment *
           autoscrollSpeedScale;
 
@@ -717,7 +734,13 @@ export const useReorderableListCore = <T>({
           let listRef =
             flatListRef as unknown as AnimatedRef<Animated.ScrollView>;
 
-          if (shouldScrollParent(y) && scrollViewScrollOffsetY) {
+          // Checking on every autoscroll whether to scroll the container,
+          // this allows to smoothly pass the scroll from the container to the nested list
+          // without any gesture input.
+          if (
+            scrollViewScrollOffsetY &&
+            shouldScrollContainer(getRelativeContainerY())
+          ) {
             scrollOffset = scrollViewScrollOffsetY.value;
             listRef =
               scrollViewContainerRef as unknown as AnimatedRef<Animated.ScrollView>;
@@ -759,7 +782,7 @@ export const useReorderableListCore = <T>({
     }
   });
 
-  // parent scroll handler
+  // container scroll handler
   useAnimatedReaction(
     () => scrollViewScrollOffsetY?.value,
     value => {
@@ -837,18 +860,30 @@ export const useReorderableListCore = <T>({
     (e: LayoutChangeEvent) => {
       flatListHeightY.value = e.nativeEvent.layout.height;
 
-      runOnUI(() => {
-        const measurement = measure(flatListRef);
-        if (!measurement) {
-          return;
-        }
+      // If nested in a scroll container.
+      if (scrollViewScrollOffsetY) {
+        // Timeout fixes a bug where measure returns height 0.
+        setTimeout(() => {
+          runOnUI(() => {
+            const measurement = measure(flatListRef);
+            if (!measurement) {
+              return;
+            }
 
-        flatListPageY.value = measurement.pageY;
-      })();
+            flatListPageY.value = measurement.pageY;
+          })();
+        }, 100);
+      }
 
       onLayout?.(e);
     },
-    [flatListRef, flatListPageY, flatListHeightY, onLayout],
+    [
+      flatListRef,
+      flatListPageY,
+      flatListHeightY,
+      scrollViewScrollOffsetY,
+      onLayout,
+    ],
   );
 
   const handleRef = (value: FlatList<T>) => {

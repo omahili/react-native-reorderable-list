@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {ListRenderItemInfo, LogBox, StyleSheet} from 'react-native';
+import {ListRenderItemInfo, LogBox, StyleSheet, View} from 'react-native';
 
 import {
   NestedReorderableList,
@@ -37,11 +37,11 @@ const NestedList: React.FC<NestedListProps> = ({index}) => {
       renderItem={renderItem}
       keyExtractor={item => item.id}
       style={styles.nestedList}
-      autoscrollThreshold={0.3} // increase scroll area
-      autoscrollSpeedScale={0.5} // decrease scroll speed
-      scrollable
       stickyHeaderIndices={[0]}
       ListHeaderComponent={<TitleHighlight title={`Nested List ${index}`} />}
+      autoscrollThreshold={0.3} // increase autoscroll area
+      autoscrollSpeedScale={0.5} // decrease autoscroll speed
+      scrollable
     />
   );
 };
@@ -49,7 +49,10 @@ const NestedList: React.FC<NestedListProps> = ({index}) => {
 export const NestedScrollableListsScreen = () => (
   <ScrollViewContainer style={styles.container}>
     <NestedList index={0} />
-    <NestedList index={1} />
+    {/* Test nested list in a nested view */}
+    <View>
+      <NestedList index={1} />
+    </View>
     <NestedList index={2} />
   </ScrollViewContainer>
 );
