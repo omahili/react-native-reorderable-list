@@ -1,5 +1,13 @@
 
 
+## [0.13.1](https://github.com/omahili/react-native-reorderable-list/compare/v0.13.0...v0.13.1) (2025-03-23)
+
+
+### Bug Fixes
+
+* autoscroll area size in scroll container ([bffb44d](https://github.com/omahili/react-native-reorderable-list/commit/bffb44d31acd6219e52060fa8ea5037f8d16ffff))
+* autoscroll when wrapping nested lists ([e66a699](https://github.com/omahili/react-native-reorderable-list/commit/e66a6991e57804adf37a9974c7c13d8385c0bcce))
+
 # [0.13.0](https://github.com/omahili/react-native-reorderable-list/compare/v0.12.0...v0.13.0) (2025-03-16)
 
 
