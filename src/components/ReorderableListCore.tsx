@@ -6,7 +6,6 @@ import {
   LayoutChangeEvent,
   Platform,
   ScrollView,
-  unstable_batchedUpdates,
 } from 'react-native';
 
 import {
@@ -39,7 +38,6 @@ import {ReorderableListContext} from '../contexts';
 import {ReorderableListProps, ReorderableListState} from '../types';
 import {
   AUTOSCROLL_CONFIG,
-  HAS_AUTOMATIC_BATCHING,
   OPACITY_ANIMATION_CONFIG_DEFAULT,
   SCALE_ANIMATION_CONFIG_DEFAULT,
 } from './constants';
@@ -364,15 +362,7 @@ const ReorderableListCore = <T,>(
     runOnUI(resetSharedValues)();
 
     if (fromIndex !== toIndex) {
-      const updateState = () => {
-        onReorder({from: fromIndex, to: toIndex});
-      };
-
-      if (!HAS_AUTOMATIC_BATCHING) {
-        unstable_batchedUpdates(updateState);
-      } else {
-        updateState();
-      }
+      onReorder({from: fromIndex, to: toIndex});
     }
   };
 

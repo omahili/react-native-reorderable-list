@@ -1,4 +1,3 @@
-import React from 'react';
 import {Platform} from 'react-native';
 
 import {Easing, WithTimingConfig} from 'react-native-reanimated';
@@ -68,8 +67,3 @@ export const OPACITY_ANIMATION_CONFIG_DEFAULT: AnimationConfig = {
     duration: DURATION_END,
   },
 };
-
-const version = React.version.split('.');
-export const HAS_AUTOMATIC_BATCHING = version.length
-  ? parseInt(version[0], 10) >= 18
-  : false;
