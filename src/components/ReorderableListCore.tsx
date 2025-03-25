@@ -1,14 +1,19 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {
+  CellRendererProps,
   FlatList,
+  FlatListProps,
   LayoutChangeEvent,
+  Platform,
   ScrollView,
   unstable_batchedUpdates,
 } from 'react-native';
 
 import {
   Gesture,
+  GestureDetector,
   GestureUpdateEvent,
+  NativeGesture,
   PanGestureHandlerEventPayload,
   State,
 } from 'react-native-gesture-handler';
@@ -23,84 +28,80 @@ import Animated, {
   useAnimatedReaction,
   useAnimatedRef,
   useAnimatedScrollHandler,
+  useComposedEventHandler,
   useDerivedValue,
   useSharedValue,
   withDelay,
   withTiming,
 } from 'react-native-reanimated';
 
+import {ReorderableListContext} from '../contexts';
+import {ReorderableListProps, ReorderableListState} from '../types';
 import {
+  AUTOSCROLL_CONFIG,
+  HAS_AUTOMATIC_BATCHING,
   OPACITY_ANIMATION_CONFIG_DEFAULT,
   SCALE_ANIMATION_CONFIG_DEFAULT,
-} from './animationDefaults';
-import {AUTOSCROLL_CONFIG} from './autoscrollConfig';
-import {
-  ReorderableListCellAnimations,
-  ReorderableListDragEndEvent,
-  ReorderableListDragStartEvent,
-  ReorderableListIndexChangeEvent,
-  ReorderableListReorderEvent,
-  ReorderableListState,
-} from '../../types';
+} from './constants';
+import {ReorderableListCell} from './ReorderableListCell';
 
-const version = React.version.split('.');
-const hasAutomaticBatching = version.length
-  ? parseInt(version[0], 10) >= 18
-  : false;
+const AnimatedFlatList = Animated.createAnimatedComponent(
+  FlatList,
+) as unknown as <T>(
+  props: FlatListProps<T> & {ref?: React.Ref<FlatList<T>>},
+) => React.ReactElement;
 
-interface UseReorderableListCoreArgs<T> {
-  ref: React.ForwardedRef<FlatList<T>>;
-  autoscrollThreshold: number;
-  autoscrollThresholdOffset: {top?: number; bottom?: number} | undefined;
-  autoscrollSpeedScale: number;
-  autoscrollDelay: number;
-  autoscrollActivationDelta: number;
-  animationDuration: number;
-  onReorder: (event: ReorderableListReorderEvent) => void;
-  onDragStart?: (event: ReorderableListDragStartEvent) => void;
-  onDragEnd?: (event: ReorderableListDragEndEvent) => void;
-  onIndexChange?: (event: ReorderableListIndexChangeEvent) => void;
-  onLayout?: (event: LayoutChangeEvent) => void;
+interface ReorderableListCoreProps<T> extends ReorderableListProps<T> {
+  // Not optional but undefined to force passing the prop.
   scrollViewContainerRef: React.RefObject<ScrollView> | undefined;
   scrollViewPageY: SharedValue<number> | undefined;
   scrollViewHeightY: SharedValue<number> | undefined;
   scrollViewScrollOffsetY: SharedValue<number> | undefined;
   scrollViewScrollEnabled: SharedValue<boolean> | undefined;
-  scrollable: boolean | undefined;
-  initialScrollEnabled: boolean | undefined;
+  outerScrollGesture: NativeGesture | undefined;
   initialScrollViewScrollEnabled: boolean | undefined;
-  cellAnimations: ReorderableListCellAnimations | undefined;
-  shouldUpdateActiveItem: boolean | undefined;
-  panEnabled: boolean;
-  panActivateAfterLongPress: number | undefined;
+  scrollable: boolean | undefined;
+  scrollEnabled: boolean | undefined;
 }
 
-export const useReorderableListCore = <T>({
-  ref,
-  autoscrollThreshold,
-  autoscrollThresholdOffset,
-  autoscrollSpeedScale,
-  autoscrollDelay,
-  autoscrollActivationDelta,
-  animationDuration,
-  onReorder,
-  onDragStart,
-  onDragEnd,
-  onLayout,
-  onIndexChange,
-  scrollViewContainerRef,
-  scrollViewPageY,
-  scrollViewHeightY,
-  scrollViewScrollOffsetY,
-  scrollViewScrollEnabled,
-  scrollable,
-  initialScrollEnabled,
-  initialScrollViewScrollEnabled,
-  cellAnimations,
-  shouldUpdateActiveItem,
-  panActivateAfterLongPress,
-  panEnabled,
-}: UseReorderableListCoreArgs<T>) => {
+const ReorderableListCore = <T,>(
+  {
+    autoscrollThreshold = 0.1,
+    autoscrollThresholdOffset,
+    autoscrollSpeedScale = 1,
+    autoscrollDelay = AUTOSCROLL_CONFIG.delay,
+    autoscrollActivationDelta = 5,
+    animationDuration = 200,
+    onLayout,
+    onReorder,
+    onScroll,
+    onDragStart,
+    onDragEnd,
+    onIndexChange,
+    scrollViewContainerRef,
+    scrollViewPageY,
+    scrollViewHeightY,
+    scrollViewScrollOffsetY,
+    scrollViewScrollEnabled,
+    scrollable,
+    outerScrollGesture,
+    cellAnimations,
+    shouldUpdateActiveItem,
+    panEnabled = true,
+    panActivateAfterLongPress,
+    ...rest
+  }: ReorderableListCoreProps<T>,
+  ref: React.ForwardedRef<FlatList<T>>,
+) => {
+  // FlatList will default to true if we pass explicitly undefined,
+  // but internally we would treat it as false, so we force true.
+  const initialScrollEnabled =
+    typeof rest.scrollEnabled === 'undefined' ? true : rest.scrollEnabled;
+  const initialScrollViewScrollEnabled =
+    typeof rest.initialScrollViewScrollEnabled === 'undefined'
+      ? true
+      : rest.initialScrollViewScrollEnabled;
+
   const flatListRef = useAnimatedRef<FlatList>();
   const [activeIndex, setActiveIndex] = useState(-1);
   const scrollEnabled = useSharedValue(initialScrollEnabled);
@@ -367,7 +368,7 @@ export const useReorderableListCore = <T>({
         onReorder({from: fromIndex, to: toIndex});
       };
 
-      if (!hasAutomaticBatching) {
+      if (!HAS_AUTOMATIC_BATCHING) {
         unstable_batchedUpdates(updateState);
       } else {
         updateState();
@@ -886,27 +887,75 @@ export const useReorderableListCore = <T>({
     ],
   );
 
-  const handleRef = (value: FlatList<T>) => {
-    flatListRef(value);
+  const handleRef = useCallback(
+    (value: FlatList<T>) => {
+      flatListRef(value);
 
-    if (typeof ref === 'function') {
-      ref(value);
-    } else if (ref) {
-      ref.current = value;
+      if (typeof ref === 'function') {
+        ref(value);
+      } else if (ref) {
+        ref.current = value;
+      }
+    },
+    [flatListRef, ref],
+  );
+
+  const combinedGesture = useMemo(() => {
+    // android is able to handle nested scroll view, but not the full height ones like iOS
+    if (outerScrollGesture && !(Platform.OS === 'android' && scrollable)) {
+      return Gesture.Simultaneous(outerScrollGesture, gestureHandler);
     }
-  };
 
-  return {
-    gestureHandler,
+    return gestureHandler;
+  }, [scrollable, outerScrollGesture, gestureHandler]);
+
+  const composedScrollHandler = useComposedEventHandler([
     handleScroll,
-    handleFlatListLayout,
-    handleRef,
-    startDrag,
-    listContextValue,
-    itemOffset,
-    itemHeight,
-    draggedIndex,
-    dragY,
-    duration,
-  };
+    onScroll || null,
+  ]);
+
+  const renderAnimatedCell = useCallback(
+    ({cellKey, ...props}: CellRendererProps<T>) => (
+      <ReorderableListCell
+        {...props}
+        // forces remount with key change on reorder
+        key={`${cellKey}+${props.index}`}
+        itemOffset={itemOffset}
+        itemHeight={itemHeight}
+        dragY={dragY}
+        draggedIndex={draggedIndex}
+        animationDuration={duration}
+        startDrag={startDrag}
+      />
+    ),
+    [itemOffset, itemHeight, dragY, draggedIndex, duration, startDrag],
+  );
+
+  return (
+    <ReorderableListContext.Provider value={listContextValue}>
+      <GestureDetector gesture={combinedGesture}>
+        <AnimatedFlatList
+          {...rest}
+          ref={handleRef}
+          CellRendererComponent={renderAnimatedCell}
+          onLayout={handleFlatListLayout}
+          onScroll={composedScrollHandler}
+          scrollEventThrottle={1}
+          horizontal={false}
+          removeClippedSubviews={false}
+          numColumns={1}
+        />
+      </GestureDetector>
+    </ReorderableListContext.Provider>
+  );
 };
+
+const MemoizedReorderableListCore = React.memo(
+  React.forwardRef(ReorderableListCore),
+) as <T>(
+  props: ReorderableListCoreProps<T> & {
+    ref?: React.ForwardedRef<FlatList<T> | null>;
+  },
+) => React.ReactElement;
+
+export {MemoizedReorderableListCore as ReorderableListCore};
