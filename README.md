@@ -272,6 +272,8 @@ const Example = () => {
       data={data}
       onReorder={handleReorder}
       renderItem={renderItem}
+      // IMPORTANT: Do not use the current index as key.
+      // Always use a stable and unique key for each item.
       keyExtractor={item => item.id}
     />
   );
