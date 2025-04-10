@@ -1,4 +1,4 @@
-import React, {memo, useCallback, useMemo} from 'react';
+import React, {memo, useCallback, useEffect, useMemo} from 'react';
 import {CellRendererProps, LayoutChangeEvent} from 'react-native';
 
 import Animated, {
@@ -138,6 +138,15 @@ export const ReorderableListCell = memo(
 
       onLayout?.(e);
     };
+
+    useEffect(() => {
+      return () => {
+        runOnUI((idx: number) => {
+          itemOffset.value[idx] = 0;
+          itemHeight.value[idx] = 0;
+        })(index);
+      };
+    }, [index, itemOffset, itemHeight]);
 
     return (
       <ReorderableCellContext.Provider value={contextValue}>
