@@ -1,5 +1,12 @@
 import React, {memo} from 'react';
-import {Image, Pressable, StyleSheet, Text, View} from 'react-native';
+import {
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
 import {useReorderableDrag} from 'react-native-reorderable-list';
 
@@ -7,11 +14,17 @@ interface PlaylistItemProps {
   image: string;
   title: string;
   author: string;
+  id: string;
+  deleteItem: (id: string) => void;
 }
 
 export const PlaylistItem: React.FC<PlaylistItemProps> = memo(
-  ({image, title, author}) => {
+  ({image, title, author, deleteItem, id}) => {
     const drag = useReorderableDrag();
+
+    const handleDelete = () => {
+      deleteItem(id);
+    };
 
     return (
       <Pressable style={styles.container} onLongPress={drag}>
@@ -27,6 +40,9 @@ export const PlaylistItem: React.FC<PlaylistItemProps> = memo(
           </Text>
           <Text style={styles.author}>{author}</Text>
         </View>
+        <TouchableOpacity onPress={handleDelete} style={styles.delete}>
+          <Text>X</Text>
+        </TouchableOpacity>
       </Pressable>
     );
   },
@@ -39,6 +55,15 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     padding: 12,
   },
+  delete: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    backgroundColor: 'lightgrey',
+    color: 'white',
+    borderRadius: 4,
+    fontWeight: 'bold',
+  },
+
   image: {
     height: 50,
     width: 50,

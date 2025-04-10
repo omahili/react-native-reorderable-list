@@ -39,8 +39,12 @@ export const PlaylistScreen = () => {
     setData(value => reorderItems(value, from, to));
   };
 
+  const deleteItem = (id: string) => {
+    setData(prev => [...prev.filter(track => track.id !== id)]);
+  };
+
   const renderItem = ({item}: ListRenderItemInfo<PlaylistItemData>) => (
-    <PlaylistItem {...item} />
+    <PlaylistItem deleteItem={deleteItem} {...item} />
   );
 
   return (
