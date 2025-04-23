@@ -13,6 +13,7 @@ import {NestedScrollableListsScreen} from './NestedScrollableLists';
 import {PlaylistScreen} from './Playlist';
 import {ReadmeExampleScreen} from './ReadmeExample';
 import {RefreshControlScreen} from './RefreshControl';
+import {SwipeableListScreen} from './SwipeableList';
 
 const screens = [
   {
@@ -74,6 +75,11 @@ const screens = [
     id: '11',
     name: 'Index Change',
     component: IndexChangeScreen,
+  },
+  {
+    id: '12',
+    name: 'Swipeable List',
+    component: SwipeableListScreen,
   },
 ] as const;
 

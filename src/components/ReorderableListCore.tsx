@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
   CellRendererProps,
   FlatList,
@@ -87,6 +87,7 @@ const ReorderableListCore = <T,>(
     shouldUpdateActiveItem,
     panEnabled = true,
     panActivateAfterLongPress,
+    data,
     ...rest
   }: ReorderableListCoreProps<T>,
   ref: React.ForwardedRef<FlatList<T>>,
@@ -122,6 +123,9 @@ const ReorderableListCore = <T,>(
   const draggedHeight = useSharedValue(0);
   const itemOffset = useSharedValue<number[]>([]);
   const itemHeight = useSharedValue<number[]>([]);
+  // We need to track data length since itemOffset and itemHeight might contain more data than we need.
+  // e.g. items are removed from the list, in which case layout data for those items is set to 0.
+  const itemCount = useSharedValue(data.length);
   const autoscrollTrigger = useSharedValue(-1);
   const lastAutoscrollTrigger = useSharedValue(-1);
   const dragY = useSharedValue(0);
@@ -138,6 +142,7 @@ const ReorderableListCore = <T,>(
   const dragDirection = useSharedValue(0);
   const lastDragDirectionPivot = useSharedValue<number | null>(null);
   const autoscrollDelta = useSharedValue(autoscrollActivationDelta);
+  const prevItemCount = useRef(data.length);
 
   // Position of the list relative to the scroll container
   const nestedFlatListPositionY = useDerivedValue(
@@ -147,7 +152,31 @@ const ReorderableListCore = <T,>(
   useEffect(() => {
     duration.value = animationDuration;
     autoscrollDelta.value = autoscrollActivationDelta;
-  }, [duration, animationDuration, autoscrollDelta, autoscrollActivationDelta]);
+  }, [
+    duration,
+    animationDuration,
+    autoscrollDelta,
+    autoscrollActivationDelta,
+    itemCount,
+  ]);
+
+  useEffect(() => {
+    itemCount.value = data.length;
+
+    // This could be done unmount of the removed cell, however it leads to bugs.
+    // Surprisingly the unmount gets sometimes called after the onLayout event
+    // setting all layout data to 0 and breaking the list. So we solve it like this.
+    if (data.length < prevItemCount.current) {
+      for (let i = data.length; i < prevItemCount.current; i++) {
+        runOnUI(() => {
+          itemHeight.value[i] = 0;
+          itemOffset.value[i] = 0;
+        })();
+      }
+    }
+
+    prevItemCount.current = data.length;
+  }, [data.length, itemHeight, itemOffset, itemCount]);
 
   const listContextValue = useMemo(
     () => ({
@@ -414,7 +443,7 @@ const ReorderableListCore = <T,>(
     const currentHeight = itemHeight.value[currentIndex.value];
     const currentCenter = currentOffset + currentHeight * 0.5;
 
-    const max = itemOffset.value.length;
+    const max = itemCount.value;
     const possibleIndex =
       relativeDragCenterY < currentCenter
         ? Math.max(0, currentIndex.value - 1)
@@ -441,6 +470,7 @@ const ReorderableListCore = <T,>(
   }, [
     currentIndex,
     currentItemDragCenterY,
+    itemCount,
     itemOffset,
     itemHeight,
     flatListScrollOffsetY,
@@ -927,6 +957,7 @@ const ReorderableListCore = <T,>(
         <AnimatedFlatList
           {...rest}
           ref={handleRef}
+          data={data}
           CellRendererComponent={renderAnimatedCell}
           onLayout={handleFlatListLayout}
           onScroll={composedScrollHandler}
