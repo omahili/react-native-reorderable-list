@@ -1,5 +1,19 @@
 
 
+# [0.14.0](https://github.com/omahili/react-native-reorderable-list/compare/v0.13.1...v0.14.0) (2025-04-27)
+
+
+### Bug Fixes
+
+* persisted layout data of deleted items ([943f1ec](https://github.com/omahili/react-native-reorderable-list/commit/943f1ec16e061425333d9c0b12956935eadc21be)), closes [#47](https://github.com/omahili/react-native-reorderable-list/issues/47)
+* remove unnecessary unstable batching ([d3e1b29](https://github.com/omahili/react-native-reorderable-list/commit/d3e1b297b7c685fe0e8caf185aa4ad4fc1ca592d))
+
+
+### Features
+
+* add pan gesture prop ([a249fc9](https://github.com/omahili/react-native-reorderable-list/commit/a249fc99ca5e0bceba686a878dc100852d5f2f3d))
+* forward ref to scroll view container ([c3edee8](https://github.com/omahili/react-native-reorderable-list/commit/c3edee8b07942eee1cda1c274697c38ca5470e7b)), closes [#50](https://github.com/omahili/react-native-reorderable-list/issues/50)
+
 ## [0.13.1](https://github.com/omahili/react-native-reorderable-list/compare/v0.13.0...v0.13.1) (2025-03-23)
 
 
