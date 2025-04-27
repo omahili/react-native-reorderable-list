@@ -1,7 +1,7 @@
 import React, {memo} from 'react';
 import {Pressable, StyleSheet, Text} from 'react-native';
 
-import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
+import Swipeable from 'react-native-gesture-handler/Swipeable';
 
 import {ListItem, ListItemProps} from '../common';
 

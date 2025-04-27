@@ -6,11 +6,18 @@ import ReorderableList, {
   reorderItems,
 } from 'react-native-reorderable-list';
 
-import {ItemSeparator, ListItem, SeedDataItem, useSeedData} from './common';
+import {
+  ItemSeparator,
+  ListItem,
+  SeedDataItem,
+  usePanGesture,
+  useSeedData,
+} from './common';
 
 export const DynamicHeightsScreen = () => {
   const seedData = useSeedData();
   const [data, setData] = useState(seedData);
+  const panGesture = usePanGesture();
 
   const handleReorder = ({from, to}: ReorderableListReorderEvent) => {
     setData(value => reorderItems(value, from, to));
@@ -27,6 +34,7 @@ export const DynamicHeightsScreen = () => {
       renderItem={renderItem}
       keyExtractor={item => item.id}
       ItemSeparatorComponent={ItemSeparator}
+      panGesture={panGesture}
     />
   );
 };

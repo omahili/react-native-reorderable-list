@@ -11,6 +11,7 @@ import {
   ListItem,
   SeedDataItem,
   TitleHighlight,
+  usePanGesture,
   useSeedData,
 } from './common';
 
@@ -24,6 +25,7 @@ const contentOffset = Platform.select({ios: {y: -TOP_HEIGHT, x: 0}});
 export const FloatingHeaderFooterScreen = () => {
   const seedData = useSeedData();
   const [data, setData] = useState(seedData);
+  const panGesture = usePanGesture();
 
   const handleReorder = ({from, to}: ReorderableListReorderEvent) => {
     setData(value => reorderItems(value, from, to));
@@ -48,6 +50,7 @@ export const FloatingHeaderFooterScreen = () => {
         autoscrollThresholdOffset={autoscrollThresholdOffset}
         contentInset={contentInset}
         contentOffset={contentOffset}
+        panGesture={panGesture}
       />
       <TitleHighlight
         title="Floating Bottom"

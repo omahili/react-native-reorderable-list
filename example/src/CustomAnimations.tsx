@@ -10,7 +10,13 @@ import ReorderableList, {
   reorderItems,
 } from 'react-native-reorderable-list';
 
-import {ItemSeparator, ListItem, SeedDataItem, useSeedData} from './common';
+import {
+  ItemSeparator,
+  ListItem,
+  SeedDataItem,
+  usePanGesture,
+  useSeedData,
+} from './common';
 
 export const CustomAnimationsScreen = () => {
   const seedData = useSeedData();
@@ -18,6 +24,7 @@ export const CustomAnimationsScreen = () => {
   const scale = useSharedValue(1);
   const shadowOpacity = useSharedValue(0);
   const shadowRadius = useSharedValue(0);
+  const panGesture = usePanGesture();
 
   const handleReorder = ({from, to}: ReorderableListReorderEvent) => {
     setData(value => reorderItems(value, from, to));
@@ -96,6 +103,7 @@ export const CustomAnimationsScreen = () => {
       keyExtractor={item => item.id}
       ItemSeparatorComponent={ItemSeparator}
       cellAnimations={cellAnimations}
+      panGesture={panGesture}
     />
   );
 };

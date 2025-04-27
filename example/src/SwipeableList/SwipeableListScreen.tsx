@@ -6,12 +6,18 @@ import ReorderableList, {
   reorderItems,
 } from 'react-native-reorderable-list';
 
-import {ItemSeparator, SeedDataItem, useSeedData} from '../common';
+import {
+  ItemSeparator,
+  SeedDataItem,
+  usePanGesture,
+  useSeedData,
+} from '../common';
 import {SwipeableListItem} from './SwipeableListItem';
 
 export const SwipeableListScreen = () => {
   const seedData = useSeedData(5);
   const [data, setData] = useState(seedData);
+  const panGesture = usePanGesture();
 
   const handleReorder = ({from, to}: ReorderableListReorderEvent) => {
     setData(value => reorderItems(value, from, to));
@@ -36,6 +42,7 @@ export const SwipeableListScreen = () => {
         keyExtractor={item => item.id}
         ItemSeparatorComponent={ItemSeparator}
         contentContainerStyle={styles.listContentContainer}
+        panGesture={panGesture}
         cellAnimations={{
           // Disable opacity animation to avoid seeing the delete action underneath.
           opacity: 1,

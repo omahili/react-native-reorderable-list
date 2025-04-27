@@ -6,11 +6,12 @@ import ReorderableList, {
   reorderItems,
 } from 'react-native-reorderable-list';
 
-import {ListItem, SeedDataItem, useSeedData} from './common';
+import {ListItem, SeedDataItem, usePanGesture, useSeedData} from './common';
 
 const List = () => {
   const seedData = useSeedData();
   const [data, setData] = useState(seedData);
+  const panGesture = usePanGesture();
 
   const handleReorder = ({from, to}: ReorderableListReorderEvent) => {
     setData(value => reorderItems(value, from, to));
@@ -26,6 +27,7 @@ const List = () => {
       onReorder={handleReorder}
       renderItem={renderItem}
       keyExtractor={item => item.id}
+      panGesture={panGesture}
       style={styles.list}
     />
   );

@@ -9,6 +9,7 @@ import ReorderableList, {
 
 import {PlaylistItem} from './PlaylistItem';
 import {PlaylistItemSeparator} from './PlaylistItemSeparator';
+import {usePanGesture} from '../common';
 
 export interface PlaylistItemData {
   id: string;
@@ -34,6 +35,7 @@ export const PlaylistScreen = () => {
     [],
   );
   const [data, setData] = useState(seedData);
+  const panGesture = usePanGesture();
 
   const handleReorder = ({from, to}: ReorderableListReorderEvent) => {
     setData(value => reorderItems(value, from, to));
@@ -50,6 +52,7 @@ export const PlaylistScreen = () => {
       renderItem={renderItem}
       keyExtractor={item => item.id}
       ItemSeparatorComponent={PlaylistItemSeparator}
+      panGesture={panGesture}
     />
   );
 };

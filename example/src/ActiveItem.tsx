@@ -7,7 +7,13 @@ import ReorderableList, {
   useIsActive,
 } from 'react-native-reorderable-list';
 
-import {ItemSeparator, ListItem, ListItemProps, useSeedData} from './common';
+import {
+  ItemSeparator,
+  ListItem,
+  ListItemProps,
+  usePanGesture,
+  useSeedData,
+} from './common';
 
 export const ActiveItem: React.FC<ListItemProps> = memo(props => {
   const isActive = useIsActive();
@@ -23,6 +29,7 @@ export const ActiveItem: React.FC<ListItemProps> = memo(props => {
 export const ActiveItemScreen = () => {
   const seedData = useSeedData();
   const [data, setData] = useState(seedData);
+  const panGesture = usePanGesture();
 
   const handleReorder = ({from, to}: ReorderableListReorderEvent) => {
     setData(value => reorderItems(value, from, to));
@@ -39,6 +46,7 @@ export const ActiveItemScreen = () => {
       renderItem={renderItem}
       keyExtractor={item => item.id}
       ItemSeparatorComponent={ItemSeparator}
+      panGesture={panGesture}
       shouldUpdateActiveItem
     />
   );

@@ -7,13 +7,23 @@ import ReorderableList, {
   reorderItems,
 } from 'react-native-reorderable-list';
 
-import {ItemSeparator, ListItem, SeedDataItem, useSeedData} from './common';
+import {
+  ItemSeparator,
+  ListItem,
+  SeedDataItem,
+  usePanGesture,
+  useSeedData,
+} from './common';
 
 export const RefreshControlScreen = () => {
   const seedData = useSeedData();
   const [data, setData] = useState(seedData);
   const [refreshing, setRefreshing] = useState(false);
   const [refreshEnabled, setRefreshEnabled] = useState(true);
+
+  // Important for refresh control to work correctly on Android.
+  // It also allows navigating back through swipe in react navigation.
+  const panGesture = usePanGesture();
 
   const handleReorder = useCallback(
     ({from, to}: ReorderableListReorderEvent) => {
@@ -66,7 +76,7 @@ export const RefreshControlScreen = () => {
           enabled={refreshEnabled}
         />
       }
-      panActivateAfterLongPress={Platform.OS === 'android' ? 520 : undefined}
+      panGesture={panGesture}
     />
   );
 };

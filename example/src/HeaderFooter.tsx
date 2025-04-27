@@ -11,12 +11,14 @@ import {
   ListItem,
   SeedDataItem,
   TitleHighlight,
+  usePanGesture,
   useSeedData,
 } from './common';
 
 export const HeaderFooterScreen = () => {
   const seedData = useSeedData();
   const [data, setData] = useState(seedData);
+  const panGesture = usePanGesture();
 
   const handleReorder = ({from, to}: ReorderableListReorderEvent) => {
     setData(value => reorderItems(value, from, to));
@@ -35,6 +37,7 @@ export const HeaderFooterScreen = () => {
       ItemSeparatorComponent={ItemSeparator}
       ListHeaderComponent={<TitleHighlight title="Header" />}
       ListFooterComponent={<TitleHighlight title="Footer" />}
+      panGesture={panGesture}
     />
   );
 };

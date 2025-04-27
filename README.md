@@ -25,7 +25,8 @@ A reorderable list for React Native applications, powered by Reanimated 🚀
   - [useIsActive](#useisactive)
 - [Utils](#utils)
 - [Troubleshooting](#troubleshooting)
-  - [RefreshControl](#refreshcontrol)
+  - [React Navigation Gestures](#react-navigation-gestures)
+  - [Refresh Control](#refresh-control)
 - [Example](#example)
 - [License](#license)
 
@@ -66,8 +67,7 @@ This component uses a [FlatList](https://reactnative.dev/docs/flatlist) and it e
 | animationDuration         | `number`                                         | No       | `200`                      | Duration of the animations in milliseconds. Users won't be able to drag a new item until the dragged item is released and its animation to its new position ends.                                                                                                                                                                                                                                              |
 | cellAnimations            | `ReorderableListCellAnimations`                  | No       | N/A                        | Allows passing an object with values and/or shared values that can animate a cell, for example by using the `onDragStart` and `onDragEnd` events. Supports view style properties. Override opacity and/or transform to disable the default animation, e.g. `{opacity: 1, transform: []}`. Check the [examples](https://github.com/omahili/react-native-reorderable-list/tree/master/example) for more details. |
 | shouldUpdateActiveItem    | boolean                                          | No       | `false`                    | Whether the active item should be updated. Enables usage of `useIsActive` hook.                                                                                                                                                                                                                                                                                                                                |
-| panEnabled                | `boolean`                                        | No       | `true`                     | Wether the pan gestures necessary for dragging are enabled.                                                                                                                                                                                                                                                                                                                                                    |
-| panActivateAfterLongPress | `number`                                         | No       | N/A                        | Duration in milliseconds of the long press on the list before the pan gesture for dragging is allowed to activate.                                                                                                                                                                                                                                                                                             |
+| panGesture                | `PanGesture`                                     | No       | N/A                        | Custom instance of pan gesture. See [GestureHandler docs](https://docs.swmansion.com/react-native-gesture-handler) for further info.                                                                                                                                                                                                                                                                           |
 | onReorder                 | `(event: { from: number, to: number  }) => void` | Yes      | N/A                        | Event fired after an item is released and the list is reordered.                                                                                                                                                                                                                                                                                                                                               |
 | onDragStart               | `(event: { index: number }) => void`             | No       | N/A                        | Event fired when an item is dragged. Needs to be a `worklet`. See [Reanimated docs](https://docs.swmansion.com/react-native-reanimated) for further info.                                                                                                                                                                                                                                                      |
 | onDragEnd                 | `(event: { from: number, to: number  }) => void` | No       | N/A                        | Event fired when the dragged item is released. Needs to be a `worklet`. See [Reanimated docs](https://docs.swmansion.com/react-native-reanimated) for further info.                                                                                                                                                                                                                                            |
@@ -165,15 +165,65 @@ Additionally this hook requires setting `shouldUpdateActiveItem` to true on the 
 
 ## Troubleshooting
 
-### RefreshControl
+### React Navigation Gestures
 
-If you want to use RefreshControl with ReorderableList you might encounter some issues on Android, where gestures are conflicting making one or both of the components non responsive. To overcome this issues you can delay the activation of pan gestures necessary for dragging items by using the `panActivateAfterLongPress` prop. This duration should be slightly longer than the long press delay necessary to drag your items. If you're using Pressable the `delayLongPress` is 500 ms by default.
+If you'd like to allow for gesture-based navigation, such as swiping to go back, there are several ways to do it when working with reorderable list. You can delay the activation of pan gestures necessary for dragging items by setting the `activateAfterLongPress` on pan gesture. This duration should be slightly longer than the long press delay necessary to drag your items. If you're using Pressable the `delayLongPress` is 500 ms by default.
 
 ```typescript
+import {Gesture} from 'react-native-gesture-handler';
+
+const panGesture = useMemo(() => Gesture.Pan().activateAfterLongPress(520), []);
+
 <ReorderableList
   // ...
-  panActivateAfterLongPress={Platform.OS === 'android' ? 520 : undefined}
-/>
+  panGesture={panGesture}
+/>;
+```
+
+Another solution is to set a bigger activation offset on the x axis:
+
+```typescript
+import {Gesture} from 'react-native-gesture-handler';
+
+// If it doesn't work try with bigger values.
+const panGesture = useMemo(
+  () => Gesture.Pan().activeOffsetX([-20, 20]).activeOffsetY(0),
+  [],
+);
+
+<ReorderableList
+  // ...
+  panGesture={panGesture}
+/>;
+```
+
+One more way is to set a negative hit slop, however keep in mind that this will disable drag starts from the sides of your reorderable items:
+
+```typescript
+import {Gesture} from 'react-native-gesture-handler';
+
+// If it doesn't work try with bigger values.
+const panGesture = useMemo(() => Gesture.Pan().hitSlop(-10), []);
+
+<ReorderableList
+  // ...
+  panGesture={panGesture}
+/>;
+```
+
+### Refresh Control
+
+If you want to use RefreshControl with ReorderableList you might encounter some issues on Android, where gestures are conflicting making one or both of the components non responsive. To overcome this issues you can delay the activation of pan gestures necessary for dragging items by setting the `activateAfterLongPress` on pan gesture. This duration should be slightly longer than the long press delay necessary to drag your items. If you're using Pressable the `delayLongPress` is 500 ms by default.
+
+```typescript
+import {Gesture} from 'react-native-gesture-handler';
+
+const panGesture = useMemo(() => Gesture.Pan().activateAfterLongPress(520), []);
+
+<ReorderableList
+  // ...
+  panGesture={panGesture}
+/>;
 ```
 
 If you change `delayLongPress` on your Pressable, update this prop accordingly.

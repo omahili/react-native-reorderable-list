@@ -13,6 +13,7 @@ import {
   ListItem,
   SeedDataItem,
   TitleHighlight,
+  usePanGesture,
   useSeedData,
 } from './common';
 
@@ -20,6 +21,7 @@ export const IndexChangeScreen = () => {
   const seedData = useSeedData();
   const [data, setData] = useState(seedData);
   const [currentIndex, setCurrentIndex] = useState<number>();
+  const panGesture = usePanGesture();
 
   const handleReorder = ({from, to}: ReorderableListReorderEvent) => {
     setData(value => reorderItems(value, from, to));
@@ -55,6 +57,7 @@ export const IndexChangeScreen = () => {
         onDragEnd={handleDragEnd}
         onDragStart={handleIndexChange} // to register index at start
         onIndexChange={handleIndexChange}
+        panGesture={panGesture}
       />
       <TitleHighlight
         title={`Current ${

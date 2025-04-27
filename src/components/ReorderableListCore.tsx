@@ -85,6 +85,7 @@ const ReorderableListCore = <T,>(
     outerScrollGesture,
     cellAnimations,
     shouldUpdateActiveItem,
+    panGesture,
     panEnabled = true,
     panActivateAfterLongPress,
     data,
@@ -271,8 +272,10 @@ const ReorderableListCore = <T,>(
 
   const panGestureHandler = useMemo(
     () =>
-      Gesture.Pan()
+      (panGesture || Gesture.Pan())
         .onBegin(e => {
+          'worklet';
+
           // prevent new dragging until item is completely released
           if (state.value === ReorderableListState.IDLE) {
             startY.value = e.y;
@@ -283,6 +286,8 @@ const ReorderableListCore = <T,>(
           }
         })
         .onUpdate(e => {
+          'worklet';
+
           if (state.value === ReorderableListState.DRAGGED) {
             setDragDirection(e);
           }
@@ -299,9 +304,18 @@ const ReorderableListCore = <T,>(
             gestureState.value = e.state;
           }
         })
-        .onEnd(e => (gestureState.value = e.state))
-        .onFinalize(e => (gestureState.value = e.state)),
+        .onEnd(e => {
+          'worklet';
+
+          gestureState.value = e.state;
+        })
+        .onFinalize(e => {
+          'worklet';
+
+          gestureState.value = e.state;
+        }),
     [
+      panGesture,
       state,
       startY,
       currentY,
@@ -315,7 +329,7 @@ const ReorderableListCore = <T,>(
     ],
   );
 
-  const panGestureHandlerWithOptions = useMemo(() => {
+  const panGestureHandlerWithPropOptions = useMemo(() => {
     if (typeof panActivateAfterLongPress === 'number') {
       panGestureHandler.activateAfterLongPress(panActivateAfterLongPress);
     }
@@ -328,8 +342,9 @@ const ReorderableListCore = <T,>(
   }, [panActivateAfterLongPress, panEnabled, panGestureHandler]);
 
   const gestureHandler = useMemo(
-    () => Gesture.Simultaneous(Gesture.Native(), panGestureHandlerWithOptions),
-    [panGestureHandlerWithOptions],
+    () =>
+      Gesture.Simultaneous(Gesture.Native(), panGestureHandlerWithPropOptions),
+    [panGestureHandlerWithPropOptions],
   );
 
   const setScrollEnabled = useCallback(

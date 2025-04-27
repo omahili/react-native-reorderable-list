@@ -17,6 +17,7 @@ import type {
   ViewStyle,
 } from 'react-native';
 
+import {PanGesture} from 'react-native-gesture-handler';
 import {SharedValue, useAnimatedScrollHandler} from 'react-native-reanimated';
 
 import {MaximumOneOf, SharedValueOrType} from './misc';
@@ -111,11 +112,19 @@ export interface ReorderableListProps<T>
    */
   shouldUpdateActiveItem?: boolean;
   /**
+   * Custom instance of pan gesture. See [GestureHandler docs](https://docs.swmansion.com/react-native-gesture-handler) for further info.
+   */
+  panGesture?: PanGesture;
+  /**
    * Wether the pan gestures necessary for dragging are enabled. Default: `true`.
+   *
+   * @deprecated In favor of `panGesture` prop.
    */
   panEnabled?: boolean;
   /**
    * Duration in milliseconds of the long press on the list before the pan gesture for dragging is allowed to activate.
+   *
+   * @deprecated In favor of `panGesture` prop.
    */
   panActivateAfterLongPress?: number;
   /**

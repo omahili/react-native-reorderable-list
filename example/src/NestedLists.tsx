@@ -8,7 +8,13 @@ import {
   reorderItems,
 } from 'react-native-reorderable-list';
 
-import {ListItem, SeedDataItem, TitleHighlight, useSeedData} from './common';
+import {
+  ListItem,
+  SeedDataItem,
+  TitleHighlight,
+  usePanGesture,
+  useSeedData,
+} from './common';
 
 LogBox.ignoreLogs([
   'VirtualizedLists should never be nested inside plain ScrollViews',
@@ -21,6 +27,7 @@ interface NestedListProps {
 const NestedList: React.FC<NestedListProps> = ({index}) => {
   const seedData = useSeedData();
   const [data, setData] = useState(seedData);
+  const panGesture = usePanGesture();
 
   const handleReorder = ({from, to}: ReorderableListReorderEvent) => {
     setData(value => reorderItems(value, from, to));
@@ -38,6 +45,7 @@ const NestedList: React.FC<NestedListProps> = ({index}) => {
       keyExtractor={item => item.id}
       scrollEnabled={false}
       ListHeaderComponent={<TitleHighlight title={`Nested List ${index}`} />}
+      panGesture={panGesture}
     />
   );
 };
