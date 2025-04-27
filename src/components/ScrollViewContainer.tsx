@@ -1,5 +1,5 @@
-import React, {useCallback, useMemo} from 'react';
-import {LayoutChangeEvent} from 'react-native';
+import React, {forwardRef, useCallback, useMemo} from 'react';
+import {LayoutChangeEvent, ScrollView} from 'react-native';
 
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
 import Animated, {
@@ -14,17 +14,28 @@ import Animated, {
 import {ScrollViewContainerContext} from '../contexts/ScrollViewContainerContext';
 import type {ScrollViewContainerProps} from '../types';
 
-export const ScrollViewContainer: React.FC<ScrollViewContainerProps> = ({
-  onLayout,
-  onScroll,
-  scrollEnabled = true,
-  ...rest
-}) => {
+const ScrollViewContainerWithRef = (
+  {onLayout, onScroll, scrollEnabled = true, ...rest}: ScrollViewContainerProps,
+  ref: React.ForwardedRef<ScrollView>,
+) => {
   const scrollViewScrollEnabled = useSharedValue(scrollEnabled);
   const scrollViewContainerRef = useAnimatedRef<Animated.ScrollView>();
   const scrollViewScrollOffsetY = useSharedValue(0);
   const scrollViewPageY = useSharedValue(0);
   const scrollViewHeightY = useSharedValue(0);
+
+  const handleRef = useCallback(
+    (value: Animated.ScrollView) => {
+      scrollViewContainerRef(value);
+
+      if (typeof ref === 'function') {
+        ref(value);
+      } else if (ref) {
+        ref.current = value;
+      }
+    },
+    [scrollViewContainerRef, ref],
+  );
 
   const outerScrollGesture = useMemo(() => Gesture.Native(), []);
 
@@ -85,7 +96,7 @@ export const ScrollViewContainer: React.FC<ScrollViewContainerProps> = ({
       <GestureDetector gesture={outerScrollGesture}>
         <Animated.ScrollView
           {...rest}
-          ref={scrollViewContainerRef}
+          ref={handleRef}
           onScroll={composedScrollHandler}
           onLayout={handleLayout}
           scrollEnabled={scrollEnabled}
@@ -94,3 +105,5 @@ export const ScrollViewContainer: React.FC<ScrollViewContainerProps> = ({
     </ScrollViewContainerContext.Provider>
   );
 };
+
+export const ScrollViewContainer = forwardRef(ScrollViewContainerWithRef);
