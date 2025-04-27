@@ -25,7 +25,7 @@ A reorderable list for React Native applications, powered by Reanimated 🚀
   - [useIsActive](#useisactive)
 - [Utils](#utils)
 - [Troubleshooting](#troubleshooting)
-  - [React Navigation Gestures](#react-navigation-gestures)
+  - [Navigation Gestures](#navigation-gestures)
   - [Refresh Control](#refresh-control)
 - [Example](#example)
 - [License](#license)
@@ -165,7 +165,7 @@ Additionally this hook requires setting `shouldUpdateActiveItem` to true on the 
 
 ## Troubleshooting
 
-### React Navigation Gestures
+### Navigation Gestures
 
 If you'd like to allow for gesture-based navigation, such as swiping to go back, there are several ways to do it when working with reorderable list. You can delay the activation of pan gestures necessary for dragging items by setting the `activateAfterLongPress` on pan gesture. This duration should be slightly longer than the long press delay necessary to drag your items. If you're using Pressable the `delayLongPress` is 500 ms by default.
 
@@ -174,10 +174,12 @@ import {Gesture} from 'react-native-gesture-handler';
 
 const panGesture = useMemo(() => Gesture.Pan().activateAfterLongPress(520), []);
 
-<ReorderableList
-  // ...
-  panGesture={panGesture}
-/>;
+return (
+  <ReorderableList
+    // ...
+    panGesture={panGesture}
+  />
+);
 ```
 
 Another solution is to set a bigger activation offset on the x axis:
@@ -191,10 +193,12 @@ const panGesture = useMemo(
   [],
 );
 
-<ReorderableList
-  // ...
-  panGesture={panGesture}
-/>;
+return (
+  <ReorderableList
+    // ...
+    panGesture={panGesture}
+  />
+);
 ```
 
 One more way is to set a negative hit slop, however keep in mind that this will disable drag starts from the sides of your reorderable items:
@@ -205,10 +209,12 @@ import {Gesture} from 'react-native-gesture-handler';
 // If it doesn't work try with bigger values.
 const panGesture = useMemo(() => Gesture.Pan().hitSlop(-10), []);
 
-<ReorderableList
-  // ...
-  panGesture={panGesture}
-/>;
+return (
+  <ReorderableList
+    // ...
+    panGesture={panGesture}
+  />
+);
 ```
 
 ### Refresh Control
@@ -220,10 +226,12 @@ import {Gesture} from 'react-native-gesture-handler';
 
 const panGesture = useMemo(() => Gesture.Pan().activateAfterLongPress(520), []);
 
-<ReorderableList
-  // ...
-  panGesture={panGesture}
-/>;
+return (
+  <ReorderableList
+    // ...
+    panGesture={panGesture}
+  />
+);
 ```
 
 If you change `delayLongPress` on your Pressable, update this prop accordingly.
