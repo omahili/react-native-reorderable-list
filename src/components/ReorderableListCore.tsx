@@ -906,7 +906,11 @@ const ReorderableListCore = <T,>(
               return;
             }
 
-            flatListPageY.value = measurement.pageY;
+            // We need to use pageY because the list might be nested into other views,
+            // It's important that we take the measurement of the list without any scroll offset
+            // from the scroll container.
+            flatListPageY.value =
+              measurement.pageY + (scrollViewScrollOffsetY?.value || 0);
           })();
         }, 100);
       }
