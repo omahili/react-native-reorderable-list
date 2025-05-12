@@ -1,5 +1,12 @@
 
 
+## [0.14.1](https://github.com/omahili/react-native-reorderable-list/compare/v0.14.0...v0.14.1) (2025-05-12)
+
+
+### Bug Fixes
+
+* autoscroll on nested list layout change ([6072c06](https://github.com/omahili/react-native-reorderable-list/commit/6072c06cc10db5530df4c11505fcfadbac3d60ff)), closes [#49](https://github.com/omahili/react-native-reorderable-list/issues/49)
+
 # [0.14.0](https://github.com/omahili/react-native-reorderable-list/compare/v0.13.1...v0.14.0) (2025-04-27)
 
 
