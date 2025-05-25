@@ -1,5 +1,17 @@
 
 
+# [0.15.0](https://github.com/omahili/react-native-reorderable-list/compare/v0.14.1...v0.15.0) (2025-05-25)
+
+
+### Bug Fixes
+
+* improve scroll enable ([ffb0343](https://github.com/omahili/react-native-reorderable-list/commit/ffb0343370bfa9f882f0ab695f3d61a29f5d6d6a))
+
+
+### Features
+
+* add dragEnabled prop ([53d9c76](https://github.com/omahili/react-native-reorderable-list/commit/53d9c7687032b7c59b497fe95b14c404e836e5b9)), closes [#52](https://github.com/omahili/react-native-reorderable-list/issues/52)
+
 ## [0.14.1](https://github.com/omahili/react-native-reorderable-list/compare/v0.14.0...v0.14.1) (2025-05-12)
 
 
