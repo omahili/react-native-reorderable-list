@@ -19,8 +19,7 @@ const ScrollViewContainerWithRef = (
   {onLayout, onScroll, ...rest}: ScrollViewContainerProps,
   ref: React.ForwardedRef<ScrollView>,
 ) => {
-  const scrollEnabled =
-    typeof rest.scrollEnabled === 'undefined' ? true : rest.scrollEnabled;
+  const scrollEnabled = rest.scrollEnabled ?? true;
 
   const scrollViewScrollEnabledProp = usePropAsSharedValue(scrollEnabled);
   const scrollViewCurrentScrollEnabled = useSharedValue(scrollEnabled);

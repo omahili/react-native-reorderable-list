@@ -7,14 +7,18 @@ export interface ListItemProps {
   image: string;
   title: string;
   description: string;
+  dragMode?: 'press-in' | 'long-press';
 }
 
 export const ListItem: React.FC<ListItemProps> = memo(
-  ({image, title, description}) => {
+  ({image, title, description, dragMode = 'long-press'}) => {
     const drag = useReorderableDrag();
 
     return (
-      <Pressable style={styles.container} onLongPress={drag}>
+      <Pressable
+        style={styles.container}
+        onPressIn={dragMode === 'press-in' ? drag : undefined}
+        onLongPress={dragMode === 'long-press' ? drag : undefined}>
         <Image
           style={styles.image}
           source={{

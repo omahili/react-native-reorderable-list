@@ -85,6 +85,7 @@ const ReorderableListCore = <T,>(
     scrollable,
     outerScrollGesture,
     cellAnimations,
+    dragEnabled = true,
     shouldUpdateActiveItem,
     panGesture,
     panEnabled = true,
@@ -94,8 +95,7 @@ const ReorderableListCore = <T,>(
   }: ReorderableListCoreProps<T>,
   ref: React.ForwardedRef<FlatList<T>>,
 ) => {
-  const scrollEnabled =
-    typeof rest.scrollEnabled === 'undefined' ? true : rest.scrollEnabled;
+  const scrollEnabled = rest.scrollEnabled ?? true;
 
   const flatListRef = useAnimatedRef<FlatList>();
   const [activeIndex, setActiveIndex] = useState(-1);
@@ -144,6 +144,7 @@ const ReorderableListCore = <T,>(
   const autoscrollActivationDeltaProp = usePropAsSharedValue(
     autoscrollActivationDelta,
   );
+  const dragEnabledProp = usePropAsSharedValue(dragEnabled ?? true);
 
   // Position of the list relative to the scroll container
   const nestedFlatListPositionY = useDerivedValue(
@@ -839,6 +840,10 @@ const ReorderableListCore = <T,>(
     (index: number) => {
       'worklet';
 
+      if (!dragEnabledProp.value) {
+        return;
+      }
+
       // allow new drag when item is completely released
       if (state.value === ReorderableListState.IDLE) {
         // resetting shared values again fixes a flickeing bug in nested lists where
@@ -866,6 +871,7 @@ const ReorderableListCore = <T,>(
       }
     },
     [
+      dragEnabledProp,
       resetSharedValues,
       shouldUpdateActiveItem,
       dragInitialScrollOffsetY,

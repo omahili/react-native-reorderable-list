@@ -11,6 +11,7 @@ import {
   ItemSeparator,
   ListItem,
   ListItemProps,
+  SeedDataItem,
   usePanGesture,
   useSeedData,
 } from './common';
@@ -35,7 +36,7 @@ export const ActiveItemScreen = () => {
     setData(value => reorderItems(value, from, to));
   };
 
-  const renderItem = ({item}: ListRenderItemInfo<ListItemProps>) => (
+  const renderItem = ({item}: ListRenderItemInfo<SeedDataItem>) => (
     <ActiveItem {...item} />
   );
 

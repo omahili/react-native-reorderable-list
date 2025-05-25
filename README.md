@@ -66,6 +66,7 @@ This component uses a [FlatList](https://reactnative.dev/docs/flatlist) and it e
 | autoscrollActivationDelta | `number`                                         | No       | `5`                        | Allows configuring the delta for autoscroll activation when dragging an item in the same direction as the autoscroll. This is particularly useful when an item is dragged within the autoscroll area to account for minor unintentional movements.                                                                                                                                                             |
 | animationDuration         | `number`                                         | No       | `200`                      | Duration of the animations in milliseconds. Users won't be able to drag a new item until the dragged item is released and its animation to its new position ends.                                                                                                                                                                                                                                              |
 | cellAnimations            | `ReorderableListCellAnimations`                  | No       | N/A                        | Allows passing an object with values and/or shared values that can animate a cell, for example by using the `onDragStart` and `onDragEnd` events. Supports view style properties. Override opacity and/or transform to disable the default animation, e.g. `{opacity: 1, transform: []}`. Check the [examples](https://github.com/omahili/react-native-reorderable-list/tree/master/example) for more details. |
+|  dragEnabled           | `boolean`                  | No       | `true`                        | Whether dragging items is enabled. |
 | shouldUpdateActiveItem    | boolean                                          | No       | `false`                    | Whether the active item should be updated. Enables usage of `useIsActive` hook.                                                                                                                                                                                                                                                                                                                                |
 | panGesture                | `PanGesture`                                     | No       | N/A                        | Custom instance of pan gesture. See [GestureHandler docs](https://docs.swmansion.com/react-native-gesture-handler) for further info.                                                                                                                                                                                                                                                                           |
 | onReorder                 | `(event: { from: number, to: number  }) => void` | Yes      | N/A                        | Event fired after an item is released and the list is reordered.                                                                                                                                                                                                                                                                                                                                               |
@@ -96,7 +97,7 @@ This component allows nesting a reorderable list within a [ScrollViewContainer](
 
 | Props      | Type      | Required | Default | Description                                                                                                                                            |
 | ---------- | --------- | -------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| scrollable | `boolean` | No       | false   | Whether the nested list is scrollable or not. If the nested list has a fixed height and it's scrollable it should be set to `true`, otherwise `false`. |
+  | scrollable | `boolean` | No       | `false`   | Whether the nested list is scrollable or not. If the nested list has a fixed height and it's scrollable it should be set to `true`, otherwise `false`. |
 
 ## Hooks
 
@@ -189,7 +190,7 @@ import {Gesture} from 'react-native-gesture-handler';
 
 // If it doesn't work try with bigger values.
 const panGesture = useMemo(
-  () => Gesture.Pan().activeOffsetX([-20, 20]).activeOffsetY(0),
+  () => Gesture.Pan().activeOffsetX([-20, 20]).activeOffsetY([0, 0]),
   [],
 );
 

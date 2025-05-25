@@ -108,6 +108,10 @@ export interface ReorderableListProps<T>
    */
   cellAnimations?: ReorderableListCellAnimations;
   /**
+   * Whether dragging items is enabled. Default: `true`.
+   */
+  dragEnabled?: boolean;
+  /**
    * Whether the active item should be updated. Enables usage of `useIsActive` hook. Default: `false`.
    */
   shouldUpdateActiveItem?: boolean;
@@ -116,7 +120,7 @@ export interface ReorderableListProps<T>
    */
   panGesture?: PanGesture;
   /**
-   * Wether the pan gestures necessary for dragging are enabled. Default: `true`.
+   * Whether the pan gestures necessary for dragging are enabled. Default: `true`.
    *
    * @deprecated In favor of `panGesture` prop.
    */

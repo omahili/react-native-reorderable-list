@@ -3,6 +3,7 @@ import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
 import {ActiveItemScreen} from './ActiveItem';
 import {CustomAnimationsScreen} from './CustomAnimations';
+import {DragEnableScreen} from './DragEnable';
 import {DynamicHeightsScreen} from './DynamicHeights';
 import {FloatingHeaderFooterScreen} from './FloatingHeaderFooter';
 import {HeaderFooterScreen} from './HeaderFooter';
@@ -80,6 +81,11 @@ const screens = [
     id: '12',
     name: 'Swipeable List',
     component: SwipeableListScreen,
+  },
+  {
+    id: '13',
+    name: 'Drag Enable',
+    component: DragEnableScreen,
   },
 ] as const;
 
