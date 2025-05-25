@@ -42,6 +42,7 @@ import {
   SCALE_ANIMATION_CONFIG_DEFAULT,
 } from './constants';
 import {ReorderableListCell} from './ReorderableListCell';
+import {usePropAsSharedValue} from '../hooks';
 
 const AnimatedFlatList = Animated.createAnimatedComponent(
   FlatList,
@@ -55,11 +56,10 @@ interface ReorderableListCoreProps<T> extends ReorderableListProps<T> {
   scrollViewPageY: SharedValue<number> | undefined;
   scrollViewHeightY: SharedValue<number> | undefined;
   scrollViewScrollOffsetY: SharedValue<number> | undefined;
-  scrollViewScrollEnabled: SharedValue<boolean> | undefined;
+  scrollViewScrollEnabledProp: SharedValue<boolean> | undefined;
+  scrollViewCurrentScrollEnabled: SharedValue<boolean> | undefined;
   outerScrollGesture: NativeGesture | undefined;
-  initialScrollViewScrollEnabled: boolean | undefined;
   scrollable: boolean | undefined;
-  scrollEnabled: boolean | undefined;
 }
 
 const ReorderableListCore = <T,>(
@@ -80,7 +80,8 @@ const ReorderableListCore = <T,>(
     scrollViewPageY,
     scrollViewHeightY,
     scrollViewScrollOffsetY,
-    scrollViewScrollEnabled,
+    scrollViewScrollEnabledProp,
+    scrollViewCurrentScrollEnabled,
     scrollable,
     outerScrollGesture,
     cellAnimations,
@@ -93,18 +94,14 @@ const ReorderableListCore = <T,>(
   }: ReorderableListCoreProps<T>,
   ref: React.ForwardedRef<FlatList<T>>,
 ) => {
-  // FlatList will default to true if we pass explicitly undefined,
-  // but internally we would treat it as false, so we force true.
-  const initialScrollEnabled =
+  const scrollEnabled =
     typeof rest.scrollEnabled === 'undefined' ? true : rest.scrollEnabled;
-  const initialScrollViewScrollEnabled =
-    typeof rest.initialScrollViewScrollEnabled === 'undefined'
-      ? true
-      : rest.initialScrollViewScrollEnabled;
 
   const flatListRef = useAnimatedRef<FlatList>();
   const [activeIndex, setActiveIndex] = useState(-1);
-  const scrollEnabled = useSharedValue(initialScrollEnabled);
+  const prevItemCount = useRef(data.length);
+
+  const currentScrollEnabled = useSharedValue(scrollEnabled);
   const gestureState = useSharedValue<State>(State.UNDETERMINED);
   const currentY = useSharedValue(0);
   const currentTranslationY = useSharedValue(0);
@@ -137,29 +134,21 @@ const ReorderableListCore = <T,>(
     ((from: number, to: number) => void)[][]
   >([]);
   const startY = useSharedValue(0);
-  const duration = useSharedValue(animationDuration);
   const scaleDefault = useSharedValue(1);
   const opacityDefault = useSharedValue(1);
   const dragDirection = useSharedValue(0);
   const lastDragDirectionPivot = useSharedValue<number | null>(null);
-  const autoscrollDelta = useSharedValue(autoscrollActivationDelta);
-  const prevItemCount = useRef(data.length);
+
+  const scrollEnabledProp = usePropAsSharedValue(scrollEnabled);
+  const animationDurationProp = usePropAsSharedValue(animationDuration);
+  const autoscrollActivationDeltaProp = usePropAsSharedValue(
+    autoscrollActivationDelta,
+  );
 
   // Position of the list relative to the scroll container
   const nestedFlatListPositionY = useDerivedValue(
     () => flatListPageY.value - (scrollViewPageY?.value || 0),
   );
-
-  useEffect(() => {
-    duration.value = animationDuration;
-    autoscrollDelta.value = autoscrollActivationDelta;
-  }, [
-    duration,
-    animationDuration,
-    autoscrollDelta,
-    autoscrollActivationDelta,
-    itemCount,
-  ]);
 
   useEffect(() => {
     itemCount.value = data.length;
@@ -227,14 +216,14 @@ const ReorderableListCore = <T,>(
           lastDragDirectionPivot.value = e.absoluteY;
         } else if (
           Math.abs(e.absoluteY - lastDragDirectionPivot.value) >=
-          autoscrollDelta.value
+          autoscrollActivationDeltaProp.value
         ) {
           dragDirection.value = direction;
           lastDragDirectionPivot.value = e.absoluteY;
         }
       }
     },
-    [dragDirection, lastDragDirectionPivot, autoscrollDelta],
+    [dragDirection, lastDragDirectionPivot, autoscrollActivationDeltaProp],
   );
 
   const setCurrentItemDragCenterY = useCallback(
@@ -349,30 +338,32 @@ const ReorderableListCore = <T,>(
 
   const setScrollEnabled = useCallback(
     (enabled: boolean) => {
-      // if scroll is enabled on list props then we can toggle it
-      if (initialScrollEnabled) {
-        scrollEnabled.value = enabled;
+      // When re-enabling the scroll of the flatlist we check whether its prop is set to true.
+      if ((enabled && scrollEnabledProp.value) || !enabled) {
+        currentScrollEnabled.value = enabled;
         flatListRef.current?.setNativeProps({scrollEnabled: enabled});
       }
 
       if (
         scrollViewContainerRef &&
-        scrollViewScrollEnabled &&
-        initialScrollViewScrollEnabled
+        scrollViewScrollEnabledProp &&
+        scrollViewCurrentScrollEnabled &&
+        // When re-enabling the scroll of the container we check whether its prop is set to true.
+        ((enabled && scrollViewScrollEnabledProp?.value) || !enabled)
       ) {
-        scrollViewScrollEnabled.value = enabled;
+        scrollViewCurrentScrollEnabled.value = enabled;
         scrollViewContainerRef.current?.setNativeProps({
           scrollEnabled: enabled,
         });
       }
     },
     [
-      initialScrollEnabled,
       flatListRef,
-      scrollEnabled,
-      initialScrollViewScrollEnabled,
+      scrollEnabledProp,
+      currentScrollEnabled,
+      scrollViewScrollEnabledProp,
+      scrollViewCurrentScrollEnabled,
       scrollViewContainerRef,
-      scrollViewScrollEnabled,
     ],
   );
 
@@ -399,8 +390,8 @@ const ReorderableListCore = <T,>(
   ]);
 
   const resetSharedValuesAfterAnimations = useCallback(() => {
-    setTimeout(runOnUI(resetSharedValues), duration.value);
-  }, [resetSharedValues, duration]);
+    setTimeout(runOnUI(resetSharedValues), animationDurationProp.value);
+  }, [resetSharedValues, animationDurationProp]);
 
   const reorder = (fromIndex: number, toIndex: number) => {
     runOnUI(resetSharedValues)();
@@ -571,7 +562,7 @@ const ReorderableListCore = <T,>(
           dragY.value = withTiming(
             newTopPosition,
             {
-              duration: duration.value,
+              duration: animationDurationProp.value,
               easing: Easing.out(Easing.ease),
             },
             () => {
@@ -799,7 +790,7 @@ const ReorderableListCore = <T,>(
     // checking if the list is not scrollable instead of the scrolling state
     // fixes a bug on iOS where the item is shifted after autoscrolling and then
     // moving away from autoscroll area
-    if (!scrollEnabled.value) {
+    if (!currentScrollEnabled.value) {
       dragScrollTranslationY.value =
         flatListScrollOffsetY.value - dragInitialScrollOffsetY.value;
     }
@@ -822,10 +813,10 @@ const ReorderableListCore = <T,>(
   useAnimatedReaction(
     () => scrollViewScrollOffsetY?.value,
     value => {
-      if (value && scrollViewScrollEnabled) {
+      if (value && scrollViewCurrentScrollEnabled) {
         // checking if the list is not scrollable instead of the scrolling state
         // fixes a bug on iOS where the item is shifted after autoscrolling and moving away from the area
-        if (!scrollViewScrollEnabled.value) {
+        if (!scrollViewCurrentScrollEnabled.value) {
           scrollViewDragScrollTranslationY.value =
             value - scrollViewDragInitialScrollOffsetY.value;
         }
@@ -963,11 +954,18 @@ const ReorderableListCore = <T,>(
         itemHeight={itemHeight}
         dragY={dragY}
         draggedIndex={draggedIndex}
-        animationDuration={duration}
+        animationDuration={animationDurationProp}
         startDrag={startDrag}
       />
     ),
-    [itemOffset, itemHeight, dragY, draggedIndex, duration, startDrag],
+    [
+      itemOffset,
+      itemHeight,
+      dragY,
+      draggedIndex,
+      animationDurationProp,
+      startDrag,
+    ],
   );
 
   return (

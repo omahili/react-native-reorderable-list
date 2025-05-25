@@ -11,14 +11,19 @@ import Animated, {
   useSharedValue,
 } from 'react-native-reanimated';
 
-import {ScrollViewContainerContext} from '../contexts/ScrollViewContainerContext';
+import {ScrollViewContainerContext} from '../contexts';
+import {usePropAsSharedValue} from '../hooks';
 import type {ScrollViewContainerProps} from '../types';
 
 const ScrollViewContainerWithRef = (
-  {onLayout, onScroll, scrollEnabled = true, ...rest}: ScrollViewContainerProps,
+  {onLayout, onScroll, ...rest}: ScrollViewContainerProps,
   ref: React.ForwardedRef<ScrollView>,
 ) => {
-  const scrollViewScrollEnabled = useSharedValue(scrollEnabled);
+  const scrollEnabled =
+    typeof rest.scrollEnabled === 'undefined' ? true : rest.scrollEnabled;
+
+  const scrollViewScrollEnabledProp = usePropAsSharedValue(scrollEnabled);
+  const scrollViewCurrentScrollEnabled = useSharedValue(scrollEnabled);
   const scrollViewContainerRef = useAnimatedRef<Animated.ScrollView>();
   const scrollViewScrollOffsetY = useSharedValue(0);
   const scrollViewPageY = useSharedValue(0);
@@ -57,18 +62,18 @@ const ScrollViewContainerWithRef = (
       scrollViewPageY,
       scrollViewHeightY,
       scrollViewScrollOffsetY,
-      scrollViewScrollEnabled,
+      scrollViewScrollEnabledProp,
+      scrollViewCurrentScrollEnabled,
       outerScrollGesture,
-      initialScrollViewScrollEnabled: scrollEnabled,
     }),
     [
       scrollViewContainerRef,
       scrollViewPageY,
       scrollViewHeightY,
       scrollViewScrollOffsetY,
-      scrollViewScrollEnabled,
+      scrollViewScrollEnabledProp,
+      scrollViewCurrentScrollEnabled,
       outerScrollGesture,
-      scrollEnabled,
     ],
   );
 
@@ -99,7 +104,6 @@ const ScrollViewContainerWithRef = (
           ref={handleRef}
           onScroll={composedScrollHandler}
           onLayout={handleLayout}
-          scrollEnabled={scrollEnabled}
         />
       </GestureDetector>
     </ScrollViewContainerContext.Provider>

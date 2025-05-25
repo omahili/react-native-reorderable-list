@@ -5,20 +5,19 @@ import {ReorderableListCore} from './ReorderableListCore';
 import type {ReorderableListProps} from '../types';
 
 const ReorderableListWithRef = <T,>(
-  {scrollEnabled = true, ...rest}: ReorderableListProps<T>,
+  props: ReorderableListProps<T>,
   ref: React.Ref<FlatList<T>>,
 ) => (
   <ReorderableListCore
-    {...rest}
+    {...props}
     ref={ref}
-    scrollEnabled={scrollEnabled}
     scrollViewContainerRef={undefined}
     scrollViewScrollOffsetY={undefined}
     scrollViewPageY={undefined}
     scrollViewHeightY={undefined}
     outerScrollGesture={undefined}
-    scrollViewScrollEnabled={undefined}
-    initialScrollViewScrollEnabled
+    scrollViewScrollEnabledProp={undefined}
+    scrollViewCurrentScrollEnabled={undefined}
     scrollable
   />
 );

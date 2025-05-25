@@ -7,7 +7,7 @@ import {useContext} from '../hooks';
 import type {NestedReorderableListProps} from '../types';
 
 const NestedReorderableListWithRef = <T,>(
-  {scrollable, scrollEnabled = true, ...rest}: NestedReorderableListProps<T>,
+  {scrollable, ...rest}: NestedReorderableListProps<T>,
   ref?: React.ForwardedRef<FlatList<T>>,
 ) => {
   const {
@@ -15,9 +15,9 @@ const NestedReorderableListWithRef = <T,>(
     scrollViewScrollOffsetY,
     scrollViewPageY,
     scrollViewHeightY,
-    scrollViewScrollEnabled,
+    scrollViewScrollEnabledProp,
+    scrollViewCurrentScrollEnabled,
     outerScrollGesture,
-    initialScrollViewScrollEnabled,
   } = useContext(ScrollViewContainerContext);
 
   return (
@@ -29,10 +29,9 @@ const NestedReorderableListWithRef = <T,>(
       scrollViewPageY={scrollViewPageY}
       scrollViewHeightY={scrollViewHeightY}
       outerScrollGesture={outerScrollGesture}
-      scrollViewScrollEnabled={scrollViewScrollEnabled}
-      initialScrollViewScrollEnabled={initialScrollViewScrollEnabled}
+      scrollViewScrollEnabledProp={scrollViewScrollEnabledProp}
+      scrollViewCurrentScrollEnabled={scrollViewCurrentScrollEnabled}
       scrollable={scrollable}
-      scrollEnabled={scrollEnabled}
       nestedScrollEnabled
     />
   );

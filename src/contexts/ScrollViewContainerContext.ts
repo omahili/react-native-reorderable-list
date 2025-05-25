@@ -9,9 +9,9 @@ interface ScrollViewContainerContextData {
   scrollViewPageY: SharedValue<number>;
   scrollViewHeightY: SharedValue<number>;
   scrollViewScrollOffsetY: SharedValue<number>;
-  scrollViewScrollEnabled: SharedValue<boolean>;
+  scrollViewScrollEnabledProp: SharedValue<boolean>;
+  scrollViewCurrentScrollEnabled: SharedValue<boolean>;
   outerScrollGesture: NativeGesture;
-  initialScrollViewScrollEnabled: boolean;
 }
 
 export const ScrollViewContainerContext = React.createContext<
