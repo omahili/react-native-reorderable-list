@@ -1,6 +1,7 @@
-import React, {memo, useState} from 'react';
+import React, {memo, useMemo, useState} from 'react';
 import {ListRenderItemInfo} from 'react-native';
 
+import {faker} from '@faker-js/faker';
 import ReorderableList, {
   ReorderableListReorderEvent,
   reorderItems,
@@ -13,7 +14,6 @@ import {
   ListItemProps,
   SeedDataItem,
   usePanGesture,
-  useSeedData,
 } from './common';
 
 export const ActiveItem: React.FC<ListItemProps> = memo(props => {
@@ -28,7 +28,24 @@ export const ActiveItem: React.FC<ListItemProps> = memo(props => {
 });
 
 export const ActiveItemScreen = () => {
-  const seedData = useSeedData();
+  const seedData: SeedDataItem[] = useMemo(
+    () =>
+      faker.helpers.multiple(
+        () => ({
+          id: faker.string.uuid(),
+          image: faker.image.urlPicsumPhotos({
+            width: 50,
+            height: 50,
+          }),
+          title: faker.book.title(),
+          description: faker.book.genre(),
+        }),
+        {
+          count: 20,
+        },
+      ),
+    [],
+  );
   const [data, setData] = useState(seedData);
   const panGesture = usePanGesture();
 
