@@ -3,6 +3,7 @@ import {
   CellRendererProps,
   FlatList,
   FlatListProps,
+  InteractionManager,
   LayoutChangeEvent,
   Platform,
   ScrollView,
@@ -42,7 +43,7 @@ import {
   SCALE_ANIMATION_CONFIG_DEFAULT,
 } from './constants';
 import {ReorderableListCell} from './ReorderableListCell';
-import {usePropAsSharedValue} from '../hooks';
+import {usePropAsSharedValue, useStableCallback} from '../hooks';
 
 const AnimatedFlatList = Animated.createAnimatedComponent(
   FlatList,
@@ -87,10 +88,12 @@ const ReorderableListCore = <T,>(
     cellAnimations,
     dragEnabled = true,
     shouldUpdateActiveItem,
+    itemLayoutAnimation,
     panGesture,
     panEnabled = true,
     panActivateAfterLongPress,
     data,
+    keyExtractor,
     ...rest
   }: ReorderableListCoreProps<T>,
   ref: React.ForwardedRef<FlatList<T>>,
@@ -98,6 +101,7 @@ const ReorderableListCore = <T,>(
   const scrollEnabled = rest.scrollEnabled ?? true;
 
   const flatListRef = useAnimatedRef<FlatList>();
+  const markedCellsRef = useRef<Map<string, 1>>();
   const [activeIndex, setActiveIndex] = useState(-1);
   const prevItemCount = useRef(data.length);
 
@@ -139,6 +143,12 @@ const ReorderableListCore = <T,>(
   const dragDirection = useSharedValue(0);
   const lastDragDirectionPivot = useSharedValue<number | null>(null);
 
+  const itemLayoutAnimationPropRef = useRef(itemLayoutAnimation);
+  itemLayoutAnimationPropRef.current = itemLayoutAnimation;
+
+  const keyExtractorPropRef = useRef(keyExtractor);
+  keyExtractorPropRef.current = keyExtractor;
+
   const scrollEnabledProp = usePropAsSharedValue(scrollEnabled);
   const animationDurationProp = usePropAsSharedValue(animationDuration);
   const autoscrollActivationDeltaProp = usePropAsSharedValue(
@@ -169,6 +179,42 @@ const ReorderableListCore = <T,>(
     prevItemCount.current = data.length;
   }, [data.length, itemHeight, itemOffset, itemCount]);
 
+  useEffect(() => {
+    if (
+      !markedCellsRef.current ||
+      // Clean keys once they surpass by 10% the size of the list itself.
+      markedCellsRef.current.size <= data.length + Math.ceil(data.length * 0.1)
+    ) {
+      return;
+    }
+
+    // Can be heavy to loop through all items, defer the task to run after interactions.
+    const task = InteractionManager.runAfterInteractions(() => {
+      if (!markedCellsRef.current) {
+        return;
+      }
+
+      const map = new Map<string, 1>();
+      for (let i = 0; i < data.length; i++) {
+        const key = keyExtractorPropRef.current?.(data[i], i) || i.toString();
+        if (markedCellsRef.current.has(key)) {
+          map.set(key, markedCellsRef.current.get(key)!);
+        }
+      }
+
+      markedCellsRef.current = map;
+    });
+
+    return () => {
+      task.cancel();
+    };
+  }, [data]);
+
+  const createCellKey = useCallback((cellKey: string) => {
+    const mark = markedCellsRef.current?.get(cellKey) || 0;
+    return `${cellKey}#${mark}`;
+  }, []);
+
   const listContextValue = useMemo(
     () => ({
       draggedHeight,
@@ -176,6 +222,7 @@ const ReorderableListCore = <T,>(
       draggedIndex,
       dragEndHandlers,
       activeIndex,
+      itemLayoutAnimation: itemLayoutAnimationPropRef,
       cellAnimations: {
         ...cellAnimations,
         transform:
@@ -195,6 +242,7 @@ const ReorderableListCore = <T,>(
       dragEndHandlers,
       activeIndex,
       cellAnimations,
+      itemLayoutAnimationPropRef,
       scaleDefault,
       opacityDefault,
     ],
@@ -394,8 +442,27 @@ const ReorderableListCore = <T,>(
     setTimeout(runOnUI(resetSharedValues), animationDurationProp.value);
   }, [resetSharedValues, animationDurationProp]);
 
+  const markCells = (fromIndex: number, toIndex: number) => {
+    if (!markedCellsRef.current) {
+      markedCellsRef.current = new Map();
+    }
+
+    const start = Math.min(fromIndex, toIndex);
+    const end = Math.max(fromIndex, toIndex);
+    for (let i = start; i <= end; i++) {
+      const cellKey = keyExtractorPropRef.current?.(data[i], i) || i.toString();
+      if (!markedCellsRef.current.has(cellKey)) {
+        markedCellsRef.current.set(cellKey, 1);
+      } else {
+        markedCellsRef.current.delete(cellKey);
+      }
+    }
+  };
+
   const reorder = (fromIndex: number, toIndex: number) => {
     runOnUI(resetSharedValues)();
+
+    markCells(fromIndex, toIndex);
 
     if (fromIndex !== toIndex) {
       onReorder({from: fromIndex, to: toIndex});
@@ -950,12 +1017,12 @@ const ReorderableListCore = <T,>(
     onScroll || null,
   ]);
 
-  const renderAnimatedCell = useCallback(
+  const renderAnimatedCell = useStableCallback(
     ({cellKey, ...props}: CellRendererProps<T>) => (
       <ReorderableListCell
         {...props}
         // forces remount with key change on reorder
-        key={`${cellKey}+${props.index}`}
+        key={createCellKey(cellKey)}
         itemOffset={itemOffset}
         itemHeight={itemHeight}
         dragY={dragY}
@@ -964,14 +1031,6 @@ const ReorderableListCore = <T,>(
         startDrag={startDrag}
       />
     ),
-    [
-      itemOffset,
-      itemHeight,
-      dragY,
-      draggedIndex,
-      animationDurationProp,
-      startDrag,
-    ],
   );
 
   return (
@@ -981,6 +1040,7 @@ const ReorderableListCore = <T,>(
           {...rest}
           ref={handleRef}
           data={data}
+          keyExtractor={keyExtractor}
           CellRendererComponent={renderAnimatedCell}
           onLayout={handleFlatListLayout}
           onScroll={composedScrollHandler}

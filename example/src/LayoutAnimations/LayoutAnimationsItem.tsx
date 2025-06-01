@@ -5,12 +5,12 @@ import Swipeable from 'react-native-gesture-handler/Swipeable';
 
 import {ListItem, ListItemProps} from '../common';
 
-interface SwipeableListItemProps extends ListItemProps {
+interface LayoutAnimationsItemProps extends ListItemProps {
   id: string;
   onDeletePress: (id: string) => void;
 }
 
-export const SwipeableListItem: React.FC<SwipeableListItemProps> = memo(
+export const LayoutAnimationsItem: React.FC<LayoutAnimationsItemProps> = memo(
   ({id, onDeletePress, ...rest}) => {
     const renderRightActions = () => (
       <Pressable

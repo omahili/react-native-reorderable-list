@@ -38,8 +38,14 @@ export const ReorderableListCell = memo(
     draggedIndex,
     animationDuration,
   }: ReorderableListCellProps<T>) => {
-    const {currentIndex, draggedHeight, activeIndex, cellAnimations} =
-      useContext(ReorderableListContext);
+    const {
+      currentIndex,
+      draggedHeight,
+      activeIndex,
+      cellAnimations,
+      itemLayoutAnimation,
+    } = useContext(ReorderableListContext);
+
     const dragHandler = useCallback(
       () => runOnUI(startDrag)(index),
       [startDrag, index],
@@ -141,7 +147,10 @@ export const ReorderableListCell = memo(
 
     return (
       <ReorderableCellContext.Provider value={contextValue}>
-        <Animated.View style={animatedStyle} onLayout={handleLayout}>
+        <Animated.View
+          style={animatedStyle}
+          onLayout={handleLayout}
+          layout={itemLayoutAnimation.current}>
           {children}
         </Animated.View>
       </ReorderableCellContext.Provider>

@@ -8,13 +8,13 @@ import {DynamicHeightsScreen} from './DynamicHeights';
 import {FloatingHeaderFooterScreen} from './FloatingHeaderFooter';
 import {HeaderFooterScreen} from './HeaderFooter';
 import {IndexChangeScreen} from './IndexChange';
+import {LayoutAnimationsScreen} from './LayoutAnimations';
 import {MultipleListsScreen} from './MultipleLists';
 import {NestedListsScreen} from './NestedLists';
 import {NestedScrollableListsScreen} from './NestedScrollableLists';
 import {PlaylistScreen} from './Playlist';
 import {ReadmeExampleScreen} from './ReadmeExample';
 import {RefreshControlScreen} from './RefreshControl';
-import {SwipeableListScreen} from './SwipeableList';
 
 const screens = [
   {
@@ -79,8 +79,8 @@ const screens = [
   },
   {
     id: '12',
-    name: 'Swipeable List',
-    component: SwipeableListScreen,
+    name: 'Layout Animations',
+    component: LayoutAnimationsScreen,
   },
   {
     id: '13',

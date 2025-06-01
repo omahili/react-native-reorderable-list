@@ -1,4 +1,6 @@
-import {SharedValue} from 'react-native-reanimated';
+import {ComponentProps} from 'react';
+
+import Animated, {SharedValue} from 'react-native-reanimated';
 
 export enum ReorderableListState {
   IDLE = 0,
@@ -6,6 +8,11 @@ export enum ReorderableListState {
   RELEASED,
   AUTOSCROLL,
 }
+
+export type ItemLayoutAnimation = Exclude<
+  ComponentProps<typeof Animated.View>['layout'],
+  undefined
+>;
 
 export type SharedValueOrType<T> = {
   [TKey in keyof T]?: SharedValue<T[TKey]> | T[TKey];

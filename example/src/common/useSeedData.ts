@@ -9,25 +9,24 @@ export interface SeedDataItem {
   description: string;
 }
 
+export const createDataItem = () => ({
+  id: faker.string.uuid(),
+  image: faker.image.urlPicsumPhotos({
+    width: 50,
+    height: 50,
+  }),
+  title: faker.lorem.sentence(5).slice(0, -1),
+  description: faker.lorem.paragraph({
+    min: 1,
+    max: 3,
+  }),
+});
+
 export const useSeedData = (count = 20) =>
   useMemo(
     () =>
-      faker.helpers.multiple(
-        () => ({
-          id: faker.string.uuid(),
-          image: faker.image.urlPicsumPhotos({
-            width: 50,
-            height: 50,
-          }),
-          title: faker.lorem.sentence(5).slice(0, -1),
-          description: faker.lorem.paragraph({
-            min: 1,
-            max: 3,
-          }),
-        }),
-        {
-          count,
-        },
-      ),
+      faker.helpers.multiple(createDataItem, {
+        count,
+      }),
     [count],
   );

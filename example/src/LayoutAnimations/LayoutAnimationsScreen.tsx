@@ -1,6 +1,7 @@
 import React, {useCallback, useState} from 'react';
 import {Button, ListRenderItemInfo, StyleSheet, View} from 'react-native';
 
+import {LinearTransition} from 'react-native-reanimated';
 import ReorderableList, {
   ReorderableListReorderEvent,
   reorderItems,
@@ -9,29 +10,38 @@ import ReorderableList, {
 import {
   ItemSeparator,
   SeedDataItem,
+  createDataItem,
   usePanGesture,
   useSeedData,
 } from '../common';
-import {SwipeableListItem} from './SwipeableListItem';
+import {LayoutAnimationsItem} from './LayoutAnimationsItem';
 
-export const SwipeableListScreen = () => {
+export const LayoutAnimationsScreen = () => {
   const seedData = useSeedData(5);
   const [data, setData] = useState(seedData);
   const panGesture = usePanGesture();
 
-  const handleReorder = ({from, to}: ReorderableListReorderEvent) => {
-    setData(value => reorderItems(value, from, to));
-  };
+  const handleReorder = useCallback(
+    ({from, to}: ReorderableListReorderEvent) => {
+      setData(value => reorderItems(value, from, to));
+    },
+    [],
+  );
+
+  const handleAddPress = useCallback(() => {
+    setData(value => [createDataItem(), ...value]);
+  }, []);
 
   const handleDeletePress = useCallback((id: string) => {
     setData(value => value.filter(x => x.id !== id));
   }, []);
 
-  const renderItem = ({item}: ListRenderItemInfo<SeedDataItem>) => (
-    <SwipeableListItem {...item} onDeletePress={handleDeletePress} />
+  const renderItem = useCallback(
+    ({item}: ListRenderItemInfo<SeedDataItem>) => (
+      <LayoutAnimationsItem {...item} onDeletePress={handleDeletePress} />
+    ),
+    [handleDeletePress],
   );
-
-  const handleResetPress = () => setData(seedData);
 
   return (
     <View style={styles.container}>
@@ -43,12 +53,13 @@ export const SwipeableListScreen = () => {
         ItemSeparatorComponent={ItemSeparator}
         contentContainerStyle={styles.listContentContainer}
         panGesture={panGesture}
+        itemLayoutAnimation={LinearTransition}
         cellAnimations={{
           // Disable opacity animation to avoid seeing the delete action underneath.
           opacity: 1,
         }}
       />
-      <Button title="Reset" onPress={handleResetPress} />
+      <Button title="Add" onPress={handleAddPress} />
     </View>
   );
 };

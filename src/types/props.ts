@@ -20,7 +20,7 @@ import type {
 import {PanGesture} from 'react-native-gesture-handler';
 import {SharedValue, useAnimatedScrollHandler} from 'react-native-reanimated';
 
-import {MaximumOneOf, SharedValueOrType} from './misc';
+import {ItemLayoutAnimation, MaximumOneOf, SharedValueOrType} from './misc';
 
 export interface ReorderableListReorderEvent {
   /**
@@ -131,6 +131,10 @@ export interface ReorderableListProps<T>
    * @deprecated In favor of `panGesture` prop.
    */
   panActivateAfterLongPress?: number;
+  /**
+   * Layout animation when the item is added to and/or removed from the view hierarchy. To skip entering or exiting animations use the LayoutAnimationConfig component from [Reanimated](https://docs.swmansion.com/react-native-reanimated).
+   */
+  itemLayoutAnimation?: ItemLayoutAnimation;
   /**
    * Event fired after an item is released and the list is reordered.
    */
