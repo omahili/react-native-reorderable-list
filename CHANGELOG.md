@@ -1,5 +1,12 @@
 
 
+# [0.16.0](https://github.com/omahili/react-native-reorderable-list/compare/v0.15.0...v0.16.0) (2025-06-01)
+
+
+### Features
+
+* add support for layout animations ([dcdf76a](https://github.com/omahili/react-native-reorderable-list/commit/dcdf76a7508a950ce1341b95b580bd0e57f2cab3)), closes [#23](https://github.com/omahili/react-native-reorderable-list/issues/23)
+
 # [0.15.0](https://github.com/omahili/react-native-reorderable-list/compare/v0.14.1...v0.15.0) (2025-05-25)
 
 
