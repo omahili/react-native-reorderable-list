@@ -390,7 +390,7 @@ const ReorderableListCore = <T,>(
       // When re-enabling the scroll of the flatlist we check whether its prop is set to true.
       if ((enabled && scrollEnabledProp.value) || !enabled) {
         currentScrollEnabled.value = enabled;
-        flatListRef.current?.setNativeProps({scrollEnabled: enabled});
+        flatListRef.current?.setNativeProps?.({scrollEnabled: enabled});
       }
 
       if (
@@ -401,7 +401,7 @@ const ReorderableListCore = <T,>(
         ((enabled && scrollViewScrollEnabledProp?.value) || !enabled)
       ) {
         scrollViewCurrentScrollEnabled.value = enabled;
-        scrollViewContainerRef.current?.setNativeProps({
+        scrollViewContainerRef.current?.setNativeProps?.({
           scrollEnabled: enabled,
         });
       }
