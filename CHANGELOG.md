@@ -1,5 +1,12 @@
 
 
+## [0.16.1](https://github.com/omahili/react-native-reorderable-list/compare/v0.16.0...v0.16.1) (2025-06-14)
+
+
+### Bug Fixes
+
+* set native props not available on web ([1f3c07d](https://github.com/omahili/react-native-reorderable-list/commit/1f3c07dc4b6fc078724b4eff8e0fcef020d849ef))
+
 # [0.16.0](https://github.com/omahili/react-native-reorderable-list/compare/v0.15.0...v0.16.0) (2025-06-01)
 
 
