@@ -17,7 +17,7 @@ const ReorderableListWithRef = <T,>(
     scrollViewHeightY={undefined}
     outerScrollGesture={undefined}
     scrollViewScrollEnabledProp={undefined}
-    scrollViewCurrentScrollEnabled={undefined}
+    setScrollViewForceDisableScroll={undefined}
     scrollable
   />
 );

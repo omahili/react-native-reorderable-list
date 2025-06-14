@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Dispatch, SetStateAction} from 'react';
 import {ScrollView} from 'react-native';
 
 import {NativeGesture} from 'react-native-gesture-handler';
@@ -10,8 +10,8 @@ interface ScrollViewContainerContextData {
   scrollViewHeightY: SharedValue<number>;
   scrollViewScrollOffsetY: SharedValue<number>;
   scrollViewScrollEnabledProp: SharedValue<boolean>;
-  scrollViewCurrentScrollEnabled: SharedValue<boolean>;
   outerScrollGesture: NativeGesture;
+  setScrollViewForceDisableScroll: Dispatch<SetStateAction<boolean>>;
 }
 
 export const ScrollViewContainerContext = React.createContext<

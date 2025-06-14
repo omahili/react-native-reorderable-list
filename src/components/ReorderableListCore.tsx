@@ -1,4 +1,13 @@
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import React, {
+  Dispatch,
+  RefObject,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {
   CellRendererProps,
   FlatList,
@@ -53,12 +62,14 @@ const AnimatedFlatList = Animated.createAnimatedComponent(
 
 interface ReorderableListCoreProps<T> extends ReorderableListProps<T> {
   // Not optional but undefined to force passing the prop.
-  scrollViewContainerRef: React.RefObject<ScrollView> | undefined;
+  scrollViewContainerRef: RefObject<ScrollView> | undefined;
   scrollViewPageY: SharedValue<number> | undefined;
   scrollViewHeightY: SharedValue<number> | undefined;
   scrollViewScrollOffsetY: SharedValue<number> | undefined;
   scrollViewScrollEnabledProp: SharedValue<boolean> | undefined;
-  scrollViewCurrentScrollEnabled: SharedValue<boolean> | undefined;
+  setScrollViewForceDisableScroll:
+    | Dispatch<SetStateAction<boolean>>
+    | undefined;
   outerScrollGesture: NativeGesture | undefined;
   scrollable: boolean | undefined;
 }
@@ -82,7 +93,7 @@ const ReorderableListCore = <T,>(
     scrollViewHeightY,
     scrollViewScrollOffsetY,
     scrollViewScrollEnabledProp,
-    scrollViewCurrentScrollEnabled,
+    setScrollViewForceDisableScroll,
     scrollable,
     outerScrollGesture,
     cellAnimations,
@@ -105,7 +116,10 @@ const ReorderableListCore = <T,>(
   const [activeIndex, setActiveIndex] = useState(-1);
   const prevItemCount = useRef(data.length);
 
+  const [forceDisableScroll, setForceDisableScroll] = useState(false);
+  const scrollEnabledProp = usePropAsSharedValue(scrollEnabled);
   const currentScrollEnabled = useSharedValue(scrollEnabled);
+
   const gestureState = useSharedValue<State>(State.UNDETERMINED);
   const currentY = useSharedValue(0);
   const currentTranslationY = useSharedValue(0);
@@ -149,7 +163,6 @@ const ReorderableListCore = <T,>(
   const keyExtractorPropRef = useRef(keyExtractor);
   keyExtractorPropRef.current = keyExtractor;
 
-  const scrollEnabledProp = usePropAsSharedValue(scrollEnabled);
   const animationDurationProp = usePropAsSharedValue(animationDuration);
   const autoscrollActivationDeltaProp = usePropAsSharedValue(
     autoscrollActivationDelta,
@@ -387,32 +400,38 @@ const ReorderableListCore = <T,>(
 
   const setScrollEnabled = useCallback(
     (enabled: boolean) => {
-      // When re-enabling the scroll of the flatlist we check whether its prop is set to true.
-      if ((enabled && scrollEnabledProp.value) || !enabled) {
-        currentScrollEnabled.value = enabled;
-        flatListRef.current?.setNativeProps({scrollEnabled: enabled});
-      }
+      currentScrollEnabled.value = enabled;
 
-      if (
-        scrollViewContainerRef &&
-        scrollViewScrollEnabledProp &&
-        scrollViewCurrentScrollEnabled &&
-        // When re-enabling the scroll of the container we check whether its prop is set to true.
-        ((enabled && scrollViewScrollEnabledProp?.value) || !enabled)
-      ) {
-        scrollViewCurrentScrollEnabled.value = enabled;
-        scrollViewContainerRef.current?.setNativeProps({
-          scrollEnabled: enabled,
-        });
+      // IMPORTANT:
+      // On web setNativeProps API is not available, so disabling scroll is controlled by a state.
+      // On Android/iOS we can keep using setNativeProps which performs better and doesn't require re-renders.
+      if (Platform.OS === 'web') {
+        setForceDisableScroll(!enabled);
+
+        if (setScrollViewForceDisableScroll) {
+          setScrollViewForceDisableScroll(!enabled);
+        }
+      } else {
+        if (!enabled || scrollEnabledProp.value) {
+          // We disable the scroll or when re-enabling the scroll of the container we set it back to the current prop value.
+          flatListRef.current?.setNativeProps({scrollEnabled: enabled});
+        }
+
+        if (!enabled || scrollViewScrollEnabledProp?.value) {
+          // We disable the scroll or when re-enabling the scroll of the container we set it back to the current prop value.
+          scrollViewContainerRef?.current?.setNativeProps({
+            scrollEnabled: enabled,
+          });
+        }
       }
     },
     [
+      currentScrollEnabled,
       flatListRef,
       scrollEnabledProp,
-      currentScrollEnabled,
-      scrollViewScrollEnabledProp,
-      scrollViewCurrentScrollEnabled,
       scrollViewContainerRef,
+      scrollViewScrollEnabledProp,
+      setScrollViewForceDisableScroll,
     ],
   );
 
@@ -855,9 +874,9 @@ const ReorderableListCore = <T,>(
   const handleScroll = useAnimatedScrollHandler(e => {
     flatListScrollOffsetY.value = e.contentOffset.y;
 
-    // checking if the list is not scrollable instead of the scrolling state
-    // fixes a bug on iOS where the item is shifted after autoscrolling and then
-    // moving away from autoscroll area
+    // Checking if the list is not scrollable instead of the scrolling state.
+    // Fixes a bug on iOS where the item is shifted after autoscrolling and then
+    // moving away from the area.
     if (!currentScrollEnabled.value) {
       dragScrollTranslationY.value =
         flatListScrollOffsetY.value - dragInitialScrollOffsetY.value;
@@ -881,10 +900,11 @@ const ReorderableListCore = <T,>(
   useAnimatedReaction(
     () => scrollViewScrollOffsetY?.value,
     value => {
-      if (value && scrollViewCurrentScrollEnabled) {
-        // checking if the list is not scrollable instead of the scrolling state
-        // fixes a bug on iOS where the item is shifted after autoscrolling and moving away from the area
-        if (!scrollViewCurrentScrollEnabled.value) {
+      if (value) {
+        // Checking if the list is not scrollable instead of the scrolling state.
+        // Fixes a bug on iOS where the item is shifted after autoscrolling and then
+        // moving away from the area.
+        if (!currentScrollEnabled.value) {
           scrollViewDragScrollTranslationY.value =
             value - scrollViewDragInitialScrollOffsetY.value;
         }
@@ -1048,6 +1068,8 @@ const ReorderableListCore = <T,>(
           horizontal={false}
           removeClippedSubviews={false}
           numColumns={1}
+          // We force disable scroll or let the component prop control it.
+          scrollEnabled={forceDisableScroll ? false : scrollEnabled}
         />
       </GestureDetector>
     </ReorderableListContext.Provider>

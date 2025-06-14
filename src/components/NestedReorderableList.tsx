@@ -16,8 +16,8 @@ const NestedReorderableListWithRef = <T,>(
     scrollViewPageY,
     scrollViewHeightY,
     scrollViewScrollEnabledProp,
-    scrollViewCurrentScrollEnabled,
     outerScrollGesture,
+    setScrollViewForceDisableScroll,
   } = useContext(ScrollViewContainerContext);
 
   return (
@@ -30,7 +30,7 @@ const NestedReorderableListWithRef = <T,>(
       scrollViewHeightY={scrollViewHeightY}
       outerScrollGesture={outerScrollGesture}
       scrollViewScrollEnabledProp={scrollViewScrollEnabledProp}
-      scrollViewCurrentScrollEnabled={scrollViewCurrentScrollEnabled}
+      setScrollViewForceDisableScroll={setScrollViewForceDisableScroll}
       scrollable={scrollable}
       nestedScrollEnabled
     />

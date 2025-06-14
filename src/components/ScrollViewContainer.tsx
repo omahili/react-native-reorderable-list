@@ -1,4 +1,4 @@
-import React, {forwardRef, useCallback, useMemo} from 'react';
+import React, {forwardRef, useCallback, useMemo, useState} from 'react';
 import {LayoutChangeEvent, ScrollView} from 'react-native';
 
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
@@ -21,8 +21,9 @@ const ScrollViewContainerWithRef = (
 ) => {
   const scrollEnabled = rest.scrollEnabled ?? true;
 
+  const [scrollViewForceDisableScroll, setScrollViewForceDisableScroll] =
+    useState(false);
   const scrollViewScrollEnabledProp = usePropAsSharedValue(scrollEnabled);
-  const scrollViewCurrentScrollEnabled = useSharedValue(scrollEnabled);
   const scrollViewContainerRef = useAnimatedRef<Animated.ScrollView>();
   const scrollViewScrollOffsetY = useSharedValue(0);
   const scrollViewPageY = useSharedValue(0);
@@ -62,8 +63,8 @@ const ScrollViewContainerWithRef = (
       scrollViewHeightY,
       scrollViewScrollOffsetY,
       scrollViewScrollEnabledProp,
-      scrollViewCurrentScrollEnabled,
       outerScrollGesture,
+      setScrollViewForceDisableScroll,
     }),
     [
       scrollViewContainerRef,
@@ -71,8 +72,8 @@ const ScrollViewContainerWithRef = (
       scrollViewHeightY,
       scrollViewScrollOffsetY,
       scrollViewScrollEnabledProp,
-      scrollViewCurrentScrollEnabled,
       outerScrollGesture,
+      setScrollViewForceDisableScroll,
     ],
   );
 
@@ -103,6 +104,8 @@ const ScrollViewContainerWithRef = (
           ref={handleRef}
           onScroll={composedScrollHandler}
           onLayout={handleLayout}
+          // We force disable scroll or let the component prop control it.
+          scrollEnabled={scrollViewForceDisableScroll ? false : scrollEnabled}
         />
       </GestureDetector>
     </ScrollViewContainerContext.Provider>
