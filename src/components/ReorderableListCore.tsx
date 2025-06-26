@@ -481,9 +481,8 @@ const ReorderableListCore = <T,>(
   const reorder = (fromIndex: number, toIndex: number) => {
     runOnUI(resetSharedValues)();
 
-    markCells(fromIndex, toIndex);
-
     if (fromIndex !== toIndex) {
+      markCells(fromIndex, toIndex);
       onReorder({from: fromIndex, to: toIndex});
     }
   };
