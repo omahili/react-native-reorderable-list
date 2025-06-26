@@ -1,5 +1,5 @@
 {
-  "name": "react-native-reorderable-list",
+  "name": "react-native-reorderable-list-mv",
   "version": "0.16.1",
   "description": "Reorderable list for React Native applications, powered by Reanimated",
   "main": "lib/commonjs/index",
@@ -49,14 +49,14 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/omahili/react-native-reorderable-list.git"
+    "url": "git+https://github.com/mvcelak/react-native-reorderable-list.git"
   },
   "author": "Omar Mahili",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/omahili/react-native-reorderable-list/issues"
+    "url": "https://github.com/mvcelak/react-native-reorderable-list/issues"
   },
-  "homepage": "https://github.com/omahili/react-native-reorderable-list#readme",
+  "homepage": "https://github.com/mvcelak/react-native-reorderable-list#readme",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
