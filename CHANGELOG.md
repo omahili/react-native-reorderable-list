@@ -1,5 +1,12 @@
 
 
+## [0.16.2](https://github.com/omahili/react-native-reorderable-list/compare/v0.16.1...v0.16.2) (2025-06-26)
+
+
+### Bug Fixes
+
+* cell translating on reorder ([#58](https://github.com/omahili/react-native-reorderable-list/issues/58)) ([1d07821](https://github.com/omahili/react-native-reorderable-list/commit/1d07821ba78297d41d46a9c4948c5d9ce466f919)), closes [#56](https://github.com/omahili/react-native-reorderable-list/issues/56)
+
 ## [0.16.1](https://github.com/omahili/react-native-reorderable-list/compare/v0.16.0...v0.16.1) (2025-06-14)
 
 

@@ -1,6 +1,6 @@
 {
   "name": "react-native-reorderable-list",
-  "version": "0.16.1",
+  "version": "0.16.2",
   "description": "Reorderable list for React Native applications, powered by Reanimated",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
