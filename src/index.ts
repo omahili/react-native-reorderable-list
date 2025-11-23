@@ -10,6 +10,7 @@ import {
   useReorderableDragStart,
 } from './hooks';
 import type {
+  NestedReorderableListProps,
   ReorderableListCellAnimations,
   ReorderableListDragEndEvent,
   ReorderableListDragStartEvent,
@@ -25,6 +26,7 @@ export {
   useReorderableDrag,
   useReorderableDragStart,
   useReorderableDragEnd,
+  NestedReorderableListProps,
   ReorderableListProps,
   ReorderableListReorderEvent,
   ReorderableListCellAnimations,
