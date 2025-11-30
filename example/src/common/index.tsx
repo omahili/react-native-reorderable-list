@@ -6,5 +6,6 @@ export * from './NestedReorderableList';
 export * from './ScrollViewContainer';
 export * from './useSeedData';
 export * from './usePanGesture';
+export * from './useHorizontal';
 export * from './HorizontalContext';
 export * from './HorizontalFooterSwitch';

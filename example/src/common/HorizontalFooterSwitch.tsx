@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {StyleSheet, Switch, Text, View} from 'react-native';
 
-import {useHorizontal} from './HorizontalContext';
+import {useHorizontal} from './useHorizontal';
 
 export const HorizontalFooterSwitch = () => {
   const {horizontal, setHorizontal} = useHorizontal();
