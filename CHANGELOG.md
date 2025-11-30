@@ -1,5 +1,17 @@
 
 
+# [0.17.0](https://github.com/omahili/react-native-reorderable-list/compare/v0.16.2...v0.17.0) (2025-11-30)
+
+
+### Bug Fixes
+
+* export missing nested list props type ([b8e3cd9](https://github.com/omahili/react-native-reorderable-list/commit/b8e3cd99b764b4d573f4a7108746511ab060172e))
+
+
+### Features
+
+* support horizontal layout ([e4bd6cb](https://github.com/omahili/react-native-reorderable-list/commit/e4bd6cb530d3cdc3daea27d08d92141b9efbfb9f)), closes [#42](https://github.com/omahili/react-native-reorderable-list/issues/42)
+
 ## [0.16.2](https://github.com/omahili/react-native-reorderable-list/compare/v0.16.1...v0.16.2) (2025-06-26)
 
 
