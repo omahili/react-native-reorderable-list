@@ -5,6 +5,7 @@ import {faker} from '@faker-js/faker';
 export interface SeedDataItem {
   id: string;
   image: string;
+  imageWidth: number;
   title: string;
   description: string;
 }
@@ -14,6 +15,10 @@ export const createDataItem = () => ({
   image: faker.image.urlPicsumPhotos({
     width: 50,
     height: 50,
+  }),
+  imageWidth: faker.number.int({
+    min: 40,
+    max: 120,
   }),
   title: faker.lorem.sentence(5).slice(0, -1),
   description: faker.lorem.paragraph({

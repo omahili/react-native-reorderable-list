@@ -21,13 +21,18 @@ export const HomeScreen = () => {
       )}
       keyExtractor={item => item.id}
       style={styles.list}
+      contentContainerStyle={styles.listContentContainer}
     />
   );
 };
 
 const styles = StyleSheet.create({
   list: {
+    flex: 1,
     backgroundColor: 'white',
+  },
+  listContentContainer: {
+    flexGrow: 1,
   },
   item: {
     padding: 12,

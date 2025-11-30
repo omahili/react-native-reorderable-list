@@ -2,14 +2,14 @@ import React, {useMemo, useState} from 'react';
 import {ListRenderItemInfo} from 'react-native';
 
 import {faker} from '@faker-js/faker';
-import ReorderableList, {
+import {
   ReorderableListReorderEvent,
   reorderItems,
 } from 'react-native-reorderable-list';
 
 import {PlaylistItem} from './PlaylistItem';
 import {PlaylistItemSeparator} from './PlaylistItemSeparator';
-import {usePanGesture} from '../common';
+import {ReorderableList, usePanGesture} from '../common';
 
 export interface PlaylistItemData {
   id: string;

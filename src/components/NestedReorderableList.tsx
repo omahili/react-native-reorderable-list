@@ -12,9 +12,9 @@ const NestedReorderableListWithRef = <T,>(
 ) => {
   const {
     scrollViewContainerRef,
-    scrollViewScrollOffsetY,
-    scrollViewPageY,
-    scrollViewHeightY,
+    scrollViewScrollOffsetXY,
+    scrollViewPageXY,
+    scrollViewSize,
     scrollViewScrollEnabledProp,
     outerScrollGesture,
     setScrollViewForceDisableScroll,
@@ -25,9 +25,9 @@ const NestedReorderableListWithRef = <T,>(
       {...rest}
       ref={ref}
       scrollViewContainerRef={scrollViewContainerRef}
-      scrollViewScrollOffsetY={scrollViewScrollOffsetY}
-      scrollViewPageY={scrollViewPageY}
-      scrollViewHeightY={scrollViewHeightY}
+      scrollViewScrollOffsetXY={scrollViewScrollOffsetXY}
+      scrollViewPageXY={scrollViewPageXY}
+      scrollViewSize={scrollViewSize}
       outerScrollGesture={outerScrollGesture}
       scrollViewScrollEnabledProp={scrollViewScrollEnabledProp}
       setScrollViewForceDisableScroll={setScrollViewForceDisableScroll}

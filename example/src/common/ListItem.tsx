@@ -1,34 +1,50 @@
 import React, {memo} from 'react';
-import {Image, Pressable, StyleSheet, Text, View} from 'react-native';
+import {
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+  ViewProps,
+} from 'react-native';
 
 import {useReorderableDrag} from 'react-native-reorderable-list';
 
-export interface ListItemProps {
+import {useHorizontal} from '../common';
+
+export interface ListItemProps extends ViewProps {
   image: string;
+  imageWidth: number;
   title: string;
   description: string;
   dragMode?: 'press-in' | 'long-press';
 }
 
 export const ListItem: React.FC<ListItemProps> = memo(
-  ({image, title, description, dragMode = 'long-press'}) => {
+  ({image, imageWidth, title, description, dragMode = 'long-press', style}) => {
     const drag = useReorderableDrag();
+    const {horizontal} = useHorizontal();
 
     return (
       <Pressable
-        style={styles.container}
+        style={[styles.container, style]}
         onPressIn={dragMode === 'press-in' ? drag : undefined}
         onLongPress={dragMode === 'long-press' ? drag : undefined}>
+        {/* When list is horizontal display images with variable width. */}
         <Image
-          style={styles.image}
+          style={[styles.image, horizontal && {width: imageWidth}]}
           source={{
             uri: image,
           }}
         />
-        <View style={styles.details}>
-          <Text style={styles.title}>{title}</Text>
-          <Text style={styles.description}>{description}</Text>
-        </View>
+
+        {/* When list is horizontal hide text. */}
+        {!horizontal && (
+          <View style={styles.details}>
+            <Text style={styles.title}>{title}</Text>
+            <Text style={styles.description}>{description}</Text>
+          </View>
+        )}
       </Pressable>
     );
   },

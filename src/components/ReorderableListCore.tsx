@@ -63,9 +63,9 @@ const AnimatedFlatList = Animated.createAnimatedComponent(
 interface ReorderableListCoreProps<T> extends ReorderableListProps<T> {
   // Not optional but undefined to force passing the prop.
   scrollViewContainerRef: RefObject<ScrollView> | undefined;
-  scrollViewPageY: SharedValue<number> | undefined;
-  scrollViewHeightY: SharedValue<number> | undefined;
-  scrollViewScrollOffsetY: SharedValue<number> | undefined;
+  scrollViewPageXY: SharedValue<number> | undefined;
+  scrollViewSize: SharedValue<number> | undefined;
+  scrollViewScrollOffsetXY: SharedValue<number> | undefined;
   scrollViewScrollEnabledProp: SharedValue<boolean> | undefined;
   setScrollViewForceDisableScroll:
     | Dispatch<SetStateAction<boolean>>
@@ -89,9 +89,9 @@ const ReorderableListCore = <T,>(
     onDragEnd,
     onIndexChange,
     scrollViewContainerRef,
-    scrollViewPageY,
-    scrollViewHeightY,
-    scrollViewScrollOffsetY,
+    scrollViewPageXY,
+    scrollViewSize,
+    scrollViewScrollOffsetXY,
     scrollViewScrollEnabledProp,
     setScrollViewForceDisableScroll,
     scrollable,
@@ -121,37 +121,37 @@ const ReorderableListCore = <T,>(
   const currentScrollEnabled = useSharedValue(scrollEnabled);
 
   const gestureState = useSharedValue<State>(State.UNDETERMINED);
-  const currentY = useSharedValue(0);
-  const currentTranslationY = useSharedValue(0);
-  const currentItemDragCenterY = useSharedValue<number | null>(null);
-  const startItemDragCenterY = useSharedValue<number>(0);
-  const flatListScrollOffsetY = useSharedValue(0);
-  const flatListHeightY = useSharedValue(0);
-  const flatListPageY = useSharedValue(0);
-  // The scroll y translation of the list since drag start
-  const dragScrollTranslationY = useSharedValue(0);
-  // The initial scroll offset y of the list on drag start
-  const dragInitialScrollOffsetY = useSharedValue(0);
-  // The scroll y translation of the ScrollViewContainer since drag start
-  const scrollViewDragScrollTranslationY = useSharedValue(0);
-  // The initial scroll offset y of the ScrollViewContainer on drag start
-  const scrollViewDragInitialScrollOffsetY = useSharedValue(0);
-  const draggedHeight = useSharedValue(0);
+  const currentXY = useSharedValue(0);
+  const currentTranslationXY = useSharedValue(0);
+  const currentItemDragCenterXY = useSharedValue<number | null>(null);
+  const startItemDragCenterXY = useSharedValue<number>(0);
+  const flatListScrollOffsetXY = useSharedValue(0);
+  const flatListSize = useSharedValue(0);
+  const flatListPageXY = useSharedValue(0);
+  // The scroll x or y translation of the list since drag start
+  const dragScrollTranslationXY = useSharedValue(0);
+  // The initial scroll offset x or y of the list on drag start
+  const dragInitialScrollOffsetXY = useSharedValue(0);
+  // The scroll x or y translation of the ScrollViewContainer since drag start
+  const scrollViewDragScrollTranslationXY = useSharedValue(0);
+  // The initial scroll offset x or y of the ScrollViewContainer on drag start
+  const scrollViewDragInitialScrollOffsetXY = useSharedValue(0);
+  const draggedSize = useSharedValue(0);
   const itemOffset = useSharedValue<number[]>([]);
-  const itemHeight = useSharedValue<number[]>([]);
-  // We need to track data length since itemOffset and itemHeight might contain more data than we need.
+  const itemSize = useSharedValue<number[]>([]);
+  // We need to track data length since itemOffset and itemSize might contain more data than we need.
   // e.g. items are removed from the list, in which case layout data for those items is set to 0.
   const itemCount = useSharedValue(data.length);
   const autoscrollTrigger = useSharedValue(-1);
   const lastAutoscrollTrigger = useSharedValue(-1);
-  const dragY = useSharedValue(0);
+  const dragXY = useSharedValue(0);
   const currentIndex = useSharedValue(-1);
   const draggedIndex = useSharedValue(-1);
   const state = useSharedValue<ReorderableListState>(ReorderableListState.IDLE);
   const dragEndHandlers = useSharedValue<
     ((from: number, to: number) => void)[][]
   >([]);
-  const startY = useSharedValue(0);
+  const startXY = useSharedValue(0);
   const scaleDefault = useSharedValue(1);
   const opacityDefault = useSharedValue(1);
   const dragDirection = useSharedValue(0);
@@ -168,10 +168,11 @@ const ReorderableListCore = <T,>(
     autoscrollActivationDelta,
   );
   const dragEnabledProp = usePropAsSharedValue(dragEnabled ?? true);
+  const horizontalProp = usePropAsSharedValue(!!rest.horizontal);
 
   // Position of the list relative to the scroll container
-  const nestedFlatListPositionY = useDerivedValue(
-    () => flatListPageY.value - (scrollViewPageY?.value || 0),
+  const nestedFlatListPositionXY = useDerivedValue(
+    () => flatListPageXY.value - (scrollViewPageXY?.value || 0),
   );
 
   useEffect(() => {
@@ -183,14 +184,14 @@ const ReorderableListCore = <T,>(
     if (data.length < prevItemCount.current) {
       for (let i = data.length; i < prevItemCount.current; i++) {
         runOnUI(() => {
-          itemHeight.value[i] = 0;
+          itemSize.value[i] = 0;
           itemOffset.value[i] = 0;
         })();
       }
     }
 
     prevItemCount.current = data.length;
-  }, [data.length, itemHeight, itemOffset, itemCount]);
+  }, [data.length, itemSize, itemOffset, itemCount]);
 
   useEffect(() => {
     if (
@@ -230,12 +231,13 @@ const ReorderableListCore = <T,>(
 
   const listContextValue = useMemo(
     () => ({
-      draggedHeight,
+      draggedSize,
       currentIndex,
       draggedIndex,
       dragEndHandlers,
       activeIndex,
       itemLayoutAnimation: itemLayoutAnimationPropRef,
+      horizontal: horizontalProp,
       cellAnimations: {
         ...cellAnimations,
         transform:
@@ -249,7 +251,7 @@ const ReorderableListCore = <T,>(
       },
     }),
     [
-      draggedHeight,
+      draggedSize,
       currentIndex,
       draggedIndex,
       dragEndHandlers,
@@ -258,6 +260,7 @@ const ReorderableListCore = <T,>(
       itemLayoutAnimationPropRef,
       scaleDefault,
       opacityDefault,
+      horizontalProp,
     ],
   );
 
@@ -272,52 +275,65 @@ const ReorderableListCore = <T,>(
     (e: GestureUpdateEvent<PanGestureHandlerEventPayload>) => {
       'worklet';
 
-      const direction = e.velocityY > 0 ? 1 : -1;
+      const absoluteXY = horizontalProp.value ? e.absoluteX : e.absoluteY;
+      const velocityXY = horizontalProp.value ? e.velocityX : e.velocityY;
+
+      const direction = velocityXY > 0 ? 1 : -1;
       if (direction !== dragDirection.value) {
         if (lastDragDirectionPivot.value === null) {
-          lastDragDirectionPivot.value = e.absoluteY;
+          lastDragDirectionPivot.value = absoluteXY;
         } else if (
-          Math.abs(e.absoluteY - lastDragDirectionPivot.value) >=
+          Math.abs(absoluteXY - lastDragDirectionPivot.value) >=
           autoscrollActivationDeltaProp.value
         ) {
           dragDirection.value = direction;
-          lastDragDirectionPivot.value = e.absoluteY;
+          lastDragDirectionPivot.value = absoluteXY;
         }
-      }
-    },
-    [dragDirection, lastDragDirectionPivot, autoscrollActivationDeltaProp],
-  );
-
-  const setCurrentItemDragCenterY = useCallback(
-    (e: GestureUpdateEvent<PanGestureHandlerEventPayload>) => {
-      'worklet';
-
-      if (currentItemDragCenterY.value === null) {
-        if (currentIndex.value >= 0) {
-          const itemCenter = itemHeight.value[currentIndex.value] * 0.5;
-          // the y coordinate of the item relative to the list
-          const itemY =
-            itemOffset.value[currentIndex.value] -
-            (flatListScrollOffsetY.value +
-              scrollViewDragScrollTranslationY.value);
-
-          const value = itemY + itemCenter + e.translationY;
-          startItemDragCenterY.value = value;
-          currentItemDragCenterY.value = value;
-        }
-      } else {
-        currentItemDragCenterY.value =
-          startItemDragCenterY.value + e.translationY;
       }
     },
     [
-      currentItemDragCenterY,
+      dragDirection,
+      lastDragDirectionPivot,
+      autoscrollActivationDeltaProp,
+      horizontalProp,
+    ],
+  );
+
+  const setCurrentItemDragCenterXY = useCallback(
+    (e: GestureUpdateEvent<PanGestureHandlerEventPayload>) => {
+      'worklet';
+
+      const translationXY = horizontalProp.value
+        ? e.translationX
+        : e.translationY;
+
+      if (currentItemDragCenterXY.value === null) {
+        if (currentIndex.value >= 0) {
+          const itemCenter = itemSize.value[currentIndex.value] * 0.5;
+          // the x or y coordinate of the item relative to the list
+          const itemXY =
+            itemOffset.value[currentIndex.value] -
+            (flatListScrollOffsetXY.value +
+              scrollViewDragScrollTranslationXY.value);
+
+          const value = itemXY + itemCenter + translationXY;
+          startItemDragCenterXY.value = value;
+          currentItemDragCenterXY.value = value;
+        }
+      } else {
+        currentItemDragCenterXY.value =
+          startItemDragCenterXY.value + translationXY;
+      }
+    },
+    [
+      horizontalProp,
+      currentItemDragCenterXY,
       currentIndex,
-      startItemDragCenterY,
+      startItemDragCenterXY,
       itemOffset,
-      itemHeight,
-      flatListScrollOffsetY,
-      scrollViewDragScrollTranslationY,
+      itemSize,
+      flatListScrollOffsetXY,
+      scrollViewDragScrollTranslationXY,
     ],
   );
 
@@ -329,10 +345,15 @@ const ReorderableListCore = <T,>(
 
           // prevent new dragging until item is completely released
           if (state.value === ReorderableListState.IDLE) {
-            startY.value = e.y;
-            currentY.value = e.y;
-            currentTranslationY.value = e.translationY;
-            dragY.value = e.translationY;
+            const xy = horizontalProp.value ? e.x : e.y;
+            const translationXY = horizontalProp.value
+              ? e.translationX
+              : e.translationY;
+
+            startXY.value = xy;
+            currentXY.value = xy;
+            currentTranslationXY.value = translationXY;
+            dragXY.value = translationXY;
             gestureState.value = e.state;
           }
         })
@@ -344,14 +365,18 @@ const ReorderableListCore = <T,>(
           }
 
           if (state.value !== ReorderableListState.RELEASED) {
-            setCurrentItemDragCenterY(e);
+            setCurrentItemDragCenterXY(e);
 
-            currentY.value = startY.value + e.translationY;
-            currentTranslationY.value = e.translationY;
-            dragY.value =
-              e.translationY +
-              dragScrollTranslationY.value +
-              scrollViewDragScrollTranslationY.value;
+            const translationXY = horizontalProp.value
+              ? e.translationX
+              : e.translationY;
+
+            currentXY.value = startXY.value + translationXY;
+            currentTranslationXY.value = translationXY;
+            dragXY.value =
+              translationXY +
+              dragScrollTranslationXY.value +
+              scrollViewDragScrollTranslationXY.value;
             gestureState.value = e.state;
           }
         })
@@ -368,15 +393,16 @@ const ReorderableListCore = <T,>(
     [
       panGesture,
       state,
-      startY,
-      currentY,
-      currentTranslationY,
-      dragY,
+      startXY,
+      currentXY,
+      currentTranslationXY,
+      dragXY,
       gestureState,
-      dragScrollTranslationY,
-      scrollViewDragScrollTranslationY,
+      dragScrollTranslationXY,
+      scrollViewDragScrollTranslationXY,
       setDragDirection,
-      setCurrentItemDragCenterY,
+      setCurrentItemDragCenterXY,
+      horizontalProp,
     ],
   );
 
@@ -440,21 +466,21 @@ const ReorderableListCore = <T,>(
 
     state.value = ReorderableListState.IDLE;
     draggedIndex.value = -1;
-    dragY.value = 0;
-    dragScrollTranslationY.value = 0;
-    scrollViewDragScrollTranslationY.value = 0;
+    dragXY.value = 0;
+    dragScrollTranslationXY.value = 0;
+    scrollViewDragScrollTranslationXY.value = 0;
     dragDirection.value = 0;
     lastDragDirectionPivot.value = null;
-    currentItemDragCenterY.value = null;
+    currentItemDragCenterXY.value = null;
   }, [
     state,
     draggedIndex,
-    dragY,
-    dragScrollTranslationY,
-    scrollViewDragScrollTranslationY,
+    dragXY,
+    dragScrollTranslationXY,
+    scrollViewDragScrollTranslationXY,
     dragDirection,
     lastDragDirectionPivot,
-    currentItemDragCenterY,
+    currentItemDragCenterXY,
   ]);
 
   const resetSharedValuesAfterAnimations = useCallback(() => {
@@ -496,19 +522,19 @@ const ReorderableListCore = <T,>(
       const index2 = itemDirection ? to : from;
 
       const newOffset1 = itemOffset.value[index1];
-      const newHeight1 = itemHeight.value[index2];
+      const newSize1 = itemSize.value[index2];
       const newOffset2 =
         itemOffset.value[index2] +
-        itemHeight.value[index2] -
-        itemHeight.value[index1];
-      const newHeight2 = itemHeight.value[index1];
+        itemSize.value[index2] -
+        itemSize.value[index1];
+      const newSize2 = itemSize.value[index1];
 
       itemOffset.value[index1] = newOffset1;
-      itemHeight.value[index1] = newHeight1;
+      itemSize.value[index1] = newSize1;
       itemOffset.value[index2] = newOffset2;
-      itemHeight.value[index2] = newHeight2;
+      itemSize.value[index2] = newSize2;
     },
-    [itemOffset, itemHeight],
+    [itemOffset, itemSize],
   );
 
   /**
@@ -521,36 +547,38 @@ const ReorderableListCore = <T,>(
   const computeCurrentIndex = useCallback(() => {
     'worklet';
 
-    if (currentItemDragCenterY.value === null) {
+    if (currentItemDragCenterXY.value === null) {
       return currentIndex.value;
     }
 
-    // apply scroll offset and scroll container translation
-    const relativeDragCenterY =
-      flatListScrollOffsetY.value +
-      scrollViewDragScrollTranslationY.value +
-      currentItemDragCenterY.value;
+    // Apply scroll offset and scroll container translation.
+    const relativeDragCenterXY =
+      flatListScrollOffsetXY.value +
+      scrollViewDragScrollTranslationXY.value +
+      currentItemDragCenterXY.value;
 
     const currentOffset = itemOffset.value[currentIndex.value];
-    const currentHeight = itemHeight.value[currentIndex.value];
-    const currentCenter = currentOffset + currentHeight * 0.5;
+    const currentSize = itemSize.value[currentIndex.value];
+    const currentCenter = currentOffset + currentSize * 0.5;
 
     const max = itemCount.value;
     const possibleIndex =
-      relativeDragCenterY < currentCenter
+      relativeDragCenterXY < currentCenter
         ? Math.max(0, currentIndex.value - 1)
         : Math.min(max - 1, currentIndex.value + 1);
 
     if (currentIndex.value !== possibleIndex) {
       let possibleOffset = itemOffset.value[possibleIndex];
       if (possibleIndex > currentIndex.value) {
-        possibleOffset += itemHeight.value[possibleIndex] - currentHeight;
+        possibleOffset += itemSize.value[possibleIndex] - currentSize;
       }
 
-      const possibleCenter = possibleOffset + currentHeight * 0.5;
-      const distanceFromCurrent = Math.abs(relativeDragCenterY - currentCenter);
+      const possibleCenter = possibleOffset + currentSize * 0.5;
+      const distanceFromCurrent = Math.abs(
+        relativeDragCenterXY - currentCenter,
+      );
       const distanceFromPossible = Math.abs(
-        relativeDragCenterY - possibleCenter,
+        relativeDragCenterXY - possibleCenter,
       );
 
       return distanceFromCurrent <= distanceFromPossible
@@ -561,12 +589,12 @@ const ReorderableListCore = <T,>(
     return currentIndex.value;
   }, [
     currentIndex,
-    currentItemDragCenterY,
+    currentItemDragCenterXY,
     itemCount,
     itemOffset,
-    itemHeight,
-    flatListScrollOffsetY,
-    scrollViewDragScrollTranslationY,
+    itemSize,
+    flatListScrollOffsetXY,
+    scrollViewDragScrollTranslationXY,
   ]);
 
   const setCurrentIndex = useCallback(() => {
@@ -592,7 +620,7 @@ const ReorderableListCore = <T,>(
         scaleDefault.value = withTiming(scaleConfig.toValue, scaleConfig);
       }
 
-      // if no custom opacity run the default
+      // If no custom opacity run the default.
       if (!(cellAnimations && 'opacity' in cellAnimations)) {
         const opacityConfig = OPACITY_ANIMATION_CONFIG_DEFAULT[type];
         opacityDefault.value = withTiming(opacityConfig.toValue, opacityConfig);
@@ -619,7 +647,7 @@ const ReorderableListCore = <T,>(
           runOnJS(setActiveIndex)(-1);
         }
 
-        // trigger onDragEnd event
+        // Trigger onDragEnd event.
         let e = {from: draggedIndex.value, to: currentIndex.value};
         onDragEnd?.(e);
 
@@ -630,23 +658,23 @@ const ReorderableListCore = <T,>(
 
         // they are actually swapped on drag translation
         const currentItemOffset = itemOffset.value[draggedIndex.value];
-        const currentItemHeight = itemHeight.value[draggedIndex.value];
+        const currentItemSize = itemSize.value[draggedIndex.value];
         const draggedItemOffset = itemOffset.value[currentIndex.value];
-        const draggedItemHeight = itemHeight.value[currentIndex.value];
+        const draggedItemSize = itemSize.value[currentIndex.value];
 
-        const newTopPosition =
+        const newPositionXY =
           currentIndex.value > draggedIndex.value
             ? draggedItemOffset - currentItemOffset
             : draggedItemOffset -
               currentItemOffset +
-              (draggedItemHeight - currentItemHeight);
+              (draggedItemSize - currentItemSize);
 
         runDefaultDragAnimations('end');
 
-        if (dragY.value !== newTopPosition) {
-          // animate dragged item to its new position on release
-          dragY.value = withTiming(
-            newTopPosition,
+        if (dragXY.value !== newPositionXY) {
+          // Animate dragged item to its new position on release.
+          dragXY.value = withTiming(
+            newPositionXY,
             {
               duration: animationDurationProp.value,
               easing: Easing.out(Easing.ease),
@@ -656,9 +684,9 @@ const ReorderableListCore = <T,>(
             },
           );
         } else {
-          // user might drag and release the item without moving it so,
+          // User might drag and release the item without moving it so,
           // since the animation end callback is not executed in that case
-          // we need to reset values as the reorder function would do
+          // we need to reset values as the reorder function would do.
           runOnJS(resetSharedValuesAfterAnimations)();
         }
       }
@@ -667,28 +695,28 @@ const ReorderableListCore = <T,>(
 
   const computeHiddenArea = useCallback(() => {
     'worklet';
-    if (!scrollViewScrollOffsetY || !scrollViewHeightY) {
-      return {top: 0, bottom: 0};
+    if (!scrollViewScrollOffsetXY || !scrollViewSize) {
+      return {start: 0, end: 0};
     }
 
     // hidden area cannot be negative
-    const top = Math.max(
+    const start = Math.max(
       0,
-      scrollViewScrollOffsetY.value - nestedFlatListPositionY.value,
+      scrollViewScrollOffsetXY.value - nestedFlatListPositionXY.value,
     );
-    const bottom = Math.max(
+    const end = Math.max(
       0,
-      nestedFlatListPositionY.value +
-        flatListHeightY.value -
-        (scrollViewScrollOffsetY.value + scrollViewHeightY.value),
+      nestedFlatListPositionXY.value +
+        flatListSize.value -
+        (scrollViewScrollOffsetXY.value + scrollViewSize.value),
     );
 
-    return {top, bottom};
+    return {start, end};
   }, [
-    scrollViewScrollOffsetY,
-    scrollViewHeightY,
-    nestedFlatListPositionY,
-    flatListHeightY,
+    scrollViewScrollOffsetXY,
+    scrollViewSize,
+    nestedFlatListPositionXY,
+    flatListSize,
   ]);
 
   const computeThresholdArea = useCallback(() => {
@@ -696,43 +724,55 @@ const ReorderableListCore = <T,>(
 
     const hiddenArea = computeHiddenArea();
 
-    const offsetTop = Math.max(0, autoscrollThresholdOffset?.top || 0);
-    const offsetBottom = Math.max(0, autoscrollThresholdOffset?.bottom || 0);
+    const offsetStart = Math.max(
+      0,
+      autoscrollThresholdOffset?.start || autoscrollThresholdOffset?.top || 0,
+    );
+    const offsetEnd = Math.max(
+      0,
+      autoscrollThresholdOffset?.end || autoscrollThresholdOffset?.bottom || 0,
+    );
     const threshold = Math.max(0, Math.min(autoscrollThreshold, 0.4));
-    const visibleHeight =
-      flatListHeightY.value -
-      (hiddenArea.top + hiddenArea.bottom) -
-      (offsetTop + offsetBottom);
+    const visibleSize =
+      flatListSize.value -
+      (hiddenArea.start + hiddenArea.end) -
+      (offsetStart + offsetEnd);
 
-    const area = visibleHeight * threshold;
-    const top = area + offsetTop;
-    const bottom = flatListHeightY.value - area - offsetBottom;
+    const area = visibleSize * threshold;
+    const start = area + offsetStart;
+    const end = flatListSize.value - area - offsetEnd;
 
-    return {top, bottom};
+    return {start, end};
   }, [
     computeHiddenArea,
     autoscrollThreshold,
     autoscrollThresholdOffset,
-    flatListHeightY,
+    flatListSize,
   ]);
 
   const computeContainerThresholdArea = useCallback(() => {
     'worklet';
-    if (!scrollViewHeightY) {
-      return {top: -Infinity, bottom: Infinity};
+    if (!scrollViewSize) {
+      return {start: -Infinity, end: Infinity};
     }
 
-    const offsetTop = Math.max(0, autoscrollThresholdOffset?.top || 0);
-    const offsetBottom = Math.max(0, autoscrollThresholdOffset?.bottom || 0);
+    const offsetStart = Math.max(
+      0,
+      autoscrollThresholdOffset?.start || autoscrollThresholdOffset?.top || 0,
+    );
+    const offsetEnd = Math.max(
+      0,
+      autoscrollThresholdOffset?.end || autoscrollThresholdOffset?.bottom || 0,
+    );
     const threshold = Math.max(0, Math.min(autoscrollThreshold, 0.4));
-    const visibleHeight = scrollViewHeightY.value - (offsetTop + offsetBottom);
+    const visibleSize = scrollViewSize.value - (offsetStart + offsetEnd);
 
-    const area = visibleHeight * threshold;
-    const top = area + offsetTop;
-    const bottom = visibleHeight - area - offsetBottom;
+    const area = visibleSize * threshold;
+    const start = area + offsetStart;
+    const end = visibleSize - area - offsetEnd;
 
-    return {top, bottom};
-  }, [autoscrollThreshold, autoscrollThresholdOffset, scrollViewHeightY]);
+    return {start, end};
+  }, [autoscrollThreshold, autoscrollThresholdOffset, scrollViewSize]);
 
   const shouldScrollContainer = useCallback(
     (y: number) => {
@@ -743,52 +783,56 @@ const ReorderableListCore = <T,>(
       // We should scroll the container if there's a hidden part of the nested list.
       // We might have floating errors like 0.0001 which we should ignore.
       return (
-        (nestedListHiddenArea.top > 0.01 && y <= containerThresholdArea.top) ||
-        (nestedListHiddenArea.bottom > 0.01 &&
-          y >= containerThresholdArea.bottom)
+        (nestedListHiddenArea.start > 0.01 &&
+          y <= containerThresholdArea.start) ||
+        (nestedListHiddenArea.end > 0.01 && y >= containerThresholdArea.end)
       );
     },
     [computeHiddenArea, computeContainerThresholdArea],
   );
 
-  const getRelativeContainerY = useCallback(() => {
+  const getRelativeContainerXY = useCallback(() => {
     'worklet';
 
     return (
-      currentY.value +
-      nestedFlatListPositionY.value -
-      scrollViewDragInitialScrollOffsetY.value
+      currentXY.value +
+      nestedFlatListPositionXY.value -
+      scrollViewDragInitialScrollOffsetXY.value
     );
-  }, [currentY, nestedFlatListPositionY, scrollViewDragInitialScrollOffsetY]);
+  }, [
+    currentXY,
+    nestedFlatListPositionXY,
+    scrollViewDragInitialScrollOffsetXY,
+  ]);
 
-  const getRelativeListY = useCallback(() => {
+  const getRelativeListXY = useCallback(() => {
     'worklet';
 
-    return currentY.value + scrollViewDragScrollTranslationY.value;
-  }, [currentY, scrollViewDragScrollTranslationY]);
+    return currentXY.value + scrollViewDragScrollTranslationXY.value;
+  }, [currentXY, scrollViewDragScrollTranslationXY]);
 
   const scrollDirection = useCallback(() => {
     'worklet';
 
-    const relativeContainerY = getRelativeContainerY();
-    if (shouldScrollContainer(relativeContainerY)) {
+    const relativeContainerXY = getRelativeContainerXY();
+    if (shouldScrollContainer(relativeContainerXY)) {
       const containerThresholdArea = computeContainerThresholdArea();
-      if (relativeContainerY <= containerThresholdArea.top) {
+      if (relativeContainerXY <= containerThresholdArea.start) {
         return -1;
       }
 
-      if (relativeContainerY >= containerThresholdArea.bottom) {
+      if (relativeContainerXY >= containerThresholdArea.end) {
         return 1;
       }
     } else if (scrollable) {
-      const relativeListY = getRelativeListY();
+      const relativeListXY = getRelativeListXY();
       const thresholdArea = computeThresholdArea();
 
-      if (relativeListY <= thresholdArea.top) {
+      if (relativeListXY <= thresholdArea.start) {
         return -1;
       }
 
-      if (relativeListY >= thresholdArea.bottom) {
+      if (relativeListXY >= thresholdArea.end) {
         return 1;
       }
     }
@@ -798,13 +842,13 @@ const ReorderableListCore = <T,>(
     shouldScrollContainer,
     computeThresholdArea,
     computeContainerThresholdArea,
-    getRelativeContainerY,
-    getRelativeListY,
+    getRelativeContainerXY,
+    getRelativeListXY,
     scrollable,
   ]);
 
   useAnimatedReaction(
-    () => currentY.value,
+    () => currentXY.value,
     () => {
       if (
         state.value === ReorderableListState.DRAGGED ||
@@ -813,11 +857,12 @@ const ReorderableListCore = <T,>(
         setCurrentIndex();
 
         // Trigger autoscroll when:
-        // 1. Within the threshold area (top or bottom of list)
+        // 1. Within the threshold area (start or end of list)
         // 2. Have dragged in the same direction as the scroll
         // 3. Not already in autoscroll mode
         if (dragDirection.value === scrollDirection()) {
-          // When the first two conditions are met and it's already in autoscroll mode, we let it continue (no-op)
+          // When the first two conditions are met and it's already in autoscroll mode,
+          // we let it continue (no-op).
           if (state.value !== ReorderableListState.AUTOSCROLL) {
             state.value = ReorderableListState.AUTOSCROLL;
             lastAutoscrollTrigger.value = autoscrollTrigger.value;
@@ -843,7 +888,7 @@ const ReorderableListCore = <T,>(
           autoscrollSpeedScale;
 
         if (autoscrollIncrement !== 0) {
-          let scrollOffset = flatListScrollOffsetY.value;
+          let scrollOffset = flatListScrollOffsetXY.value;
           let listRef =
             flatListRef as unknown as AnimatedRef<Animated.ScrollView>;
 
@@ -851,15 +896,21 @@ const ReorderableListCore = <T,>(
           // this allows to smoothly pass the scroll from the container to the nested list
           // without any gesture input.
           if (
-            scrollViewScrollOffsetY &&
-            shouldScrollContainer(getRelativeContainerY())
+            scrollViewScrollOffsetXY &&
+            shouldScrollContainer(getRelativeContainerXY())
           ) {
-            scrollOffset = scrollViewScrollOffsetY.value;
+            scrollOffset = scrollViewScrollOffsetXY.value;
             listRef =
               scrollViewContainerRef as unknown as AnimatedRef<Animated.ScrollView>;
           }
+          const scrollToValue = scrollOffset + autoscrollIncrement;
 
-          scrollTo(listRef, 0, scrollOffset + autoscrollIncrement, true);
+          scrollTo(
+            listRef,
+            horizontalProp.value ? scrollToValue : 0,
+            horizontalProp.value ? 0 : scrollToValue,
+            true,
+          );
         }
 
         // when autoscrolling user may not be moving his finger so we need
@@ -871,21 +922,23 @@ const ReorderableListCore = <T,>(
 
   // flatlist scroll handler
   const handleScroll = useAnimatedScrollHandler(e => {
-    flatListScrollOffsetY.value = e.contentOffset.y;
+    flatListScrollOffsetXY.value = horizontalProp.value
+      ? e.contentOffset.x
+      : e.contentOffset.y;
 
     // Checking if the list is not scrollable instead of the scrolling state.
     // Fixes a bug on iOS where the item is shifted after autoscrolling and then
     // moving away from the area.
     if (!currentScrollEnabled.value) {
-      dragScrollTranslationY.value =
-        flatListScrollOffsetY.value - dragInitialScrollOffsetY.value;
+      dragScrollTranslationXY.value =
+        flatListScrollOffsetXY.value - dragInitialScrollOffsetXY.value;
     }
 
     if (state.value === ReorderableListState.AUTOSCROLL) {
-      dragY.value =
-        currentTranslationY.value +
-        dragScrollTranslationY.value +
-        scrollViewDragScrollTranslationY.value;
+      dragXY.value =
+        currentTranslationXY.value +
+        dragScrollTranslationXY.value +
+        scrollViewDragScrollTranslationXY.value;
 
       lastAutoscrollTrigger.value = autoscrollTrigger.value;
       autoscrollTrigger.value = withDelay(
@@ -897,20 +950,21 @@ const ReorderableListCore = <T,>(
 
   // container scroll handler
   useAnimatedReaction(
-    () => scrollViewScrollOffsetY?.value,
+    () => scrollViewScrollOffsetXY?.value,
     value => {
       if (value) {
         // Checking if the list is not scrollable instead of the scrolling state.
-        // Fixes a bug on iOS where the item is shifted after autoscrolling and then
+        // Fixes a bug on iOS where the item is shifted, after autoscrolling and then
         // moving away from the area.
         if (!currentScrollEnabled.value) {
-          scrollViewDragScrollTranslationY.value =
-            value - scrollViewDragInitialScrollOffsetY.value;
+          scrollViewDragScrollTranslationXY.value =
+            value - scrollViewDragInitialScrollOffsetXY.value;
         }
 
         if (state.value === ReorderableListState.AUTOSCROLL) {
-          dragY.value =
-            currentTranslationY.value + scrollViewDragScrollTranslationY.value;
+          dragXY.value =
+            currentTranslationXY.value +
+            scrollViewDragScrollTranslationXY.value;
 
           lastAutoscrollTrigger.value = autoscrollTrigger.value;
           autoscrollTrigger.value = withDelay(
@@ -930,21 +984,21 @@ const ReorderableListCore = <T,>(
         return;
       }
 
-      // allow new drag when item is completely released
+      // Allow new drag when item is completely released.
       if (state.value === ReorderableListState.IDLE) {
-        // resetting shared values again fixes a flickeing bug in nested lists where
-        // after scrolling the parent list it would offset the new dragged item in another nested list
+        // Resetting shared values again fixes a flickeing bug in nested lists where
+        // after scrolling the parent list it would offset the new dragged item in another nested list.
         resetSharedValues();
 
         if (shouldUpdateActiveItem) {
           runOnJS(setActiveIndex)(index);
         }
 
-        dragInitialScrollOffsetY.value = flatListScrollOffsetY.value;
-        scrollViewDragInitialScrollOffsetY.value =
-          scrollViewScrollOffsetY?.value || 0;
+        dragInitialScrollOffsetXY.value = flatListScrollOffsetXY.value;
+        scrollViewDragInitialScrollOffsetXY.value =
+          scrollViewScrollOffsetXY?.value || 0;
 
-        draggedHeight.value = itemHeight.value[index];
+        draggedSize.value = itemSize.value[index];
         draggedIndex.value = index;
         currentIndex.value = index;
         state.value = ReorderableListState.DRAGGED;
@@ -960,16 +1014,16 @@ const ReorderableListCore = <T,>(
       dragEnabledProp,
       resetSharedValues,
       shouldUpdateActiveItem,
-      dragInitialScrollOffsetY,
-      scrollViewScrollOffsetY,
-      scrollViewDragInitialScrollOffsetY,
+      dragInitialScrollOffsetXY,
+      scrollViewScrollOffsetXY,
+      scrollViewDragInitialScrollOffsetXY,
       setScrollEnabled,
       currentIndex,
-      draggedHeight,
+      draggedSize,
       draggedIndex,
       state,
-      flatListScrollOffsetY,
-      itemHeight,
+      flatListScrollOffsetXY,
+      itemSize,
       onDragStart,
       runDefaultDragAnimations,
     ],
@@ -977,11 +1031,13 @@ const ReorderableListCore = <T,>(
 
   const handleFlatListLayout = useCallback(
     (e: LayoutChangeEvent) => {
-      flatListHeightY.value = e.nativeEvent.layout.height;
+      flatListSize.value = horizontalProp.value
+        ? e.nativeEvent.layout.width
+        : e.nativeEvent.layout.height;
 
       // If nested in a scroll container.
-      if (scrollViewScrollOffsetY) {
-        // Timeout fixes a bug where measure returns height 0.
+      if (scrollViewScrollOffsetXY) {
+        // Timeout fixes a bug where measure returns width or height 0.
         setTimeout(() => {
           runOnUI(() => {
             const measurement = measure(flatListRef);
@@ -989,11 +1045,15 @@ const ReorderableListCore = <T,>(
               return;
             }
 
+            const pageXY = horizontalProp.value
+              ? measurement.pageX
+              : measurement.pageY;
+
             // We need to use pageY because the list might be nested into other views,
             // It's important that we take the measurement of the list without any scroll offset
             // from the scroll container.
-            flatListPageY.value =
-              measurement.pageY + (scrollViewScrollOffsetY?.value || 0);
+            flatListPageXY.value =
+              pageXY + (scrollViewScrollOffsetXY?.value || 0);
           })();
         }, 100);
       }
@@ -1002,9 +1062,10 @@ const ReorderableListCore = <T,>(
     },
     [
       flatListRef,
-      flatListPageY,
-      flatListHeightY,
-      scrollViewScrollOffsetY,
+      flatListPageXY,
+      flatListSize,
+      horizontalProp,
+      scrollViewScrollOffsetXY,
       onLayout,
     ],
   );
@@ -1023,7 +1084,7 @@ const ReorderableListCore = <T,>(
   );
 
   const combinedGesture = useMemo(() => {
-    // android is able to handle nested scroll view, but not the full height ones like iOS
+    // Android is able to handle nested scroll view, but not the full size ones like iOS.
     if (outerScrollGesture && !(Platform.OS === 'android' && scrollable)) {
       return Gesture.Simultaneous(outerScrollGesture, gestureHandler);
     }
@@ -1043,8 +1104,8 @@ const ReorderableListCore = <T,>(
         // forces remount with key change on reorder
         key={createCellKey(cellKey)}
         itemOffset={itemOffset}
-        itemHeight={itemHeight}
-        dragY={dragY}
+        itemSize={itemSize}
+        dragXY={dragXY}
         draggedIndex={draggedIndex}
         animationDuration={animationDurationProp}
         startDrag={startDrag}
@@ -1064,7 +1125,6 @@ const ReorderableListCore = <T,>(
           onLayout={handleFlatListLayout}
           onScroll={composedScrollHandler}
           scrollEventThrottle={1}
-          horizontal={false}
           removeClippedSubviews={false}
           numColumns={1}
           // We force disable scroll or let the component prop control it.

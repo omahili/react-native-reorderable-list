@@ -1,8 +1,8 @@
 import React, {memo, useMemo, useState} from 'react';
-import {ListRenderItemInfo} from 'react-native';
+import {ListRenderItemInfo, StyleSheet} from 'react-native';
 
 import {faker} from '@faker-js/faker';
-import ReorderableList, {
+import {
   ReorderableListReorderEvent,
   reorderItems,
   useIsActive,
@@ -12,6 +12,7 @@ import {
   ItemSeparator,
   ListItem,
   ListItemProps,
+  ReorderableList,
   SeedDataItem,
   usePanGesture,
 } from './common';
@@ -19,12 +20,7 @@ import {
 export const ActiveItem: React.FC<ListItemProps> = memo(props => {
   const isActive = useIsActive();
 
-  return (
-    <ListItem
-      {...props}
-      description={isActive ? 'ACTIVE' : props.description}
-    />
-  );
+  return <ListItem style={isActive && styles.activeItem} {...props} />;
 });
 
 export const ActiveItemScreen = () => {
@@ -36,6 +32,10 @@ export const ActiveItemScreen = () => {
           image: faker.image.urlPicsumPhotos({
             width: 50,
             height: 50,
+          }),
+          imageWidth: faker.number.int({
+            min: 50,
+            max: 90,
           }),
           title: faker.book.title(),
           description: faker.book.genre(),
@@ -69,3 +69,9 @@ export const ActiveItemScreen = () => {
     />
   );
 };
+
+const styles = StyleSheet.create({
+  activeItem: {
+    backgroundColor: 'lightblue',
+  },
+});

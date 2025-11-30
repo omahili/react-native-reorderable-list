@@ -2,13 +2,14 @@ import React, {useCallback, useState} from 'react';
 import {Button, ListRenderItemInfo, StyleSheet, View} from 'react-native';
 
 import {LinearTransition} from 'react-native-reanimated';
-import ReorderableList, {
+import {
   ReorderableListReorderEvent,
   reorderItems,
 } from 'react-native-reorderable-list';
 
 import {
   ItemSeparator,
+  ReorderableList,
   SeedDataItem,
   createDataItem,
   usePanGesture,

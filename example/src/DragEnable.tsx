@@ -2,12 +2,18 @@ import React, {useCallback, useMemo, useState} from 'react';
 import {Button, ListRenderItemInfo, StyleSheet, View} from 'react-native';
 
 import {Gesture} from 'react-native-gesture-handler';
-import ReorderableList, {
+import {
   ReorderableListReorderEvent,
   reorderItems,
 } from 'react-native-reorderable-list';
 
-import {ItemSeparator, ListItem, SeedDataItem, useSeedData} from './common';
+import {
+  ItemSeparator,
+  ListItem,
+  ReorderableList,
+  SeedDataItem,
+  useSeedData,
+} from './common';
 
 export const DragEnableScreen = () => {
   const seedData = useSeedData();
@@ -58,7 +64,6 @@ export const DragEnableScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingBottom: 32,
   },
   listContentContainer: {
     flexGrow: 1,

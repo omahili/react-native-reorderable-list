@@ -25,9 +25,10 @@ const ScrollViewContainerWithRef = (
     useState(false);
   const scrollViewScrollEnabledProp = usePropAsSharedValue(scrollEnabled);
   const scrollViewContainerRef = useAnimatedRef<Animated.ScrollView>();
-  const scrollViewScrollOffsetY = useSharedValue(0);
-  const scrollViewPageY = useSharedValue(0);
-  const scrollViewHeightY = useSharedValue(0);
+  const scrollViewScrollOffsetXY = useSharedValue(0);
+  const scrollViewPageXY = useSharedValue(0);
+  const scrollViewSize = useSharedValue(0);
+  const horizontalProp = usePropAsSharedValue(!!rest.horizontal);
 
   const handleRef = useCallback(
     (value: Animated.ScrollView) => {
@@ -46,9 +47,11 @@ const ScrollViewContainerWithRef = (
 
   const handleScroll = useAnimatedScrollHandler(
     e => {
-      scrollViewScrollOffsetY.value = e.contentOffset.y;
+      scrollViewScrollOffsetXY.value = horizontalProp.value
+        ? e.contentOffset.x
+        : e.contentOffset.y;
     },
-    [scrollViewScrollOffsetY],
+    [scrollViewScrollOffsetXY],
   );
 
   const composedScrollHandler = useComposedEventHandler([
@@ -59,18 +62,18 @@ const ScrollViewContainerWithRef = (
   const contextValue = useMemo(
     () => ({
       scrollViewContainerRef,
-      scrollViewPageY,
-      scrollViewHeightY,
-      scrollViewScrollOffsetY,
+      scrollViewPageXY,
+      scrollViewSize,
+      scrollViewScrollOffsetXY,
       scrollViewScrollEnabledProp,
       outerScrollGesture,
       setScrollViewForceDisableScroll,
     }),
     [
       scrollViewContainerRef,
-      scrollViewPageY,
-      scrollViewHeightY,
-      scrollViewScrollOffsetY,
+      scrollViewPageXY,
+      scrollViewSize,
+      scrollViewScrollOffsetXY,
       scrollViewScrollEnabledProp,
       outerScrollGesture,
       setScrollViewForceDisableScroll,
@@ -79,7 +82,9 @@ const ScrollViewContainerWithRef = (
 
   const handleLayout = useCallback(
     (e: LayoutChangeEvent) => {
-      scrollViewHeightY.value = e.nativeEvent.layout.height;
+      scrollViewSize.value = horizontalProp.value
+        ? e.nativeEvent.layout.width
+        : e.nativeEvent.layout.height;
 
       // measuring pageY allows wrapping nested lists in other views
       runOnUI(() => {
@@ -88,12 +93,20 @@ const ScrollViewContainerWithRef = (
           return;
         }
 
-        scrollViewPageY.value = measurement.pageY;
+        scrollViewPageXY.value = horizontalProp.value
+          ? measurement.pageX
+          : measurement.pageY;
       })();
 
       onLayout?.(e);
     },
-    [onLayout, scrollViewContainerRef, scrollViewHeightY, scrollViewPageY],
+    [
+      onLayout,
+      scrollViewContainerRef,
+      scrollViewSize,
+      scrollViewPageXY,
+      horizontalProp,
+    ],
   );
 
   return (

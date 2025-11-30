@@ -2,7 +2,7 @@ import React, {useCallback, useState} from 'react';
 import {ListRenderItemInfo, StyleSheet, View} from 'react-native';
 
 import {runOnJS} from 'react-native-reanimated';
-import ReorderableList, {
+import {
   ReorderableListReorderEvent,
   reorderItems,
 } from 'react-native-reorderable-list';
@@ -11,6 +11,7 @@ import {ReorderableListIndexChangeEvent} from 'src/types';
 import {
   ItemSeparator,
   ListItem,
+  ReorderableList,
   SeedDataItem,
   TitleHighlight,
   usePanGesture,
@@ -74,7 +75,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   footer: {
-    height: 80,
-    paddingBottom: 24,
+    height: 60,
   },
 });

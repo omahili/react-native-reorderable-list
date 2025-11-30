@@ -4,7 +4,7 @@ import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {ActiveItemScreen} from './ActiveItem';
 import {CustomAnimationsScreen} from './CustomAnimations';
 import {DragEnableScreen} from './DragEnable';
-import {DynamicHeightsScreen} from './DynamicHeights';
+import {DynamicSizesScreen} from './DynamicSizes';
 import {FloatingHeaderFooterScreen} from './FloatingHeaderFooter';
 import {HeaderFooterScreen} from './HeaderFooter';
 import {IndexChangeScreen} from './IndexChange';
@@ -19,18 +19,18 @@ import {RefreshControlScreen} from './RefreshControl';
 const screens = [
   {
     id: '0',
+    name: 'Readme Example',
+    component: ReadmeExampleScreen,
+  },
+  {
+    id: '1',
     name: 'Playlist',
     component: PlaylistScreen,
   },
   {
-    id: '1',
-    name: 'Dynamic Heights',
-    component: DynamicHeightsScreen,
-  },
-  {
     id: '2',
-    name: 'Readme Example',
-    component: ReadmeExampleScreen,
+    name: 'Dynamic Sizes',
+    component: DynamicSizesScreen,
   },
   {
     id: '3',

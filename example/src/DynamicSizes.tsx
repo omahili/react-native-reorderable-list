@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {ListRenderItemInfo} from 'react-native';
 
-import ReorderableList, {
+import {
   ReorderableListReorderEvent,
   reorderItems,
 } from 'react-native-reorderable-list';
@@ -9,12 +9,13 @@ import ReorderableList, {
 import {
   ItemSeparator,
   ListItem,
+  ReorderableList,
   SeedDataItem,
   usePanGesture,
   useSeedData,
 } from './common';
 
-export const DynamicHeightsScreen = () => {
+export const DynamicSizesScreen = () => {
   const seedData = useSeedData();
   const [data, setData] = useState(seedData);
   const panGesture = usePanGesture();

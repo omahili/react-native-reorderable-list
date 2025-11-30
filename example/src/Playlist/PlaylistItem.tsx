@@ -3,6 +3,8 @@ import {Image, Pressable, StyleSheet, Text, View} from 'react-native';
 
 import {useReorderableDrag} from 'react-native-reorderable-list';
 
+import {useHorizontal} from '../common';
+
 interface PlaylistItemProps {
   image: string;
   title: string;
@@ -12,6 +14,7 @@ interface PlaylistItemProps {
 export const PlaylistItem: React.FC<PlaylistItemProps> = memo(
   ({image, title, author}) => {
     const drag = useReorderableDrag();
+    const {horizontal} = useHorizontal();
 
     return (
       <Pressable style={styles.container} onLongPress={drag}>
@@ -21,12 +24,14 @@ export const PlaylistItem: React.FC<PlaylistItemProps> = memo(
             uri: image,
           }}
         />
-        <View style={styles.details}>
-          <Text style={styles.title} numberOfLines={1}>
-            {title}
-          </Text>
-          <Text style={styles.author}>{author}</Text>
-        </View>
+        {!horizontal && (
+          <View style={styles.details}>
+            <Text style={styles.title} numberOfLines={1}>
+              {title}
+            </Text>
+            <Text style={styles.author}>{author}</Text>
+          </View>
+        )}
       </Pressable>
     );
   },

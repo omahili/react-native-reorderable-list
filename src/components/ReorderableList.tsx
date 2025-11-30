@@ -12,9 +12,9 @@ const ReorderableListWithRef = <T,>(
     {...props}
     ref={ref}
     scrollViewContainerRef={undefined}
-    scrollViewScrollOffsetY={undefined}
-    scrollViewPageY={undefined}
-    scrollViewHeightY={undefined}
+    scrollViewScrollOffsetXY={undefined}
+    scrollViewPageXY={undefined}
+    scrollViewSize={undefined}
     outerScrollGesture={undefined}
     scrollViewScrollEnabledProp={undefined}
     setScrollViewForceDisableScroll={undefined}

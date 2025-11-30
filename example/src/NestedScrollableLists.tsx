@@ -2,16 +2,17 @@ import React, {useState} from 'react';
 import {ListRenderItemInfo, LogBox, StyleSheet, View} from 'react-native';
 
 import {
-  NestedReorderableList,
   ReorderableListReorderEvent,
-  ScrollViewContainer,
   reorderItems,
 } from 'react-native-reorderable-list';
 
 import {
   ListItem,
+  NestedReorderableList,
+  ScrollViewContainer,
   SeedDataItem,
   TitleHighlight,
+  useHorizontal,
   usePanGesture,
   useSeedData,
 } from './common';
@@ -28,6 +29,7 @@ const NestedList: React.FC<NestedListProps> = ({index}) => {
   const seedData = useSeedData();
   const [data, setData] = useState(seedData);
   const panGesture = usePanGesture();
+  const {horizontal} = useHorizontal();
 
   const handleReorder = ({from, to}: ReorderableListReorderEvent) => {
     setData(value => reorderItems(value, from, to));
@@ -43,7 +45,11 @@ const NestedList: React.FC<NestedListProps> = ({index}) => {
       onReorder={handleReorder}
       renderItem={renderItem}
       keyExtractor={item => item.id}
-      style={styles.nestedList}
+      style={
+        horizontal ? styles.nestedListHorizontal : styles.nestedListVertical
+      }
+      // IMPORTANT: FlatList does not support this `stickyHeaderIndices`
+      // in conjunction with `horizontal`, nor does ReorderableList.
       stickyHeaderIndices={[0]}
       ListHeaderComponent={<TitleHighlight title={`Nested List ${index}`} />}
       autoscrollThreshold={0.3} // increase autoscroll area
@@ -69,7 +75,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  nestedList: {
+  nestedListVertical: {
     height: 300,
+  },
+  nestedListHorizontal: {
+    width: 300,
   },
 });

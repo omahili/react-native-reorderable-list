@@ -2,14 +2,22 @@
 [![GitHub License](https://img.shields.io/github/license/omahili/react-native-reorderable-list)](https://github.com/omahili/react-native-reorderable-list?tab=MIT-1-ov-file#readme)
 [![NPM Version](https://img.shields.io/npm/v/react-native-reorderable-list)](https://www.npmjs.com/package/react-native-reorderable-list?activeTab=versions)
 <br />
-![iOS](https://img.shields.io/badge/platform-iOS-000.svg?logo=apple)
-![Android](https://img.shields.io/badge/platform-Android-3ddc84.svg?logo=android)
+[![iOS](https://img.shields.io/badge/platform-iOS-000.svg?logo=apple)](https://developer.apple.com/ios)
+[![Android](https://img.shields.io/badge/platform-Android-3ddc84.svg?logo=android)](https://www.android.com)
 
 # React Native Reorderable List
 
-A reorderable list for React Native applications, powered by Reanimated 🚀
+A reorderable list for React Native applications, powered by Reanimated 🚀.
 
 ![Demo](https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExanBuODMwN29scmxoNXY0MmZkcHpzZnFxYXE5eTVydzBsbHIyY3ZqMyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/T9uQrEnUCijeJOzSs9/giphy.gif)
+
+### Features
+
+- Drag & Drop FlatList
+- Vertical & Horizontal Mode
+- Layout Animations
+- Nested Lists
+- Custom Animations
 
 ## Index
 
@@ -60,7 +68,7 @@ This component uses a [FlatList](https://reactnative.dev/docs/flatlist) and it e
 | Props                     | Type                                             | Required | Default                    | Description                                                                                                                                                                                                                                                                                                                                                                                                    |
 | ------------------------- | ------------------------------------------------ | -------- | -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | autoscrollThreshold       | `number`                                         | No       | `0.1`                      | Threshold at the extremity of the list that triggers autoscroll when an item is dragged to it. A value of `0.1` means that 10% of the area at the top and 10% at the bottom will trigger autoscroll. Min value: `0`. Max value: `0.4`.                                                                                                                                                                         |
-| autoscrollThresholdOffset | `{top?: number; bottom?: number}`                | No       | `{top: 0, bottom: 0}`      | Amount by which the threshold is offset at the extremety of the list. For example, setting `{top: 50}` will make the autoscroll trigger 50 pixels earlier at the top.                                                                                                                                                                                                                                          |
+| autoscrollThresholdOffset | `{start?: number; end?: number}`                | No       | `{start: 0, end: 0}`      | Amount by which the threshold is offset at the extremety of the list. For example, setting `{start: 50}` will make the autoscroll trigger 50 pixels earlier at the start of the list.                                                                                                                                                                               |
 | autoscrollSpeedScale      | `number`                                         | No       | `1`                        | Scales the autoscroll speed at which the list scrolls when an item is dragged to the scroll areas.                                                                                                                                                                                                                                                                                                             |
 | autoscrollDelay           | `number`                                         | No       | `0` (Android), `100` (iOS) | Delay in between autoscroll triggers. Can be used to tune the autoscroll smoothness. Default values differ between platforms: `0` for Android and `100` for iOS.                                                                                                                                                                                                                                               |
 | autoscrollActivationDelta | `number`                                         | No       | `5`                        | Allows configuring the delta for autoscroll activation when dragging an item in the same direction as the autoscroll. This is particularly useful when an item is dragged within the autoscroll area to account for minor unintentional movements.                                                                                                                                                             |
@@ -78,7 +86,6 @@ This component uses a [FlatList](https://reactnative.dev/docs/flatlist) and it e
 
 The following props from FlatList are not supported:
 
-- horizontal
 - scrollEventThrottle
 - removeClippedSubviews
 - CellRendererComponent

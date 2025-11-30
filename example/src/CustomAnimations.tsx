@@ -2,7 +2,7 @@ import React, {useMemo, useState} from 'react';
 import {ListRenderItemInfo, Platform} from 'react-native';
 
 import {Easing, useSharedValue, withTiming} from 'react-native-reanimated';
-import ReorderableList, {
+import {
   ReorderableListCellAnimations,
   ReorderableListDragEndEvent,
   ReorderableListDragStartEvent,
@@ -13,6 +13,7 @@ import ReorderableList, {
 import {
   ItemSeparator,
   ListItem,
+  ReorderableList,
   SeedDataItem,
   usePanGesture,
   useSeedData,

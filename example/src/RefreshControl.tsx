@@ -2,7 +2,7 @@ import React, {useCallback, useState} from 'react';
 import {ListRenderItemInfo, Platform, RefreshControl} from 'react-native';
 
 import {runOnJS} from 'react-native-reanimated';
-import ReorderableList, {
+import {
   ReorderableListReorderEvent,
   reorderItems,
 } from 'react-native-reorderable-list';
@@ -10,6 +10,7 @@ import ReorderableList, {
 import {
   ItemSeparator,
   ListItem,
+  ReorderableList,
   SeedDataItem,
   usePanGesture,
   useSeedData,
