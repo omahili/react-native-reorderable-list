@@ -1,5 +1,12 @@
 
 
+# [0.18.0](https://github.com/omahili/react-native-reorderable-list/compare/v0.17.0...v0.18.0) (2026-01-02)
+
+
+### Features
+
+* support drop indicator ([b33a3cf](https://github.com/omahili/react-native-reorderable-list/commit/b33a3cfd2807b6ace2f29bb9616de293f4baa22b)), closes [#61](https://github.com/omahili/react-native-reorderable-list/issues/61)
+
 # [0.17.0](https://github.com/omahili/react-native-reorderable-list/compare/v0.16.2...v0.17.0) (2025-11-30)
 
 
