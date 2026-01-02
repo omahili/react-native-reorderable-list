@@ -12,6 +12,7 @@ interface ReorderableListContextData {
   itemLayoutAnimation: React.MutableRefObject<ItemLayoutAnimation | undefined>;
   cellAnimations: ReorderableListCellAnimations;
   horizontal: SharedValue<boolean>;
+  dropIndicatorTranslationXY: SharedValue<number>;
 }
 
 export const ReorderableListContext = React.createContext<

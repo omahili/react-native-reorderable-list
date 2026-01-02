@@ -1,9 +1,10 @@
-import React, {memo, useCallback, useMemo} from 'react';
+import React, {memo, useCallback, useMemo, useState} from 'react';
 import {CellRendererProps, LayoutChangeEvent} from 'react-native';
 
 import Animated, {
   Easing,
   SharedValue,
+  runOnJS,
   runOnUI,
   useAnimatedReaction,
   useAnimatedStyle,
@@ -15,6 +16,8 @@ import Animated, {
 import {ReorderableCellContext, ReorderableListContext} from '../contexts';
 import {useContext} from '../hooks';
 import {applyAnimatedStyles} from './helpers';
+import {ReorderableListDropIndicator} from './ReorderableListDropIndicator';
+import {ReorderableListRenderItem} from '../types';
 
 interface ReorderableListCellProps<T>
   extends Omit<CellRendererProps<T>, 'cellKey'> {
@@ -24,12 +27,14 @@ interface ReorderableListCellProps<T>
   dragXY: SharedValue<number>;
   draggedIndex: SharedValue<number>;
   animationDuration: SharedValue<number>;
+  renderDropIndicator?: ReorderableListRenderItem<T>;
 }
 
 export const ReorderableListCell = memo(
   <T,>({
     index,
     startDrag,
+    item,
     children,
     onLayout,
     itemOffset,
@@ -37,9 +42,11 @@ export const ReorderableListCell = memo(
     dragXY,
     draggedIndex,
     animationDuration,
+    renderDropIndicator,
   }: ReorderableListCellProps<T>) => {
     const {
       currentIndex,
+      dropIndicatorTranslationXY,
       draggedSize,
       activeIndex,
       cellAnimations,
@@ -51,6 +58,8 @@ export const ReorderableListCell = memo(
       () => runOnUI(startDrag)(index),
       [startDrag, index],
     );
+
+    const [showDropIndicator, setShowDropIndicator] = useState(false);
 
     const isActive = activeIndex === index;
     const contextValue = useMemo(
@@ -67,7 +76,20 @@ export const ReorderableListCell = memo(
     // otherwise animations might stutter if multiple are triggered
     // (even in other cells, e.g. released item and reordering cells)
     const itemTranslateXY = useSharedValue(0);
-    const isActiveCell = useDerivedValue(() => draggedIndex.value === index);
+
+    const isActiveCell = useDerivedValue(() => {
+      const value = draggedIndex.value === index;
+
+      if (renderDropIndicator) {
+        if (value) {
+          runOnJS(setShowDropIndicator)(true);
+        } else if (showDropIndicator) {
+          runOnJS(setShowDropIndicator)(false);
+        }
+      }
+
+      return value;
+    });
 
     useAnimatedReaction(
       () => dragXY.value,
@@ -161,7 +183,17 @@ export const ReorderableListCell = memo(
           layout={itemLayoutAnimation.current}>
           {children}
         </Animated.View>
+        {showDropIndicator && renderDropIndicator && (
+          <ReorderableListDropIndicator
+            index={index}
+            item={item}
+            animationDuration={animationDuration}
+            dropIndicatorTranslationXY={dropIndicatorTranslationXY}
+            renderDropIndicator={renderDropIndicator}
+          />
+        )}
       </ReorderableCellContext.Provider>
     );
   },
-);
+  // Memo breaks type inference, we cast it to maintain it.
+) as <T>(props: ReorderableListCellProps<T>) => JSX.Element;

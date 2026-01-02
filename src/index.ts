@@ -16,6 +16,8 @@ import type {
   ReorderableListDragStartEvent,
   ReorderableListIndexChangeEvent,
   ReorderableListProps,
+  ReorderableListRenderItem,
+  ReorderableListRenderItemInfo,
   ReorderableListReorderEvent,
   ScrollViewContainerProps,
 } from './types';
@@ -28,6 +30,8 @@ export {
   useReorderableDragEnd,
   NestedReorderableListProps,
   ReorderableListProps,
+  ReorderableListRenderItem,
+  ReorderableListRenderItemInfo,
   ReorderableListReorderEvent,
   ReorderableListCellAnimations,
   ReorderableListDragStartEvent,

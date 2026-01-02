@@ -4,6 +4,7 @@ import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {ActiveItemScreen} from './ActiveItem';
 import {CustomAnimationsScreen} from './CustomAnimations';
 import {DragEnableScreen} from './DragEnable';
+import {DropIndicatorScreen} from './DropIndicator';
 import {DynamicSizesScreen} from './DynamicSizes';
 import {FloatingHeaderFooterScreen} from './FloatingHeaderFooter';
 import {HeaderFooterScreen} from './HeaderFooter';
@@ -86,6 +87,11 @@ const screens = [
     id: '13',
     name: 'Drag Enable',
     component: DragEnableScreen,
+  },
+  {
+    id: '14',
+    name: 'Drop Indicator',
+    component: DropIndicatorScreen,
   },
 ] as const;
 

@@ -65,6 +65,15 @@ type OmittedProps =
   | 'CellRendererComponent'
   | 'numColumns';
 
+export interface ReorderableListRenderItemInfo<T> {
+  item: T;
+  index: number;
+}
+
+export type ReorderableListRenderItem<T> = (
+  info: ReorderableListRenderItemInfo<T>,
+) => React.ReactElement | null;
+
 export interface ReorderableListProps<T>
   extends Omit<FlatListProps<T>, OmittedProps> {
   data: T[];
@@ -174,6 +183,10 @@ export interface ReorderableListProps<T>
    * Event fired when the index of the dragged item changes. Needs to be a `worklet`. See [Reanimated docs](https://docs.swmansion.com/react-native-reanimated) for further info.
    */
   onIndexChange?: (event: ReorderableListIndexChangeEvent) => void;
+  /**
+   * A render function to customise the drop indicator, which shows where an item will be dropped. If not provided, no drop indicator will be displayed.
+   */
+  renderDropIndicator?: ReorderableListRenderItem<T>;
 }
 
 export type Transforms = PerspectiveTransform &

@@ -103,6 +103,7 @@ const ReorderableListCore = <T,>(
     panGesture,
     panEnabled = true,
     panActivateAfterLongPress,
+    renderDropIndicator,
     data,
     keyExtractor,
     ...rest
@@ -156,6 +157,7 @@ const ReorderableListCore = <T,>(
   const opacityDefault = useSharedValue(1);
   const dragDirection = useSharedValue(0);
   const lastDragDirectionPivot = useSharedValue<number | null>(null);
+  const dropIndicatorTranslationXY = useSharedValue(0);
 
   const itemLayoutAnimationPropRef = useRef(itemLayoutAnimation);
   itemLayoutAnimationPropRef.current = itemLayoutAnimation;
@@ -236,6 +238,7 @@ const ReorderableListCore = <T,>(
       draggedIndex,
       dragEndHandlers,
       activeIndex,
+      dropIndicatorTranslationXY,
       itemLayoutAnimation: itemLayoutAnimationPropRef,
       horizontal: horizontalProp,
       cellAnimations: {
@@ -253,6 +256,7 @@ const ReorderableListCore = <T,>(
     [
       draggedSize,
       currentIndex,
+      dropIndicatorTranslationXY,
       draggedIndex,
       dragEndHandlers,
       activeIndex,
@@ -604,11 +608,22 @@ const ReorderableListCore = <T,>(
 
     if (currentIndex.value !== newIndex) {
       recomputeLayout(currentIndex.value, newIndex);
+
       currentIndex.value = newIndex;
+      // After recomputing the layout we can update the drop indicator translation,
+      // it now matches the offset for the new index.
+      dropIndicatorTranslationXY.value = itemOffset.value[newIndex];
 
       onIndexChange?.({index: newIndex});
     }
-  }, [currentIndex, computeCurrentIndex, recomputeLayout, onIndexChange]);
+  }, [
+    currentIndex,
+    dropIndicatorTranslationXY,
+    itemOffset,
+    computeCurrentIndex,
+    recomputeLayout,
+    onIndexChange,
+  ]);
 
   const runDefaultDragAnimations = useCallback(
     (type: 'start' | 'end') => {
@@ -999,6 +1014,7 @@ const ReorderableListCore = <T,>(
           scrollViewScrollOffsetXY?.value || 0;
 
         draggedSize.value = itemSize.value[index];
+        dropIndicatorTranslationXY.value = itemOffset.value[index];
         draggedIndex.value = index;
         currentIndex.value = index;
         state.value = ReorderableListState.DRAGGED;
@@ -1019,6 +1035,8 @@ const ReorderableListCore = <T,>(
       scrollViewDragInitialScrollOffsetXY,
       setScrollEnabled,
       currentIndex,
+      dropIndicatorTranslationXY,
+      itemOffset,
       draggedSize,
       draggedIndex,
       state,
@@ -1109,6 +1127,7 @@ const ReorderableListCore = <T,>(
         draggedIndex={draggedIndex}
         animationDuration={animationDurationProp}
         startDrag={startDrag}
+        renderDropIndicator={renderDropIndicator}
       />
     ),
   );
