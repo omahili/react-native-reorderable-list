@@ -74,6 +74,24 @@ interface ReorderableListCoreProps<T> extends ReorderableListProps<T> {
   scrollable: boolean | undefined;
 }
 
+type ScrollableNodeStyleSnapshot = {
+  overflow: string;
+  overflowX: string;
+  overflowY: string;
+  touchAction: string;
+};
+
+type ScrollableNodeStyle = {
+  overflow?: string;
+  overflowX?: string;
+  overflowY?: string;
+  touchAction?: string;
+};
+
+type ScrollableNode = {
+  style: ScrollableNodeStyle;
+};
+
 const ReorderableListCore = <T,>(
   {
     autoscrollThreshold = 0.1,
@@ -114,6 +132,9 @@ const ReorderableListCore = <T,>(
 
   const flatListRef = useAnimatedRef<FlatList>();
   const markedCellsRef = useRef<Map<string, 1>>();
+  const webScrollableNodeStyleRef = useRef<ScrollableNodeStyleSnapshot | null>(
+    null,
+  );
   const [activeIndex, setActiveIndex] = useState(-1);
   const prevItemCount = useRef(data.length);
 
@@ -422,11 +443,16 @@ const ReorderableListCore = <T,>(
     return panGestureHandler;
   }, [panActivateAfterLongPress, panEnabled, panGestureHandler]);
 
-  const gestureHandler = useMemo(
-    () =>
-      Gesture.Simultaneous(Gesture.Native(), panGestureHandlerWithPropOptions),
-    [panGestureHandlerWithPropOptions],
-  );
+  const gestureHandler = useMemo(() => {
+    if (Platform.OS === 'web') {
+      return panGestureHandlerWithPropOptions;
+    }
+
+    return Gesture.Simultaneous(
+      Gesture.Native(),
+      panGestureHandlerWithPropOptions,
+    );
+  }, [panGestureHandlerWithPropOptions]);
 
   const setScrollEnabled = useCallback(
     (enabled: boolean) => {
@@ -436,6 +462,46 @@ const ReorderableListCore = <T,>(
       // On web setNativeProps API is not available, so disabling scroll is controlled by a state.
       // On Android/iOS we can keep using setNativeProps which performs better and doesn't require re-renders.
       if (Platform.OS === 'web') {
+        try {
+          const scrollableNode = flatListRef.current?.getScrollableNode?.();
+          const hasStyle =
+            scrollableNode &&
+            typeof scrollableNode === 'object' &&
+            'style' in scrollableNode;
+
+          if (hasStyle) {
+            const {style} = scrollableNode as ScrollableNode;
+            if (!enabled) {
+              if (!webScrollableNodeStyleRef.current) {
+                webScrollableNodeStyleRef.current = {
+                  overflow: style.overflow || '',
+                  overflowX: style.overflowX || '',
+                  overflowY: style.overflowY || '',
+                  touchAction: style.touchAction || '',
+                };
+              }
+
+              style.overflow = 'hidden';
+              style.overflowX = 'hidden';
+              style.overflowY = 'hidden';
+              style.touchAction = 'none';
+            } else if (webScrollableNodeStyleRef.current) {
+              style.overflow = webScrollableNodeStyleRef.current.overflow;
+              style.overflowX = webScrollableNodeStyleRef.current.overflowX;
+              style.overflowY = webScrollableNodeStyleRef.current.overflowY;
+              style.touchAction = webScrollableNodeStyleRef.current.touchAction;
+              webScrollableNodeStyleRef.current = null;
+            } else {
+              style.overflow = '';
+              style.overflowX = '';
+              style.overflowY = '';
+              style.touchAction = '';
+            }
+          }
+        } catch (_) {
+          // Keep state-based fallback if DOM manipulation fails.
+        }
+
         setForceDisableScroll(!enabled);
 
         if (setScrollViewForceDisableScroll) {

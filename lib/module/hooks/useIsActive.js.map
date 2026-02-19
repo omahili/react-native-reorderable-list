@@ -1,0 +1,1 @@
+{"version":3,"names":["useContext","ReorderableCellContext","useIsActive","isActive"],"sourceRoot":"../../../src","sources":["hooks/useIsActive.ts"],"mappings":"AAAA,SAAQA,UAAU,QAAO,cAAc;AACvC,SAAQC,sBAAsB,QAAO,aAAa;AAElD,OAAO,MAAMC,WAAW,GAAGA,CAAA,KAAM;EAC/B,MAAM;IAACC;EAAQ,CAAC,GAAGH,UAAU,CAACC,sBAAsB,CAAC;EACrD,OAAOE,QAAQ;AACjB,CAAC","ignoreList":[]}

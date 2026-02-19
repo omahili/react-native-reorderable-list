@@ -1,0 +1,1 @@
+{"version":3,"names":["useContext","useReactContext","context","value","undefined"],"sourceRoot":"../../../src","sources":["hooks/useContext.ts"],"mappings":"AAAA,SAAQA,UAAU,IAAIC,eAAe,QAAO,OAAO;AAEnD,OAAO,MAAMD,UAAU,GAAOE,OAAqC,IAAK;EACtE,MAAMC,KAAK,GAAGF,eAAe,CAACC,OAAO,CAAC;EAEtC,IAAIC,KAAK,KAAKC,SAAS,EAAE;IACvB,OAAOD,KAAK;EACd;EAEA,MAAM,6DAA6D;AACrE,CAAC","ignoreList":[]}
