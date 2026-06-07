@@ -3,10 +3,10 @@ import {ListRenderItemInfo, StyleSheet, View} from 'react-native';
 
 import {runOnJS} from 'react-native-reanimated';
 import {
+  ReorderableListIndexChangeEvent,
   ReorderableListReorderEvent,
   reorderItems,
 } from 'react-native-reorderable-list';
-import {ReorderableListIndexChangeEvent} from 'src/types';
 
 import {
   ItemSeparator,

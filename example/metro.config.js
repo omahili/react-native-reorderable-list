@@ -2,7 +2,6 @@ const path = require('path');
 
 const {getDefaultConfig} = require('@react-native/metro-config');
 const escape = require('escape-string-regexp');
-const exclusionList = require('metro-config/src/defaults/exclusionList');
 const {
   wrapWithReanimatedMetroConfig,
 } = require('react-native-reanimated/metro-config');
@@ -28,10 +27,8 @@ const config = {
   resolver: {
     ...defaultConfig.resolver,
 
-    blacklistRE: exclusionList(
-      modules.map(
-        m => new RegExp(`^${escape(path.join(root, 'node_modules', m))}\\/.*$`),
-      ),
+    blacklistRE: modules.map(
+      m => new RegExp(`^${escape(path.join(root, 'node_modules', m))}\\/.*$`),
     ),
 
     extraNodeModules: modules.reduce((acc, name) => {
