@@ -927,10 +927,6 @@ const ReorderableListCore = <T,>(
             true,
           );
         }
-
-        // when autoscrolling user may not be moving his finger so we need
-        // to update the current position of the dragged item here
-        setCurrentIndex();
       }
     },
   );
@@ -950,6 +946,12 @@ const ReorderableListCore = <T,>(
     }
 
     if (state.value === ReorderableListState.AUTOSCROLL) {
+      // During autoscroll the user can keep the dragged item stationary in
+      // the autoscroll area. We need to update the current item index and
+      // it's best to do this on scroll change for it to be always up to date.
+      // See issue #68 for details.
+      setCurrentIndex();
+
       dragXY.value =
         currentTranslationXY.value +
         dragScrollTranslationXY.value +
@@ -977,6 +979,12 @@ const ReorderableListCore = <T,>(
         }
 
         if (state.value === ReorderableListState.AUTOSCROLL) {
+          // During autoscroll the user can keep the dragged item stationary in
+          // the autoscroll area. We need to update the current item index and
+          // it's best to do this on scroll change for it to be always up to date.
+          // See issue #68 for details.
+          setCurrentIndex();
+
           dragXY.value =
             currentTranslationXY.value +
             scrollViewDragScrollTranslationXY.value;
