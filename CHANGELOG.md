@@ -1,5 +1,12 @@
 
 
+## [0.18.1](https://github.com/omahili/react-native-reorderable-list/compare/v0.18.0...v0.18.1) (2026-07-12)
+
+
+### Bug Fixes
+
+* keep drop position in sync during autoscroll ([23c514e](https://github.com/omahili/react-native-reorderable-list/commit/23c514e5301a6d27c0b45c2b919518743edc9a2e)), closes [#68](https://github.com/omahili/react-native-reorderable-list/issues/68)
+
 # [0.18.0](https://github.com/omahili/react-native-reorderable-list/compare/v0.17.0...v0.18.0) (2026-01-02)
 
 
