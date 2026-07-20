@@ -60,6 +60,9 @@ const AnimatedFlatList = Animated.createAnimatedComponent(
   props: FlatListProps<T> & {ref?: React.Ref<FlatList<T>>},
 ) => React.ReactElement;
 
+// Stable default so the empty case doesn't allocate a new array each render.
+const EMPTY_LOCKED_INDICES: number[] = [];
+
 interface ReorderableListCoreProps<T> extends ReorderableListProps<T> {
   // Not optional but undefined to force passing the prop.
   scrollViewContainerRef: RefObject<ScrollView> | undefined;
@@ -98,6 +101,7 @@ const ReorderableListCore = <T,>(
     outerScrollGesture,
     cellAnimations,
     dragEnabled = true,
+    lockedIndices,
     shouldUpdateActiveItem,
     itemLayoutAnimation,
     panGesture,
@@ -170,6 +174,9 @@ const ReorderableListCore = <T,>(
     autoscrollActivationDelta,
   );
   const dragEnabledProp = usePropAsSharedValue(dragEnabled ?? true);
+  const lockedIndicesProp = usePropAsSharedValue(
+    lockedIndices ?? EMPTY_LOCKED_INDICES,
+  );
   const horizontalProp = usePropAsSharedValue(!!rest.horizontal);
 
   // Position of the list relative to the scroll container
@@ -571,6 +578,13 @@ const ReorderableListCore = <T,>(
         ? Math.max(0, currentIndex.value - 1)
         : Math.min(max - 1, currentIndex.value + 1);
 
+    // A locked index is a wall: refuse to step onto it. Since the index only
+    // ever moves one position at a time, walling the immediate neighbour also
+    // prevents crossing a locked item, so it never shifts.
+    if (lockedIndicesProp.value.includes(possibleIndex)) {
+      return currentIndex.value;
+    }
+
     if (currentIndex.value !== possibleIndex) {
       let possibleOffset = itemOffset.value[possibleIndex];
       if (possibleIndex > currentIndex.value) {
@@ -599,6 +613,7 @@ const ReorderableListCore = <T,>(
     itemSize,
     flatListScrollOffsetXY,
     scrollViewDragScrollTranslationXY,
+    lockedIndicesProp,
   ]);
 
   const setCurrentIndex = useCallback(() => {
@@ -1007,6 +1022,11 @@ const ReorderableListCore = <T,>(
         return;
       }
 
+      // A locked item can't be dragged.
+      if (lockedIndicesProp.value.includes(index)) {
+        return;
+      }
+
       // Allow new drag when item is completely released.
       if (state.value === ReorderableListState.IDLE) {
         // Resetting shared values again fixes a flickeing bug in nested lists where
@@ -1036,6 +1056,7 @@ const ReorderableListCore = <T,>(
     },
     [
       dragEnabledProp,
+      lockedIndicesProp,
       resetSharedValues,
       shouldUpdateActiveItem,
       dragInitialScrollOffsetXY,

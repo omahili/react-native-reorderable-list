@@ -10,6 +10,7 @@ import {FloatingHeaderFooterScreen} from './FloatingHeaderFooter';
 import {HeaderFooterScreen} from './HeaderFooter';
 import {IndexChangeScreen} from './IndexChange';
 import {LayoutAnimationsScreen} from './LayoutAnimations';
+import {LockedItemsScreen} from './LockedItems';
 import {MultipleListsScreen} from './MultipleLists';
 import {NestedListsScreen} from './NestedLists';
 import {NestedScrollableListsScreen} from './NestedScrollableLists';
@@ -92,6 +93,11 @@ const screens = [
     id: '14',
     name: 'Drop Indicator',
     component: DropIndicatorScreen,
+  },
+  {
+    id: '15',
+    name: 'Locked Items',
+    component: LockedItemsScreen,
   },
 ] as const;
 
