@@ -140,6 +140,13 @@ export interface ReorderableListProps<T>
    */
   dragEnabled?: boolean;
   /**
+   * Indices of items that are locked in place. A locked item can't be dragged,
+   * and a dragged item can't be moved across it, so the locked item never
+   * shifts. Indices are positional (they refer to the item at that position in
+   * `data`, not a specific item). Default: `[]`.
+   */
+  lockedIndices?: number[];
+  /**
    * Whether the active item should be updated. Enables usage of `useIsActive` hook. Default: `false`.
    */
   shouldUpdateActiveItem?: boolean;
