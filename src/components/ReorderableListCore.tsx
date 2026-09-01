@@ -179,6 +179,7 @@ const ReorderableListCore = <T,>(
 	const dragDirection = useSharedValue(0);
 	const lastDragDirectionPivot = useSharedValue<number | null>(null);
 	const dropIndicatorTranslationXY = useSharedValue(0);
+	const hasReleasedThisDrag = useSharedValue(false);
 
 	const itemLayoutAnimationPropRef = useRef(itemLayoutAnimation);
 	itemLayoutAnimationPropRef.current = itemLayoutAnimation;
@@ -738,6 +739,11 @@ const ReorderableListCore = <T,>(
 				(state.value === ReorderableListState.DRAGGED ||
 					state.value === ReorderableListState.AUTOSCROLL)
 			) {
+				if (hasReleasedThisDrag.value) {
+					return;
+				}
+				hasReleasedThisDrag.value = true;
+
 				state.value = ReorderableListState.RELEASED;
 
 				// enable back scroll on releasing
@@ -1086,6 +1092,8 @@ const ReorderableListCore = <T,>(
 
 			// Allow new drag when item is completely released.
 			if (state.value === ReorderableListState.IDLE) {
+				hasReleasedThisDrag.value = false;
+
 				// Resetting shared values again fixes a flickeing bug in nested lists where
 				// after scrolling the parent list it would offset the new dragged item in another nested list.
 				resetSharedValues();
