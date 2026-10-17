@@ -12,7 +12,6 @@ import {
   CellRendererProps,
   FlatList,
   FlatListProps,
-  InteractionManager,
   LayoutChangeEvent,
   Platform,
   ScrollView,
@@ -53,6 +52,21 @@ import {
 } from './constants';
 import {ReorderableListCell} from './ReorderableListCell';
 import {usePropAsSharedValue, useStableCallback} from '../hooks';
+
+// InteractionManager was removed in React Native 0.87; requestIdleCallback is the replacement
+// React Native recommends. Older React Native type definitions don't declare it, and some
+// browsers (react-native-web on Safari) don't have it, so fall back to a timeout there.
+declare function requestIdleCallback(callback: () => void): number;
+declare function cancelIdleCallback(handle: number): void;
+
+const runWhenIdle = (task: () => void): (() => void) => {
+  if (typeof requestIdleCallback === 'function') {
+    const handle = requestIdleCallback(task);
+    return () => cancelIdleCallback(handle);
+  }
+  const timeout = setTimeout(task, 1);
+  return () => clearTimeout(timeout);
+};
 
 const AnimatedFlatList = Animated.createAnimatedComponent(
   FlatList,
@@ -204,8 +218,8 @@ const ReorderableListCore = <T,>(
       return;
     }
 
-    // Can be heavy to loop through all items, defer the task to run after interactions.
-    const task = InteractionManager.runAfterInteractions(() => {
+    // Can be heavy to loop through all items, defer the task until the JS thread is idle.
+    const cancel = runWhenIdle(() => {
       if (!markedCellsRef.current) {
         return;
       }
@@ -221,9 +235,7 @@ const ReorderableListCore = <T,>(
       markedCellsRef.current = map;
     });
 
-    return () => {
-      task.cancel();
-    };
+    return cancel;
   }, [data]);
 
   const createCellKey = useCallback((cellKey: string) => {
