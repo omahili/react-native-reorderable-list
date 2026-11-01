@@ -1,5 +1,12 @@
 
 
+## [0.18.3](https://github.com/omahili/react-native-reorderable-list/compare/v0.18.2...v0.18.3) (2026-11-01)
+
+
+### Bug Fixes
+
+* reorder when item dropped in its exact slot ([cf3bd79](https://github.com/omahili/react-native-reorderable-list/commit/cf3bd792464e464b4aad06faa0c67083cf6f3f2d)), closes [#75](https://github.com/omahili/react-native-reorderable-list/issues/75)
+
 ## [0.18.2](https://github.com/omahili/react-native-reorderable-list/compare/v0.18.1...v0.18.2) (2026-10-18)
 
 
