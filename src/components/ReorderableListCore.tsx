@@ -683,7 +683,7 @@ const ReorderableListCore = <T,>(
         runDefaultDragAnimations('end');
 
         if (dragXY.value !== newPositionXY) {
-          // Animate dragged item to its new position on release.
+          // Animate dragged item to its new slot on release.
           dragXY.value = withTiming(
             newPositionXY,
             {
@@ -694,6 +694,9 @@ const ReorderableListCore = <T,>(
               runOnJS(reorder)(draggedIndex.value, currentIndex.value);
             },
           );
+        } else if (draggedIndex.value !== currentIndex.value) {
+          // User might drag and release the item exactly on its target slot.
+          runOnJS(reorder)(draggedIndex.value, currentIndex.value);
         } else {
           // User might drag and release the item without moving it so,
           // since the animation end callback is not executed in that case
