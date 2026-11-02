@@ -79,6 +79,7 @@ const ReorderableListCore = <T,>(
     autoscrollThreshold = 0.1,
     autoscrollThresholdOffset,
     autoscrollSpeedScale = 1,
+    autoscrollSpeedByDepth = false,
     autoscrollDelay = AUTOSCROLL_CONFIG.delay,
     autoscrollActivationDelta = 5,
     animationDuration = 200,
@@ -861,6 +862,58 @@ const ReorderableListCore = <T,>(
     scrollable,
   ]);
 
+  // How deep the dragged item is in the autoscroll area: 0 at the area's inner edge,
+  // 1 when dragged past the list's edge by the area's size.
+  const autoscrollDepth = useCallback(() => {
+    'worklet';
+
+    const ratio = (past: number, area: number) =>
+      Math.min(1, Math.max(0, past / Math.max(1, area * 2)));
+
+    const relativeContainerXY = getRelativeContainerXY();
+    if (shouldScrollContainer(relativeContainerXY)) {
+      const thresholdArea = computeContainerThresholdArea();
+      const size = scrollViewSize ? scrollViewSize.value : 0;
+      if (relativeContainerXY <= thresholdArea.start) {
+        return ratio(
+          thresholdArea.start - relativeContainerXY,
+          thresholdArea.start,
+        );
+      }
+
+      if (relativeContainerXY >= thresholdArea.end) {
+        return ratio(
+          relativeContainerXY - thresholdArea.end,
+          size - thresholdArea.end,
+        );
+      }
+    } else if (scrollable) {
+      const relativeListXY = getRelativeListXY();
+      const thresholdArea = computeThresholdArea();
+      if (relativeListXY <= thresholdArea.start) {
+        return ratio(thresholdArea.start - relativeListXY, thresholdArea.start);
+      }
+
+      if (relativeListXY >= thresholdArea.end) {
+        return ratio(
+          relativeListXY - thresholdArea.end,
+          flatListSize.value - thresholdArea.end,
+        );
+      }
+    }
+
+    return 0;
+  }, [
+    shouldScrollContainer,
+    computeThresholdArea,
+    computeContainerThresholdArea,
+    getRelativeContainerXY,
+    getRelativeListXY,
+    scrollable,
+    scrollViewSize,
+    flatListSize,
+  ]);
+
   useAnimatedReaction(
     () => currentXY.value,
     () => {
@@ -896,10 +949,17 @@ const ReorderableListCore = <T,>(
         autoscrollTrigger.value !== lastAutoscrollTrigger.value &&
         state.value === ReorderableListState.AUTOSCROLL
       ) {
-        const autoscrollIncrement =
-          dragDirection.value *
-          AUTOSCROLL_CONFIG.increment *
-          autoscrollSpeedScale;
+        // With autoscrollSpeedByDepth the list scrolls a little every frame, without animation,
+        // so the distance per frame sets the speed: 2 px at the area's inner edge up to 28 px
+        // when dragged past the list's edge by the area's size. Animated steps would wait for
+        // each animation to finish, which hides any change in step size.
+        const autoscrollIncrement = autoscrollSpeedByDepth
+          ? dragDirection.value *
+            autoscrollSpeedScale *
+            (2 + 26 * autoscrollDepth() ** 2)
+          : dragDirection.value *
+            AUTOSCROLL_CONFIG.increment *
+            autoscrollSpeedScale;
 
         if (autoscrollIncrement !== 0) {
           let scrollOffset = flatListScrollOffsetXY.value;
@@ -923,7 +983,7 @@ const ReorderableListCore = <T,>(
             listRef,
             horizontalProp.value ? scrollToValue : 0,
             horizontalProp.value ? 0 : scrollToValue,
-            true,
+            !autoscrollSpeedByDepth,
           );
         }
       }
@@ -958,7 +1018,7 @@ const ReorderableListCore = <T,>(
 
       lastAutoscrollTrigger.value = autoscrollTrigger.value;
       autoscrollTrigger.value = withDelay(
-        autoscrollDelay,
+        autoscrollSpeedByDepth ? 0 : autoscrollDelay,
         withTiming(autoscrollTrigger.value * -1, {duration: 0}),
       );
     }
@@ -990,7 +1050,7 @@ const ReorderableListCore = <T,>(
 
           lastAutoscrollTrigger.value = autoscrollTrigger.value;
           autoscrollTrigger.value = withDelay(
-            autoscrollDelay,
+            autoscrollSpeedByDepth ? 0 : autoscrollDelay,
             withTiming(autoscrollTrigger.value * -1, {duration: 0}),
           );
         }

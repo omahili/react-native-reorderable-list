@@ -113,6 +113,13 @@ export interface ReorderableListProps<T>
    */
   autoscrollSpeedScale?: number;
   /**
+   * Scrolls faster the deeper the dragged item goes into the autoscroll area, instead of at a fixed speed.
+   * The list then scrolls continuously, a little every frame: 2 px per frame at the area's inner edge,
+   * up to 28 px per frame when the item is dragged past the list's edge by the area's size.
+   * `autoscrollSpeedScale` multiplies it; `autoscrollDelay` doesn't apply. Default: `false`.
+   */
+  autoscrollSpeedByDepth?: boolean;
+  /**
    * Delay in between autoscroll triggers. Can be used to tune the autoscroll smoothness.
    * Default Android: `0`.
    * Default iOS: `100`.
