@@ -79,6 +79,7 @@ const ReorderableListCore = <T,>(
     autoscrollThreshold = 0.1,
     autoscrollThresholdOffset,
     autoscrollSpeedScale = 1,
+    autoscrollSpeedByDepth = false,
     autoscrollDelay = AUTOSCROLL_CONFIG.delay,
     autoscrollActivationDelta = 5,
     animationDuration = 200,
@@ -861,6 +862,58 @@ const ReorderableListCore = <T,>(
     scrollable,
   ]);
 
+  // How deep the dragged item is in the autoscroll area: 0 at the area's inner edge,
+  // 1 when dragged past the list's edge by the area's size.
+  const autoscrollDepth = useCallback(() => {
+    'worklet';
+
+    const ratio = (past: number, area: number) =>
+      Math.min(1, Math.max(0, past / Math.max(1, area * 2)));
+
+    const relativeContainerXY = getRelativeContainerXY();
+    if (shouldScrollContainer(relativeContainerXY)) {
+      const thresholdArea = computeContainerThresholdArea();
+      const size = scrollViewSize ? scrollViewSize.value : 0;
+      if (relativeContainerXY <= thresholdArea.start) {
+        return ratio(
+          thresholdArea.start - relativeContainerXY,
+          thresholdArea.start,
+        );
+      }
+
+      if (relativeContainerXY >= thresholdArea.end) {
+        return ratio(
+          relativeContainerXY - thresholdArea.end,
+          size - thresholdArea.end,
+        );
+      }
+    } else if (scrollable) {
+      const relativeListXY = getRelativeListXY();
+      const thresholdArea = computeThresholdArea();
+      if (relativeListXY <= thresholdArea.start) {
+        return ratio(thresholdArea.start - relativeListXY, thresholdArea.start);
+      }
+
+      if (relativeListXY >= thresholdArea.end) {
+        return ratio(
+          relativeListXY - thresholdArea.end,
+          flatListSize.value - thresholdArea.end,
+        );
+      }
+    }
+
+    return 0;
+  }, [
+    shouldScrollContainer,
+    computeThresholdArea,
+    computeContainerThresholdArea,
+    getRelativeContainerXY,
+    getRelativeListXY,
+    scrollable,
+    scrollViewSize,
+    flatListSize,
+  ]);
+
   useAnimatedReaction(
     () => currentXY.value,
     () => {
@@ -896,10 +949,14 @@ const ReorderableListCore = <T,>(
         autoscrollTrigger.value !== lastAutoscrollTrigger.value &&
         state.value === ReorderableListState.AUTOSCROLL
       ) {
+        const depthScale = autoscrollSpeedByDepth
+          ? 0.25 + 1.25 * autoscrollDepth() ** 2
+          : 1;
         const autoscrollIncrement =
           dragDirection.value *
           AUTOSCROLL_CONFIG.increment *
-          autoscrollSpeedScale;
+          autoscrollSpeedScale *
+          depthScale;
 
         if (autoscrollIncrement !== 0) {
           let scrollOffset = flatListScrollOffsetXY.value;

@@ -113,6 +113,13 @@ export interface ReorderableListProps<T>
    */
   autoscrollSpeedScale?: number;
   /**
+   * Scrolls faster the deeper the dragged item goes into the autoscroll area, instead of at a fixed speed.
+   * Speed starts at a quarter of the base speed at the area's inner edge and reaches 1.5 times the base speed
+   * when the item is dragged past the list's edge by the area's size. Combine with `autoscrollSpeedScale` to tune it.
+   * Default: `false`.
+   */
+  autoscrollSpeedByDepth?: boolean;
+  /**
    * Delay in between autoscroll triggers. Can be used to tune the autoscroll smoothness.
    * Default Android: `0`.
    * Default iOS: `100`.
