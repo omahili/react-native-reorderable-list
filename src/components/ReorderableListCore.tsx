@@ -949,14 +949,17 @@ const ReorderableListCore = <T,>(
         autoscrollTrigger.value !== lastAutoscrollTrigger.value &&
         state.value === ReorderableListState.AUTOSCROLL
       ) {
-        const depthScale = autoscrollSpeedByDepth
-          ? 0.25 + 1.25 * autoscrollDepth() ** 2
-          : 1;
-        const autoscrollIncrement =
-          dragDirection.value *
-          AUTOSCROLL_CONFIG.increment *
-          autoscrollSpeedScale *
-          depthScale;
+        // With autoscrollSpeedByDepth the list scrolls a little every frame, without animation,
+        // so the distance per frame sets the speed: 2 px at the area's inner edge up to 28 px
+        // when dragged past the list's edge by the area's size. Animated steps would wait for
+        // each animation to finish, which hides any change in step size.
+        const autoscrollIncrement = autoscrollSpeedByDepth
+          ? dragDirection.value *
+            autoscrollSpeedScale *
+            (2 + 26 * autoscrollDepth() ** 2)
+          : dragDirection.value *
+            AUTOSCROLL_CONFIG.increment *
+            autoscrollSpeedScale;
 
         if (autoscrollIncrement !== 0) {
           let scrollOffset = flatListScrollOffsetXY.value;
@@ -980,7 +983,7 @@ const ReorderableListCore = <T,>(
             listRef,
             horizontalProp.value ? scrollToValue : 0,
             horizontalProp.value ? 0 : scrollToValue,
-            true,
+            !autoscrollSpeedByDepth,
           );
         }
       }
@@ -1015,7 +1018,7 @@ const ReorderableListCore = <T,>(
 
       lastAutoscrollTrigger.value = autoscrollTrigger.value;
       autoscrollTrigger.value = withDelay(
-        autoscrollDelay,
+        autoscrollSpeedByDepth ? 0 : autoscrollDelay,
         withTiming(autoscrollTrigger.value * -1, {duration: 0}),
       );
     }
@@ -1047,7 +1050,7 @@ const ReorderableListCore = <T,>(
 
           lastAutoscrollTrigger.value = autoscrollTrigger.value;
           autoscrollTrigger.value = withDelay(
-            autoscrollDelay,
+            autoscrollSpeedByDepth ? 0 : autoscrollDelay,
             withTiming(autoscrollTrigger.value * -1, {duration: 0}),
           );
         }
