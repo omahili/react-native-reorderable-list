@@ -1111,11 +1111,28 @@ const ReorderableListCore = <T,>(
   const combinedGesture = useMemo(() => {
     // Android is able to handle nested scroll view, but not the full size ones like iOS.
     if (outerScrollGesture && !(Platform.OS === 'android' && scrollable)) {
-      return Gesture.Simultaneous(outerScrollGesture, gestureHandler);
+      // Relate to the container's gesture without attaching it to this
+      // detector as well: a gesture belongs to one GestureDetector, and with
+      // several nested lists in one container only the last list mounted kept
+      // the relation, so dragging on any earlier list did not scroll.
+      const nativeGesture =
+        Gesture.Native().simultaneousWithExternalGesture(outerScrollGesture);
+      panGestureHandlerWithPropOptions.simultaneousWithExternalGesture(
+        outerScrollGesture,
+      );
+      return Gesture.Simultaneous(
+        nativeGesture,
+        panGestureHandlerWithPropOptions,
+      );
     }
 
     return gestureHandler;
-  }, [scrollable, outerScrollGesture, gestureHandler]);
+  }, [
+    scrollable,
+    outerScrollGesture,
+    gestureHandler,
+    panGestureHandlerWithPropOptions,
+  ]);
 
   const composedScrollHandler = useComposedEventHandler([
     handleScroll,
